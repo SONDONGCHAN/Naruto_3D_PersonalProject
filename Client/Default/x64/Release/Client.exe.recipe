@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\x64\Release\Client.exe</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles>
+    <ContentFile>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\x64\Release\Shader_VtxAnimMesh.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\x64\Release\Shader_VtxMesh.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\x64\Release\Shader_VtxNorTex.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\x64\Release\Shader_VtxPosTex.cso</FullPath>
+    </ContentFile>
+  </ContentFiles>
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

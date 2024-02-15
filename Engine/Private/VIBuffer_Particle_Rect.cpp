@@ -1,0 +1,176 @@
+#include "VIBuffer_Particle_Rect.h"
+
+CVIBuffer_Particle_Rect::CVIBuffer_Particle_Rect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CVIBuffer_Instancing(pDevice, pContext)
+{
+}
+
+CVIBuffer_Particle_Rect::CVIBuffer_Particle_Rect(const CVIBuffer_Particle_Rect& rhs)
+    : CVIBuffer_Instancing(rhs)
+{
+}
+
+HRESULT CVIBuffer_Particle_Rect::Initialize_Prototype(_uint iNumInstance)
+{
+	if (FAILED(__super::Initialize_Prototype()))
+		return E_FAIL;
+
+	m_iNumVertexBuffers = 2;
+	m_iVertexStride = sizeof(VTXPOSTEX);
+	m_iNumVertices = 4;
+
+	m_iNumInstance = iNumInstance;
+	m_iIndexCountPerInstance = 6;
+	m_iIndexStride = 2;
+	m_iNumIndices = m_iIndexCountPerInstance * m_iNumInstance;
+	m_eIndexFormat = m_iIndexStride == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
+	m_ePrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+#pragma region VERTEX_BUFFER
+
+	m_BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.StructureByteStride = m_iVertexStride;
+
+	VTXPOSTEX* pVertices = new VTXPOSTEX[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXPOSTEX) * m_iNumVertices);
+	
+	pVertices[0].vPosition = _float3(-0.5f, 0.5f, 0.f);
+	pVertices[0].vTexcoord = _float2(0.f, 0.f);
+
+	pVertices[1].vPosition = _float3(0.5f, 0.5f, 0.f);
+	pVertices[1].vTexcoord = _float2(1.f, 0.f);
+
+	pVertices[2].vPosition = _float3(0.5f, -0.5f, 0.f);
+	pVertices[2].vTexcoord = _float2(1.f, 1.f);
+
+	pVertices[3].vPosition = _float3(-0.5f, -0.5f, 0.f);
+	pVertices[3].vTexcoord = _float2(0.f, 1.f);
+
+	m_InitialData.pSysMem = pVertices;
+
+	if (FAILED(__super::Create_Buffer(&m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+
+#pragma endregion
+
+#pragma region INDEX_BUFFER
+
+	m_BufferDesc.ByteWidth				= m_iIndexStride * m_iNumIndices;
+	m_BufferDesc.Usage					= D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags			= 0;
+	m_BufferDesc.MiscFlags				= 0;
+	m_BufferDesc.StructureByteStride	= 0;
+
+	_ushort* pIndices = new _ushort[m_iNumIndices];
+	ZeroMemory(pIndices, sizeof(_ushort) * m_iNumIndices);
+
+	_uint			iNumIndices = { 0 };
+
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		pIndices[iNumIndices++] = 0;
+		pIndices[iNumIndices++] = 1;
+		pIndices[iNumIndices++] = 2;
+
+		pIndices[iNumIndices++] = 0;
+		pIndices[iNumIndices++] = 2;
+		pIndices[iNumIndices++] = 3;
+	}
+
+	m_InitialData.pSysMem = pIndices;
+
+	if (FAILED(__super::Create_Buffer(&m_pIB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pIndices);
+
+#pragma endregion
+
+    return S_OK;
+}
+
+HRESULT CVIBuffer_Particle_Rect::Initialize(void* pArg)
+{
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	m_iInstanceStride = sizeof(VTXINSTANCE);
+
+	m_BufferDesc.ByteWidth			= m_iInstanceStride * m_iNumInstance;
+	m_BufferDesc.Usage				= D3D11_USAGE_DYNAMIC;
+	m_BufferDesc.BindFlags			= D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
+	m_BufferDesc.MiscFlags			= 0;
+	m_BufferDesc.StructureByteStride = m_iVertexStride;
+
+	VTXINSTANCE* pVertices = new VTXINSTANCE[m_iNumInstance];
+	ZeroMemory(pVertices, sizeof(VTXINSTANCE) * m_iNumInstance);
+
+	uniform_real_distribution<float>	WidthRange(m_InstanceData.vRange.x * -0.5f, m_InstanceData.vRange.x * 0.5f);
+	uniform_real_distribution<float>	HeightRange(m_InstanceData.vRange.y * -0.5f, m_InstanceData.vRange.y * 0.5f);
+	uniform_real_distribution<float>	DepthRange(m_InstanceData.vRange.z * -0.5f, m_InstanceData.vRange.z * 0.5f);
+	uniform_real_distribution<float>	SizeRange(m_InstanceData.vSize.x, m_InstanceData.vSize.y);
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		_float		fSize = SizeRange(m_RandomNumber);
+
+		pVertices[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
+		pVertices[i].vUp = _float4(0.f, fSize, 0.f, 0.f);
+		pVertices[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
+		pVertices[i].vTranslation = _float4(
+			m_InstanceData.vCenter.x + WidthRange(m_RandomNumber),
+			m_InstanceData.vCenter.y + HeightRange(m_RandomNumber),
+			m_InstanceData.vCenter.z + DepthRange(m_RandomNumber),
+			1.f);
+		pVertices[i].vColor = m_InstanceData.vColor;
+	}
+
+	m_InitialData.pSysMem = pVertices;
+
+	if (FAILED(__super::Create_Buffer(&m_pVBInstance)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+
+    return S_OK;
+}
+
+CVIBuffer_Particle_Rect* CVIBuffer_Particle_Rect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iNumInstance)
+{
+	CVIBuffer_Particle_Rect* pInstance = new CVIBuffer_Particle_Rect(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype(iNumInstance)))
+	{
+		MSG_BOX("Failed to Created : CVIBuffer_Particle_Rect");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CComponent* CVIBuffer_Particle_Rect::Clone(void* pArg)
+{
+	CVIBuffer_Particle_Rect* pInstance = new CVIBuffer_Particle_Rect(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : CVIBuffer_Particle_Rect");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CVIBuffer_Particle_Rect::Free()
+{
+	__super::Free();
+}
