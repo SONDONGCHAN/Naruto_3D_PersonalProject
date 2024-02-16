@@ -1,4 +1,53 @@
-﻿  UI_Player_Skills.cpp
-  UI_Player_Status.cpp
+﻿  BackGround.cpp
+  Body_Boss_Naruto.cpp
+  Body_Monster_LeafNinja.cpp
+  Body_Monster_Samurai.cpp
+  Body_Player_Custom_Face.cpp
+  Body_Player_Custom_HeadGear.cpp
+  Body_Player_Custom_Lower.cpp
+  Body_Player_Custom_Upper.cpp
+  Body_Player_Naruto.cpp
+  Boss_Naruto.cpp
+  Camera_Free.cpp
+  Chidori.cpp
+  Deco.cpp
+  FlameBomb.cpp
+  Item.cpp
+  Kamui.cpp
+  LandObject.cpp
+  Level_CustomRoom.cpp
+  Level_GamePlay.cpp
+  Level_Loading.cpp
   코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  Level_Logo.cpp
+  Loader.cpp
+  MainApp.cpp
+  Map.cpp
+  Monster_LeafNinja.cpp
+  Monster_Samurai.cpp
+  PartObject.cpp
+  Particle_Point.cpp
+  Particle_Rect.cpp
+  Player.cpp
+  Player_Custom.cpp
+  Player_Naruto.cpp
+  RasenShuriken.cpp
+  Rasengun.cpp
+  Rasengun_Super.cpp
+  Skill.cpp
+  Terrain.cpp
+  Trail_Line.cpp
+  UI.cpp
+  UI_Player_Skills.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  UI_Player_Status.cpp
+  Weapon.cpp
+  Wood_Dragon.cpp
+  Wood_Hand.cpp
+  Wood_Swap.cpp
+  코드를 생성하고 있습니다...
+  Client.cpp
+  LINK : ..\Bin\Client.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
   Client.vcxproj -> C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Client.exe
