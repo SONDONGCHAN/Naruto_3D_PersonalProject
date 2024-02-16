@@ -2,33 +2,36 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Client.exe</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Client.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxAnimMesh.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxAnimMesh.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxAnimMesh_OutLine.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxAnimMesh_OutLine.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxMesh.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxMesh.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxNorTex.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxNorTex.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxPointInstance.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxPointInstance.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxPoint_Trail.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxPoint_Rect.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxPosTex.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxPoint_Trail.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Shader_VtxRectInstance.cso</FullPath>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxPosTex.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Shader_VtxRectInstance.cso</FullPath>
     </ContentFile>
   </ContentFiles>
   <SatelliteDlls />

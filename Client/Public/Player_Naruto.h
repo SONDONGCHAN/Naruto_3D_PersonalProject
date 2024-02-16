@@ -105,12 +105,15 @@ private:
 	map<const wstring, class CPartObject*>		m_PlayerParts;
 	map<const wstring, class CSkill*>			m_PlayerSkills;
 	map<const wstring, class CTrail_Line*>		m_PlayerTrails;
+	map<const wstring, class CUI*>				m_PlayerUIs;
 
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Add_Skills();
 	HRESULT Add_Trails();
+	HRESULT Add_UIs();
+
 
 public:
 	static CPlayer_Naruto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

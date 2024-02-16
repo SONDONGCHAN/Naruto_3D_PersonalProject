@@ -1,10 +1,10 @@
 #pragma once
 #include "Client_Defines.h"
-#include "C:\Users\dhqks\Desktop\3DPersonal_Client\Reference\Headers\GameObject.h"
+#include "GameObject.h"
 
 BEGIN(Engine)
 class CShader;
-class CVIBuffer_Line;
+class CVIBuffer_Point;
 END
 
 BEGIN(Client)
@@ -33,12 +33,12 @@ public:
 
 private:
 	CShader*		m_pShaderCom = { nullptr };
-	CVIBuffer_Line*	m_pVIBufferCom = { nullptr };
+	CVIBuffer_Point*	m_pVIBufferCom = { nullptr };
 	CTransform*		m_pParentTransform = { nullptr };
 
 	_float4x4*		m_pSocketMatrix = { nullptr };
 	_float4x4		m_WorldMatrix_Current;
-	_float4x4		m_WorldMatrix_Old[30];
+	_float4x4		m_WorldMatrix_Old[60];
 	_matrix  		m_OriginalMat = {};
 
 

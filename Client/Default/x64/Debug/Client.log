@@ -1,8 +1,4 @@
-﻿  BackGround.cpp
-  Level_CustomRoom.cpp
-  Level_Loading.cpp
-  Level_Logo.cpp
-  Loader.cpp
-  MainApp.cpp
+﻿  UI_Player_Skills.cpp
+  UI_Player_Status.cpp
   코드를 생성하고 있습니다...
-  Client.vcxproj -> C:\Users\dhqks\Desktop\3DPersonal_Client\Client\Bin\Client.exe
+  Client.vcxproj -> C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Client.exe

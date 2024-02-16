@@ -166,7 +166,7 @@
     <Filter Include="01. Utility\04. Component\Navigation\Cell">
       <UniqueIdentifier>{d07602fa-ca2e-4bdc-bb0b-eca896e0d528}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Line">
+    <Filter Include="01. Utility\04. Component\VIBuffer\Point">
       <UniqueIdentifier>{2f6d71de-1191-4959-b700-4f1914f94d40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -333,8 +333,8 @@
     <ClInclude Include="..\Public\Target_Manager.h">
       <Filter>01. Utility\08. RenderTargets\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\VIBuffer_Line.h">
-      <Filter>01. Utility\04. Component\VIBuffer\Line</Filter>
+    <ClInclude Include="..\Public\VIBuffer_Point.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Point</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -488,8 +488,8 @@
     <ClCompile Include="..\Private\Target_Manager.cpp">
       <Filter>01. Utility\08. RenderTargets\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\VIBuffer_Line.cpp">
-      <Filter>01. Utility\04. Component\VIBuffer\Line</Filter>
+    <ClCompile Include="..\Private\VIBuffer_Point.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Point</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

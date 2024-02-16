@@ -25,6 +25,9 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint_Trail.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint_Rect.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -158,6 +161,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Trail_Line.cpp">
       <Filter>02.GameObjects\Effect\Trail\Line</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI.cpp">
+      <Filter>02.GameObjects\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Player_Status.cpp">
+      <Filter>02.GameObjects\UI\UI_Player_Status</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Player_Skills.cpp">
+      <Filter>02.GameObjects\UI\UI_Player_Skills</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -301,6 +313,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Trail_Line.h">
       <Filter>02.GameObjects\Effect\Trail\Line</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI.h">
+      <Filter>02.GameObjects\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Player_Status.h">
+      <Filter>02.GameObjects\UI\UI_Player_Status</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Player_Skills.h">
+      <Filter>02.GameObjects\UI\UI_Player_Skills</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -485,6 +506,12 @@
     </Filter>
     <Filter Include="02.GameObjects\UI">
       <UniqueIdentifier>{7045e499-8b46-43ae-80d1-9070364f309b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\UI_Player_Status">
+      <UniqueIdentifier>{9723bf45-9ce7-49ec-b59d-d6dc00039f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\UI_Player_Skills">
+      <UniqueIdentifier>{d982bd63-6ab5-415a-a72b-eb1bf1a69609}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

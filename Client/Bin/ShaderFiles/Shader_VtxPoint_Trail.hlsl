@@ -54,19 +54,19 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> DataStream)
     float3 vUp      = normalize(cross(vLook, vRight));
 	matrix matVP    = mul(g_ViewMatrix, g_ProjMatrix);
     
-    Out[0].vPosition = In[0].vPosition + float4(vRight * 0.02f, 0.f) + float4(vLook + normalize(vLook) * 0.01f, 0.f);
+    Out[0].vPosition = In[0].vPosition - float4(vRight * 0.02f, 0.f) + float4(vLook + normalize(vLook) * 0.01f, 0.f);
     Out[0].vPosition = mul(Out[0].vPosition, matVP);
     Out[0].vTexcoord = float2(0.f, 0.f);
 
-    Out[1].vPosition = In[0].vPosition - float4(vRight * 0.02f, 0.f) + float4(vLook + normalize(vLook) * 0.01f, 0.f);
+    Out[1].vPosition = In[0].vPosition + float4(vRight * 0.02f, 0.f) + float4(vLook + normalize(vLook) * 0.01f, 0.f);
     Out[1].vPosition = mul(Out[1].vPosition, matVP);
     Out[1].vTexcoord = float2(1.f, 0.f);
 
-    Out[2].vPosition = In[0].vPosition - float4(vRight * 0.02f, 0.f) ;
+    Out[2].vPosition = In[0].vPosition + float4(vRight * 0.02f, 0.f) ;
     Out[2].vPosition = mul(Out[2].vPosition, matVP);
     Out[2].vTexcoord = float2(1.f, 1.f);
 
-    Out[3].vPosition = In[0].vPosition + float4(vRight * 0.02f, 0.f) ;
+    Out[3].vPosition = In[0].vPosition - float4(vRight * 0.02f, 0.f) ;
     Out[3].vPosition = mul(Out[3].vPosition, matVP);
     Out[3].vTexcoord = float2(0.f, 1.f);
 

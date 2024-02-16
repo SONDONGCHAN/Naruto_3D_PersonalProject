@@ -8,6 +8,10 @@
 #include "Rasengun_Super.h"
 #include "Wood_Swap.h"
 #include "Trail_Line.h"
+#include "UI_Player_Status.h"
+#include "UI_Player_Skills.h"
+
+
 
 CPlayer_Naruto::CPlayer_Naruto(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLandObject(pDevice, pContext)
@@ -46,6 +50,10 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 
 	if (FAILED(Add_Trails()))
 		return E_FAIL;
+
+	if (FAILED(Add_UIs()))
+		return E_FAIL;
+	
 	
 	_vector vStart_Pos = { -10.f, 0.f, -10.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
@@ -122,8 +130,6 @@ void CPlayer_Naruto::Tick(_float fTimeDelta)
 
 void CPlayer_Naruto::Late_Tick(_float fTimeDelta)
 {
-
-
 	for (auto& Pair : m_PlayerParts)
 		(Pair.second)->Late_Tick(fTimeDelta);
 
@@ -137,6 +143,8 @@ void CPlayer_Naruto::Late_Tick(_float fTimeDelta)
 		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Late_Tick(fTimeDelta);
 
 	
+	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
+		return;
 
 #ifdef _DEBUG
 	m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
@@ -147,18 +155,13 @@ void CPlayer_Naruto::Late_Tick(_float fTimeDelta)
 
 	for (auto& Pair : m_PlayerTrails)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+
+	for (auto& Pair : m_PlayerUIs)
+		Pair.second->Late_Tick(fTimeDelta);
 }
 
 HRESULT CPlayer_Naruto::Render()
 {
-
-//#ifdef _DEBUG
-//	m_pNavigationCom->Render();
-//	m_pColliderMain->Render();
-//	m_pColliderDetecting->Render();
-//	m_pColliderAttack->Render();
-//#endif
-
 	if (m_bSkillOn[SKILL_RASENGUN])
 		m_PlayerSkills.find(L"Skill_Rasengun")->second->Render();
 	if (m_bSkillOn[SKILL_RASENSHURIKEN])
@@ -1483,6 +1486,22 @@ HRESULT CPlayer_Naruto::Add_Trails()
 	return S_OK;
 }
 
+HRESULT CPlayer_Naruto::Add_UIs()
+{
+	CUI_Player_Status* pUIStatus = dynamic_cast<CUI_Player_Status*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Status")));
+	if (nullptr == pUIStatus)
+		return E_FAIL;
+	m_PlayerUIs.emplace(TEXT("UI_Player_Status"), pUIStatus);
+
+	CUI_Player_Skills* pUISkills = dynamic_cast<CUI_Player_Skills*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Skills")));
+	if (nullptr == pUISkills)
+		return E_FAIL;
+	m_PlayerUIs.emplace(TEXT("UI_Player_Skills"), pUISkills);
+
+
+	return S_OK;
+}
+
 CPlayer_Naruto* CPlayer_Naruto::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CPlayer_Naruto* pInstance = new CPlayer_Naruto(pDevice, pContext);
@@ -1523,6 +1542,12 @@ void CPlayer_Naruto::Free()
 	 for (auto& Pair : m_PlayerTrails)
 		Safe_Release(Pair.second);
 	m_PlayerTrails.clear();
+
+	for (auto& Pair : m_PlayerUIs)
+		Safe_Release(Pair.second);
+	m_PlayerUIs.clear();
+
+	
 	
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

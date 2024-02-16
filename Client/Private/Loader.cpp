@@ -35,6 +35,9 @@
 #include "Chidori.h"
 #include "Wood_Hand.h"
 #include "Weapon.h"
+#include "UI_Player_Status.h"
+#include "UI_Player_Skills.h"
+
 
 
 
@@ -184,6 +187,11 @@ HRESULT CLoader::Loading_For_CustomRoomLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Weapon/Weapon_SamuraiSword/Weapon_SamuraiSword.dat"))))
 		return E_FAIL;
 
+	m_strLoadingText = TEXT("버퍼를(을) 로딩 중 입니다.");
+	///////////Buffer///////////
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Point"),
+		CVIBuffer_Point::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Shader_VtxAnimMesh*/
@@ -198,7 +206,10 @@ HRESULT CLoader::Loading_For_CustomRoomLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
-
+	/* For.Prototype_Component_Shader_VtxPoint_Rect*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPoint_Rect"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPoint_Rect.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements))))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("객체원형를(을) 로딩 중 입니다.");
 	/* For.Prototype_GameObject_Camera_Free */
@@ -253,7 +264,40 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
 		return E_FAIL;
 
+	// 플레이어 상태 UI
+	/* For.Prototype_Component_Texture_Status */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_SP_Gauge_Base_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Icon_Rasengun_Super */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_Rasengan_Super_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Status_Hp */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status_Hp"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_Base2.png"), 1))))
+		return E_FAIL;
 
+	// 스킬 UI
+	/* For.Prototype_Component_Texture_Icon_Skill_Base */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Skill_Base"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Skill_Gauge_Base_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Icon_Rasengun */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_Rasengan_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Icon_RasenShuriken */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_RasenShuriken"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_TrueRasenShuriken_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Icon_WoodSwap */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Clone_BC.png"), 1))))
+		return E_FAIL;
+	
+
+	
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
 	//////////Player//////////
@@ -309,11 +353,6 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	/* For.Prototype_Component_VIBuffer_Particle_Point */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Particle_Point"),
 		CVIBuffer_Particle_Point::Create(m_pDevice, m_pContext, 2000))))
-		return E_FAIL;
-
-	///////////Buffer///////////
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Line"),
-		CVIBuffer_Line::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("네비게이션를(을) 로딩 중 입니다.");
@@ -438,20 +477,28 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	 CItem::Create(m_pDevice, m_pContext))))
 	 return E_FAIL;
 	
+	// ====이펙트====
 	/* For.Prototype_GameObject_Particle_Rect */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Rect"),
 	 CParticle_Rect::Create(m_pDevice, m_pContext))))
 	 return E_FAIL;
-	
 	/* For.Prototype_GameObject_Particle_Rect */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Point"),
 		CParticle_Point::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-
-
 	/* For.Prototype_GameObject_Trail_Line */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Trail_Line"),
 		CTrail_Line::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	// ====UI=====
+	/* For.Prototype_GameObject_UI_Player_Status*/
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Player_Status"),
+		CUI_Player_Status::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_UI_Player_Skills*/
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Player_Skills"),
+		CUI_Player_Skills::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

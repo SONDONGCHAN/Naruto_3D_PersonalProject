@@ -69,19 +69,6 @@ HRESULT CBody_Player_Naruto::Render()
 	
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 1, "g_DiffuseTexture")))
-			return E_FAIL;
-
-		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-			return E_FAIL;
-		
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
-
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
-
-
 		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
 			return E_FAIL;
 
@@ -95,20 +82,20 @@ HRESULT CBody_Player_Naruto::Render()
 			return E_FAIL;
 	}
 
-	//for (_uint i = 0; i < iNumMeshes; i++)
-	//{
-	//	if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
-	//		return E_FAIL;
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 1, "g_DiffuseTexture")))
+			return E_FAIL;
 
-	//	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderOutLine, "g_BoneMatrices", i)))
-	//		return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+		
+		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
 
-	//	if (FAILED(m_pShaderOutLine->Begin(0)))
-	//		return E_FAIL;
-
-	//	if (FAILED(m_pModelCom->Render(i)))
-	//		return E_FAIL;
-	//}
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;		
+	}
 
 	return S_OK;
 }

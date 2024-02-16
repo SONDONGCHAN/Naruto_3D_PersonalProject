@@ -61,16 +61,16 @@ HRESULT CTrail_Line::Render()
 	_float4x4		ProjMatrix = m_pGameInstance->Get_ProjMatrix_Float();
 	_float4			CameraPos = m_pGameInstance->Get_CameraPos_Float();
 	
-	for (_uint i = 29; i > 0; i--)
+	for (_uint i = 59; i > 0; i--)
 	{
 		m_WorldMatrix_Old[i] = m_WorldMatrix_Old[i - 1];
 	}
 	m_WorldMatrix_Old[0] = m_WorldMatrix_Current;
 
 	
-	for (_uint i = 0 ; i < 29 ; i++)
+	for (_uint i = 0 ; i < 59 ; i++)
 	{
-		_float fAlpha = 1.f - (1.f / 30.f) * i;
+		_float fAlpha = 1.f - (1.f / 60.f) * i;
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix_Old[i])))
 			return E_FAIL;
@@ -110,7 +110,7 @@ HRESULT CTrail_Line::Add_Component()
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Line"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Point"),
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 

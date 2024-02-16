@@ -187,6 +187,9 @@
     <ClInclude Include="..\Public\Skill.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Trail_Line.h" />
+    <ClInclude Include="..\Public\UI.h" />
+    <ClInclude Include="..\Public\UI_Player_Skills.h" />
+    <ClInclude Include="..\Public\UI_Player_Status.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Wood_Dragon.h" />
     <ClInclude Include="..\Public\Wood_Hand.h" />
@@ -235,6 +238,9 @@
     <ClCompile Include="..\Private\Skill.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Trail_Line.cpp" />
+    <ClCompile Include="..\Private\UI.cpp" />
+    <ClCompile Include="..\Private\UI_Player_Skills.cpp" />
+    <ClCompile Include="..\Private\UI_Player_Status.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Wood_Dragon.cpp" />
     <ClCompile Include="..\Private\Wood_Hand.cpp" />
@@ -276,6 +282,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPointInstance.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint_Rect.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint_Trail.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Client</EntryPointName>

@@ -5,7 +5,7 @@
 #include "Transform.h"
 #include "Navigation.h"
 #include "VIBuffer_Rect.h"
-#include "VIBuffer_Line.h"
+#include "VIBuffer_Point.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Particle_Rect.h"
 #include "VIBuffer_Particle_Point.h"
