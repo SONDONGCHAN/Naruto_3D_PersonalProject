@@ -43,11 +43,16 @@ protected:
 
 
 protected:
+	// ม฿ทย
 	_float	m_fGravity = 0.f;
 	_float	m_fMaxGravity = 0.3f;
 	_float	m_fGForcePersec	 = 1.f;
 	_bool	m_bOnAir = false;
 	_uint	m_iJumpState = 0;
+
+	_float	m_CurrentHp = 1000.f;
+	_float	m_MaxHp		= 1000.f;
+
 
 protected:
 	_bool Set_Gravity(class CTransform* pTargetTransform, _float fTimeDelta);

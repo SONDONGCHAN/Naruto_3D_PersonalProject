@@ -2,9 +2,9 @@
 
 matrix      g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix      g_WorldMatrix_Old;
-vector      g_vCamPosition;
 vector      g_vPosition_Old;
-float       g_fAlpha;
+vector      g_vColor;
+
 
 
 struct VS_IN
@@ -96,7 +96,9 @@ PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    Out.vColor = vector(113.f/255.f, 199.f/255.f, 236.f/255.f, g_fAlpha);
+    Out.vColor = g_vColor;
+    
+    //Out.vColor = vector(113.f/255.f, 199.f/255.f, 236.f/255.f, g_fAlpha);
   
     return Out;
 }

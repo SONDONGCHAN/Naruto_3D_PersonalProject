@@ -37,6 +37,8 @@
 #include "Weapon.h"
 #include "UI_Player_Status.h"
 #include "UI_Player_Skills.h"
+#include "UI_Player_Custom.h"
+
 
 
 
@@ -118,6 +120,7 @@ HRESULT CLoader::Loading_For_LogoLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Logo/Logo_Main.png"), 1))))
 		return E_FAIL;
 
+
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
 
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
@@ -136,6 +139,19 @@ HRESULT CLoader::Loading_For_CustomRoomLevel()
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_CUSTOMROOM, TEXT("Prototype_Component_Texture_CustomRoom"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CustomRoom/T_UI_Fcility_VRNijutsuTougijou_BC.png"), 1))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_CUSTOMROOM, TEXT("Prototype_Component_Texture_Custom_Base"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CustomRoom/UI/T_UI_Common_RoleItemWindow_BC.png"), 1))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_CUSTOMROOM, TEXT("Prototype_Component_Texture_Custom_Title"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CustomRoom/UI/T_UI_Common_RoleItem_WinTitle_BC.png"), 1))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_CUSTOMROOM, TEXT("Prototype_Component_Texture_Custom_Parts"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CustomRoom/UI/T_ui_Menu_Btn_05_Def_BC.png"), 1))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_CUSTOMROOM, TEXT("Prototype_Component_Texture_Custom_Parts_Sel"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/CustomRoom/UI/T_ui_Menu_Btn_05_Sel_BC.png"), 1))))
 		return E_FAIL;
 
 
@@ -247,6 +263,12 @@ HRESULT CLoader::Loading_For_CustomRoomLevel()
 		CWeapon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	// ====UI=====
+	/* For.Prototype_GameObject_UI_Player_Custom*/
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Player_Custom"),
+		CUI_Player_Custom::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
 
 	m_isFinished = true;
@@ -269,13 +291,17 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_SP_Gauge_Base_BC.png"), 1))))
 		return E_FAIL;
+	/* For.Prototype_Component_Texture_Status_Hp */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status_Hp"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_Base2.png"), 1))))
+		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_Rasengun_Super */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_Rasengan_Super_BC.png"), 1))))
 		return E_FAIL;
-	/* For.Prototype_Component_Texture_Status_Hp */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status_Hp"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_Base2.png"), 1))))
+	/* For.Prototype_Component_Texture_Icon_Kamui */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Kamui"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_SP_KamuiKakashi_BC.png"), 1))))
 		return E_FAIL;
 
 	// 스킬 UI
@@ -291,6 +317,20 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_RasenShuriken"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_TrueRasenShuriken_BC.png"), 1))))
 		return E_FAIL;
+	/* For.Prototype_Component_Texture_Icon_FireBall */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_FireBall"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_FireBall_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Icon_Chidori */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Chidori"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_Chidori_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Icon_WoodHand */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodHand"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_LaughingMonk_BC.png"), 1))))
+		return E_FAIL;
+
+
 	/* For.Prototype_Component_Texture_Icon_WoodSwap */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Clone_BC.png"), 1))))

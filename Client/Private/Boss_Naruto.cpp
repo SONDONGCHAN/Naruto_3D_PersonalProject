@@ -5,7 +5,7 @@
 #include "RasenShuriken.h"
 #include "Rasengun_Super.h"
 #include "Wood_Swap.h"
-
+#include "Trail_Line.h"
 #include "Player.h"
 
 CBoss_Naruto::CBoss_Naruto(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -42,6 +42,9 @@ HRESULT CBoss_Naruto::Initialize(void* pArg)
 	if (FAILED(Add_Skills()))
 		return E_FAIL;
 	
+	if (FAILED(Add_Trails()))
+		return E_FAIL;
+
 	m_CurrentState = MONSTER_STATE_IDLE;
 	_vector vStart_Pos = { 0.f, 0.f, 7.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
@@ -115,6 +118,9 @@ void CBoss_Naruto::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_DebugComponent(m_pColliderMain);
 	m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
 #endif
+
+	for (auto& Pair : m_MonsterTrails)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
 }
 
 HRESULT CBoss_Naruto::Render()
@@ -1130,6 +1136,30 @@ HRESULT CBoss_Naruto::Add_Skills()
 	if (nullptr == pWood_Swap)
 		return E_FAIL;
 	m_MonsterSkills.emplace(TEXT("Skill_Wood_Swap"), pWood_Swap);
+
+	return S_OK;
+}
+
+HRESULT CBoss_Naruto::Add_Trails()
+{
+	CTrail_Line::Trail_Line_DESC Trail_Line_L_Desc{};
+	Trail_Line_L_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_L_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("LeftFoot");
+	Trail_Line_L_Desc.eMyCharacter = CTrail_Line::MONSTER_NARUTO;
+	CTrail_Line* pTrail_Foot_L = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_L_Desc));
+	if (nullptr == pTrail_Foot_L)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Foot_L"), pTrail_Foot_L);
+
+
+	CTrail_Line::Trail_Line_DESC Trail_Line_R_Desc{};
+	Trail_Line_R_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_R_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("RightFoot");
+	Trail_Line_R_Desc.eMyCharacter = CTrail_Line::MONSTER_NARUTO;
+	CTrail_Line* pTrail_Foot_R = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_R_Desc));
+	if (nullptr == pTrail_Foot_R)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Foot_R"), pTrail_Foot_R);
 
 	return S_OK;
 }

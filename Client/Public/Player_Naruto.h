@@ -96,6 +96,8 @@ private:
 	SKILL_TYPE					m_Skill_Animation_State = { SKILL_END };
 	_bool						m_bSkillOn[SKILL_END] = { false, };
 	_float						m_fSkillDurTime = { 0.f };
+	_float						m_fSkillCoolTime[SKILL_END];
+	_float						m_fSkillCurrentCoolTime[SKILL_END];
 
 	// ¹«Àû
 	_bool						m_bInvincible = false;

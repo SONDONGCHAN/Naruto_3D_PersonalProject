@@ -64,6 +64,14 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 
 void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 {
+	for (_uint i = 0; i < SKILL_END; i++)
+	{
+		m_fSkillCurrentCoolTime[i] -= fTimeDelta;
+
+		if(m_fSkillCurrentCoolTime[i] <= 0)
+			m_fSkillCurrentCoolTime[i] = 0.f;
+	}
+
  	m_LockOnTargetLength = 99999.f;
 
 	for (auto& Pair : m_PlayerParts)
@@ -235,8 +243,12 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 	{
 		if(m_pGameInstance->Key_Down(DIK_Z))
 		{		
-			Use_Skill(L"Skill_Wood_Swap");
-			return;
+			if (m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP] <= 0.f)
+			{
+				m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP] = m_fSkillCoolTime[SKILL_WOOD_SWAP];
+				Use_Skill(L"Skill_Wood_Swap");
+				return;
+			}
 		}
 	}
 
@@ -559,18 +571,31 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 
 	else if (m_pGameInstance->Key_Down(DIK_1) )
 	{
-		Use_Skill(L"Skill_Rasengun");
-		return;
+		if (m_fSkillCurrentCoolTime[SKILL_RASENGUN] <= 0.f)
+		{
+			m_fSkillCurrentCoolTime[SKILL_RASENGUN] = m_fSkillCoolTime[SKILL_RASENGUN];
+			Use_Skill(L"Skill_Rasengun");
+			return;
+		}
 	}
 	else if (m_pGameInstance->Key_Down(DIK_2) )
 	{
-		Use_Skill(L"Skill_RasenShuriken");
-		return;
+		if (m_fSkillCurrentCoolTime[SKILL_RASENSHURIKEN] <= 0.f)
+		{
+			m_fSkillCurrentCoolTime[SKILL_RASENSHURIKEN] = m_fSkillCoolTime[SKILL_RASENSHURIKEN];
+			Use_Skill(L"Skill_RasenShuriken");
+			return;
+		}
+		
 	}
 	else if (m_pGameInstance->Key_Down(DIK_3))
 	{
-		Use_Skill(L"Skill_Rasengun_Super");
-		return;
+		if (m_fSkillCurrentCoolTime[SKILL_RASENGUN_SUPER] <= 0.f)
+		{
+			m_fSkillCurrentCoolTime[SKILL_RASENGUN_SUPER] = m_fSkillCoolTime[SKILL_RASENGUN_SUPER];
+			Use_Skill(L"Skill_Rasengun_Super");
+			return;
+		}
 	}
 	else if (m_pGameInstance->Key_Down(DIK_Q))
 	{
@@ -901,6 +926,7 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 			{
 				m_iState = PLAYER_THROW;
 				m_fDashSpeed = -15.f;
+				m_CurrentHp -= 20;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
@@ -909,6 +935,7 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 					m_iStruckState = 1;
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -15.f;
+				m_CurrentHp -= 10;
 			}
 		}
 	}
@@ -927,7 +954,7 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 	
 			m_iState = PLAYER_BEATEN_START;
 			m_fDashSpeed = -15.f;
-	
+			m_CurrentHp -= 30;
 		}
 	}
 	else if (strColliderLayerTag == L"Wood_Dragon_Collider" || strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
@@ -980,14 +1007,6 @@ void CPlayer_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 		
 	
 	}
-	else if (strColliderLayerTag == L"Monster_Attack_Collider")
-	{
-
-	}
-	else if (strColliderLayerTag == L"FlameBomb_Collider")
-	{
-
-	}
 	else if (strColliderLayerTag == L"Wood_Dragon_Collider" || strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
 	{
 		if (m_bInvincible)
@@ -1007,6 +1026,7 @@ void CPlayer_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 					m_iStruckState = 1;
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -4.f;
+				m_CurrentHp -= 10;
 			}
 			m_iGetAttackFrameCount--;
 		}
@@ -1042,6 +1062,7 @@ void CPlayer_Naruto::Collider_Event_Exit(const wstring& strColliderLayerTag, CCo
 			
 			m_iState = PLAYER_BEATEN_START;
 			m_fDashSpeed = -15.f;
+			m_CurrentHp -= 20;
 		}
 	}
 }
@@ -1424,7 +1445,8 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	if (nullptr == pRasengun)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Rasengun"), pRasengun);
-
+	m_fSkillCoolTime[SKILL_RASENGUN] = 7.f;
+	m_fSkillCurrentCoolTime[SKILL_RASENGUN] = 0.f;
 
 	// 나선 수리검
 	CRasenShuriken::SKILL_RASENSHURIKEN_DESC RasenShuriken_desc{};
@@ -1435,7 +1457,8 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	if (nullptr == pRasenShuriken)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_RasenShuriken"), pRasenShuriken);
-	
+	m_fSkillCoolTime[SKILL_RASENSHURIKEN] = 7.f;
+	m_fSkillCurrentCoolTime[SKILL_RASENSHURIKEN] = 0.f;
 	
 	// 초대옥 나선환
 	CRasengun_Super::SKILL_RASENGUN_SUPER_DESC Rasengun_Super_desc{};
@@ -1446,7 +1469,8 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	if (nullptr == pRasengun_Super)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Rasengun_Super"), pRasengun_Super);
-
+	m_fSkillCoolTime[SKILL_RASENGUN_SUPER] = 15.f;
+	m_fSkillCurrentCoolTime[SKILL_RASENGUN_SUPER] = 0.f;
 
 	// 통나무 바꿔치기 술
 	CWood_Swap::SKILL_WOOD_SWAP_DESC Wood_Swap_desc{};
@@ -1457,7 +1481,8 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	if (nullptr == pWood_Swap)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Wood_Swap"), pWood_Swap);
-	
+	m_fSkillCoolTime[SKILL_WOOD_SWAP] = 3.f;
+	m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP] = 0.f;
 
 	return S_OK;
 }
@@ -1467,7 +1492,7 @@ HRESULT CPlayer_Naruto::Add_Trails()
 	CTrail_Line::Trail_Line_DESC Trail_Line_L_Desc{};
 	Trail_Line_L_Desc.pParentTransform = m_pTransformCom;
 	Trail_Line_L_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("LeftFoot");
-
+	Trail_Line_L_Desc.eMyCharacter = CTrail_Line::PLAYER_NARUTO;
 	CTrail_Line* pTrail_Foot_L = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_L_Desc));
 	if (nullptr == pTrail_Foot_L)
 		return E_FAIL;
@@ -1477,7 +1502,7 @@ HRESULT CPlayer_Naruto::Add_Trails()
 	CTrail_Line::Trail_Line_DESC Trail_Line_R_Desc{};
 	Trail_Line_R_Desc.pParentTransform = m_pTransformCom;
 	Trail_Line_R_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("RightFoot");
-	
+	Trail_Line_R_Desc.eMyCharacter = CTrail_Line::PLAYER_NARUTO;
 	CTrail_Line* pTrail_Foot_R = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_R_Desc));
 	if (nullptr == pTrail_Foot_R)
 		return E_FAIL;
@@ -1488,12 +1513,27 @@ HRESULT CPlayer_Naruto::Add_Trails()
 
 HRESULT CPlayer_Naruto::Add_UIs()
 {
-	CUI_Player_Status* pUIStatus = dynamic_cast<CUI_Player_Status*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Status")));
+	CUI_Player_Status::UI_Player_Hp_DESC Hp_Desc{};
+	Hp_Desc.pCurrentHp			= &m_CurrentHp;
+	Hp_Desc.pMaxHp				= &m_MaxHp;
+	Hp_Desc.pCoolTime			= &m_fSkillCoolTime[SKILL_RASENGUN_SUPER];
+	Hp_Desc.pCurrentCoolTime	= &m_fSkillCurrentCoolTime[SKILL_RASENGUN_SUPER];
+	Hp_Desc.eMyCharacter = CUI_Player_Status::PLAYER_NARUTO;
+	CUI_Player_Status* pUIStatus = dynamic_cast<CUI_Player_Status*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Status"), &Hp_Desc));
 	if (nullptr == pUIStatus)
 		return E_FAIL;
 	m_PlayerUIs.emplace(TEXT("UI_Player_Status"), pUIStatus);
 
-	CUI_Player_Skills* pUISkills = dynamic_cast<CUI_Player_Skills*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Skills")));
+	CUI_Player_Skills::UI_Player_CoolTime_DESC Skill_Desc{};
+	Skill_Desc.pCoolTime[0] = &m_fSkillCoolTime[SKILL_RASENGUN];
+	Skill_Desc.pCurrentCoolTime[0] = &m_fSkillCurrentCoolTime[SKILL_RASENGUN];
+	Skill_Desc.pCoolTime[1] = &m_fSkillCoolTime[SKILL_RASENSHURIKEN];
+	Skill_Desc.pCurrentCoolTime[1] = &m_fSkillCurrentCoolTime[SKILL_RASENSHURIKEN];
+	Skill_Desc.pCoolTime[2] = &m_fSkillCoolTime[SKILL_WOOD_SWAP];
+	Skill_Desc.pCurrentCoolTime[2] = &m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP];
+	Skill_Desc.eMyCharacter = CUI_Player_Skills::PLAYER_NARUTO;
+	
+	CUI_Player_Skills* pUISkills = dynamic_cast<CUI_Player_Skills*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Skills"), &Skill_Desc));
 	if (nullptr == pUISkills)
 		return E_FAIL;
 	m_PlayerUIs.emplace(TEXT("UI_Player_Skills"), pUISkills);

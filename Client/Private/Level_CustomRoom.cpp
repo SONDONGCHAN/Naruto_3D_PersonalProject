@@ -73,6 +73,7 @@ HRESULT CLevel_CustomRoom::Ready_Layer_Player(const wstring& strLayerTag)
 
 HRESULT CLevel_CustomRoom::Ready_Layer_UI(const wstring& strLayerTag)
 {
+
     return S_OK;
 }
 
@@ -105,7 +106,7 @@ HRESULT CLevel_CustomRoom::Ready_Lights()
     LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
     LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
     LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
     
     if (FAILED(m_pGameInstance->Add_Light(LightDesc)))

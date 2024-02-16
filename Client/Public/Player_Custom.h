@@ -8,7 +8,7 @@ BEGIN(Client)
 class CPlayer_Custom : public CLandObject
 {
 	enum MOVEDIRECTION { DIR_FRONT, DIR_BACK, DIR_LEFT, DIR_RIGHT, DIR_FRONT_LEFT, DIR_FRONT_RIGHT, DIR_BACK_LEFT, DIR_BACK_RIGHT, DIR_END };
-	enum SKILL_TYPE { SKILL_WOOD_SWAP, SKILL_FLAMEBOMB, SKILL_KAMUI, SKILL_CHIDORI, SKILL_WOODHAND, SKILL_END };
+	enum SKILL_TYPE {SKILL_FLAMEBOMB, SKILL_CHIDORI, SKILL_WOODHAND, SKILL_WOOD_SWAP, SKILL_KAMUI, SKILL_END };
 
 private:
 	CPlayer_Custom(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -68,7 +68,9 @@ private:
 	CCollider* m_pColliderDetecting = { nullptr };
 	CCollider* m_pColliderAttack = { nullptr };
 
-	CModel* m_pBodyModelCom = { nullptr };
+	CModel* m_pBodyModelCom = { nullptr };	// 상체 모델
+	CModel* m_pBodyLowerCom = { nullptr };	// 하체 모델
+
 
 private:
 	// 상태
@@ -97,6 +99,8 @@ private:
 	SKILL_TYPE					m_Skill_Animation_State = { SKILL_END };
 	_bool						m_bSkillOn[SKILL_END] = { false, };
 	_float						m_fSkillDurTime = { 0.f };
+	_float						m_fSkillCoolTime[SKILL_END];
+	_float						m_fSkillCurrentCoolTime[SKILL_END];
 
 	// 무적
 	_bool						m_bInvincible = false;
@@ -108,14 +112,20 @@ private:
 	map<const wstring, class CPartObject*>		m_PlayerParts;
 	map<const wstring, class CPartObject*>		m_PlayerWeapon;
 	map<const wstring, class CSkill*>			m_PlayerSkills;
+	map<const wstring, class CTrail_Line*>		m_PlayerTrails;
+	map<const wstring, class CUI*>				m_PlayerUIs;
 
-
+	CUI* m_Player_Custom_UI;
 
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects(LEVEL CurrentLevel);
 	HRESULT Add_Weapon();
 	HRESULT Add_Skills();
+	HRESULT Add_Trails();
+	HRESULT Add_UIs();
+
+	HRESULT Add_CustomUI();
 
 
 public:

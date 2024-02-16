@@ -4,7 +4,6 @@
 
 BEGIN(Engine)
 class CShader;
-
 END
 
 

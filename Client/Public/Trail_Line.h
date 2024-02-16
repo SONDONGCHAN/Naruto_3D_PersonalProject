@@ -13,10 +13,13 @@ class CTrail_Line : public CGameObject
 {
 
 public:
+	enum PLAYER_CHARACTER { PLAYER_CUSTOM, PLAYER_NARUTO, MONSTER_NARUTO, PLAYER_END };
+
 	struct Trail_Line_DESC 
 	{
 		_float4x4*	pSocketMatrix;
-		CTransform* pParentTransform;;
+		CTransform* pParentTransform;
+		PLAYER_CHARACTER eMyCharacter;
 	};
 private:
 	CTrail_Line(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -32,16 +35,16 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CShader*		m_pShaderCom = { nullptr };
-	CVIBuffer_Point*	m_pVIBufferCom = { nullptr };
-	CTransform*		m_pParentTransform = { nullptr };
+	CShader*			m_pShaderCom		= { nullptr };
+	CVIBuffer_Point*	m_pVIBufferCom		= { nullptr };
+	CTransform*			m_pParentTransform	= { nullptr };
 
-	_float4x4*		m_pSocketMatrix = { nullptr };
-	_float4x4		m_WorldMatrix_Current;
-	_float4x4		m_WorldMatrix_Old[60];
-	_matrix  		m_OriginalMat = {};
-
-
+	_float4x4*			m_pSocketMatrix = { nullptr };
+	_float4x4			m_WorldMatrix_Current;
+	_float4x4			m_WorldMatrix_Old[60];
+	_matrix  			m_OriginalMat = {};
+	PLAYER_CHARACTER	m_eMyCharacter = { PLAYER_END };
+	_vector				m_vColor;
 
 private:
 	HRESULT Add_Component(); 

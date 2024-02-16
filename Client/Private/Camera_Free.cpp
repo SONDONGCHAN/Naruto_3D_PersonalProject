@@ -65,7 +65,7 @@ void CCamera_Free::Late_Tick(_float fTimeDelta)
 
 			// 카메라의 현재 위치와 목표위치를 선형보간하여 최종 위치를 잡아주자.
 			_vector CurrentCamPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-			_vector Lerf_Pos = XMVectorLerp(CurrentCamPos, TargetPos, 0.2f);
+			_vector Lerf_Pos = XMVectorLerp(CurrentCamPos, TargetPos, 0.13f);
 
 			//  Eye와 At을 설정해주자
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, Lerf_Pos);

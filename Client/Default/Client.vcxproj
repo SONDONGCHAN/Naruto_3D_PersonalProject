@@ -188,6 +188,7 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Trail_Line.h" />
     <ClInclude Include="..\Public\UI.h" />
+    <ClInclude Include="..\Public\UI_Player_Custom.h" />
     <ClInclude Include="..\Public\UI_Player_Skills.h" />
     <ClInclude Include="..\Public\UI_Player_Status.h" />
     <ClInclude Include="..\Public\Weapon.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Trail_Line.cpp" />
     <ClCompile Include="..\Private\UI.cpp" />
+    <ClCompile Include="..\Private\UI_Player_Custom.cpp" />
     <ClCompile Include="..\Private\UI_Player_Skills.cpp" />
     <ClCompile Include="..\Private\UI_Player_Status.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />

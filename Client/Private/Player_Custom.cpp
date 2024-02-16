@@ -8,10 +8,15 @@
 #include "Chidori.h"
 #include "Wood_Hand.h"
 #include "Wood_Swap.h"
+#include "Trail_Line.h"
 #include "Body_Player_Custom_Face.h"
 #include "Body_Player_Custom_HeadGear.h"
 #include "Body_Player_Custom_Upper.h"
 #include "Body_Player_Custom_Lower.h"
+#include "UI_Player_Status.h"
+#include "UI_Player_Skills.h"
+#include "UI_Player_Custom.h"
+
 
 
 CPlayer_Custom::CPlayer_Custom(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -53,6 +58,12 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(Add_Skills()))
 			 return E_FAIL;
 
+		 if (FAILED(Add_Trails()))
+			 return E_FAIL;
+
+		 if (FAILED(Add_UIs()))
+			 return E_FAIL;
+
 		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
 		 m_pTransformCom->Set_Pos(vStart_Pos);
 		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
@@ -74,6 +85,9 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(Add_Weapon()))
 			 return E_FAIL;
 
+		 if (FAILED(Add_CustomUI()))
+			 return E_FAIL;
+		 
 		 _vector vStart_Pos = { 0.8f, -0.2f, 0.f, 1.f };
 		 m_pTransformCom->Set_Pos(vStart_Pos);
 
@@ -101,6 +115,14 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 			(Pair.second)->Priority_Tick(fTimeDelta);
 		
 		return;
+	}
+
+	for (_uint i = 0; i < SKILL_END; i++)
+	{
+		m_fSkillCurrentCoolTime[i] -= fTimeDelta;
+	
+		if (m_fSkillCurrentCoolTime[i] <= 0)
+			m_fSkillCurrentCoolTime[i] = 0.f;
 	}
 
 	m_LockOnTargetLength = 99999.f;
@@ -190,6 +212,8 @@ void CPlayer_Custom::Late_Tick(_float fTimeDelta)
 		for (auto& Pair : m_PlayerWeapon)
 			(Pair.second)->Late_Tick(fTimeDelta);
 
+		m_Player_Custom_UI->Late_Tick(fTimeDelta);
+
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
 		return;
@@ -220,6 +244,14 @@ void CPlayer_Custom::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_DebugComponent(m_pColliderDetecting);
 	m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
 #endif
+
+	for (auto& Pair : m_PlayerTrails)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+
+	for (auto& Pair : m_PlayerUIs)
+		Pair.second->Late_Tick(fTimeDelta);
+
+
 }
 
 HRESULT CPlayer_Custom::Render()
@@ -367,8 +399,12 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 	{
 		if (m_pGameInstance->Key_Down(DIK_Z))
 		{
-			Use_Skill(L"Skill_Wood_Swap");
-			return;
+			if (m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP] <= 0.f)
+			{
+				m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP] = m_fSkillCoolTime[SKILL_WOOD_SWAP];
+				Use_Skill(L"Skill_Wood_Swap");
+				return;
+			}
 		}
 	}
 
@@ -694,26 +730,41 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 			return;
 		}
 	}
-
 	else if (m_pGameInstance->Key_Down(DIK_1))
 	{
-		Use_Skill(L"Skill_FlameBomb");
-		return;
+		if (m_fSkillCurrentCoolTime[SKILL_FLAMEBOMB] <= 0.f)
+		{
+			m_fSkillCurrentCoolTime[SKILL_FLAMEBOMB] = m_fSkillCoolTime[SKILL_FLAMEBOMB];
+			Use_Skill(L"Skill_FlameBomb");
+			return;
+		}
 	}
 	else if (m_pGameInstance->Key_Down(DIK_2))
 	{
-		Use_Skill(L"Skill_Kamui");
-		return;
+		if (m_fSkillCurrentCoolTime[SKILL_CHIDORI] <= 0.f)
+		{
+			m_fSkillCurrentCoolTime[SKILL_CHIDORI] = m_fSkillCoolTime[SKILL_CHIDORI];
+			Use_Skill(L"Skill_Chidori");
+			return;
+		}
 	}
 	else if (m_pGameInstance->Key_Down(DIK_3))
 	{
-		Use_Skill(L"Skill_Chidori");
-		return;
+		if (m_fSkillCurrentCoolTime[SKILL_WOODHAND] <= 0.f)
+		{
+			m_fSkillCurrentCoolTime[SKILL_WOODHAND] = m_fSkillCoolTime[SKILL_WOODHAND];
+			Use_Skill(L"Skill_Wood_Hand");
+			return;
+		}
 	}
 	else if (m_pGameInstance->Key_Down(DIK_4))
 	{
-		Use_Skill(L"Skill_Wood_Hand");
-		return;
+		if (m_fSkillCurrentCoolTime[SKILL_KAMUI] <= 0.f)
+		{
+			m_fSkillCurrentCoolTime[SKILL_KAMUI] = m_fSkillCoolTime[SKILL_KAMUI];
+			Use_Skill(L"Skill_Kamui");
+			return;
+		}
 	}
 	else if (m_pGameInstance->Key_Down(DIK_Q))
 	{
@@ -1044,6 +1095,7 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 			{
 				m_iState = PLAYER_THROW;
 				m_fDashSpeed = -15.f;
+				m_CurrentHp -= 20;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
@@ -1052,6 +1104,7 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 					m_iStruckState = 1;
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -15.f;
+				m_CurrentHp -= 20;
 			}
 		}
 	}
@@ -1070,7 +1123,7 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 
 			m_iState = PLAYER_BEATEN_START;
 			m_fDashSpeed = -15.f;
-
+			m_CurrentHp -= 30;
 		}
 	}
 	else if (strColliderLayerTag == L"Wood_Dragon_Collider" || strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
@@ -1124,14 +1177,6 @@ void CPlayer_Custom::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 
 
 	}
-	else if (strColliderLayerTag == L"Monster_Attack_Collider")
-	{
-
-	}
-	else if (strColliderLayerTag == L"FlameBomb_Collider")
-	{
-		
-	}
 	else if (strColliderLayerTag == L"Wood_Dragon_Collider" || strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
 	{
 		if (m_bInvincible)
@@ -1151,6 +1196,7 @@ void CPlayer_Custom::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 					m_iStruckState = 1;
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -4.f;
+				m_CurrentHp -= 10;
 			}
 			m_iGetAttackFrameCount--;
 		}
@@ -1186,6 +1232,7 @@ void CPlayer_Custom::Collider_Event_Exit(const wstring& strColliderLayerTag, CCo
 
 			m_iState = PLAYER_BEATEN_START;
 			m_fDashSpeed = -15.f;
+			m_CurrentHp -= 20;
 		}
 	}
 }
@@ -1625,8 +1672,14 @@ HRESULT CPlayer_Custom::Add_PartObjects(LEVEL CurrentLevel)
 	m_pBodyModelCom = pBody_Upper->Get_CurrentModel();
 	if (nullptr == m_pBodyModelCom)
 		return E_FAIL;
-
 	Safe_AddRef(m_pBodyModelCom);
+
+	m_pBodyLowerCom = pBody_Lower->Get_CurrentModel();
+	if (nullptr == m_pBodyLowerCom)
+		return E_FAIL;
+	Safe_AddRef(m_pBodyLowerCom);
+
+	
 	return S_OK;
 }
 
@@ -1666,7 +1719,7 @@ HRESULT CPlayer_Custom::Add_Weapon()
 }
 
 HRESULT CPlayer_Custom::Add_Skills()
-{
+{	
 	// 호화구의 술
 	CSkill::SKILL_DESC FlameBomb_desc{};
 	FlameBomb_desc.pParentTransform = m_pTransformCom;
@@ -1675,15 +1728,8 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pFlameBomb)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_FlameBomb"), pFlameBomb);
-   
-	// 카무이
-	CSkill::SKILL_DESC Kamui_desc{};
-	Kamui_desc.pParentTransform = m_pTransformCom;
-	Kamui_desc.User_Type = CSkill::USER_PLAYER;
-	CSkill* pKamui= dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Kamui"), &Kamui_desc));
-	if (nullptr == pKamui)
-		return E_FAIL;
-	m_PlayerSkills.emplace(TEXT("Skill_Kamui"), pKamui);
+	m_fSkillCoolTime[SKILL_FLAMEBOMB] = 7.f;
+	m_fSkillCurrentCoolTime[SKILL_FLAMEBOMB] = 0.f;
 
 	// 치도리
 	CChidori::SKILL_CHIDORI_DESC Chidori_desc{};
@@ -1694,6 +1740,8 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pChidori)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Chidori"), pChidori);
+	m_fSkillCoolTime[SKILL_CHIDORI] = 7.f;
+	m_fSkillCurrentCoolTime[SKILL_CHIDORI] = 0.f;
 
 	// 손뼉치기
 	CSkill::SKILL_DESC WoodHand_desc{};
@@ -1703,6 +1751,19 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pWoodHand)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Wood_Hand"), pWoodHand);
+	m_fSkillCoolTime[SKILL_WOODHAND] = 10.f;
+	m_fSkillCurrentCoolTime[SKILL_WOODHAND] = 0.f;
+
+	// 카무이
+	CSkill::SKILL_DESC Kamui_desc{};
+	Kamui_desc.pParentTransform = m_pTransformCom;
+	Kamui_desc.User_Type = CSkill::USER_PLAYER;
+	CSkill* pKamui = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Kamui"), &Kamui_desc));
+	if (nullptr == pKamui)
+		return E_FAIL;
+	m_PlayerSkills.emplace(TEXT("Skill_Kamui"), pKamui);
+	m_fSkillCoolTime[SKILL_KAMUI] = 15.f;
+	m_fSkillCurrentCoolTime[SKILL_KAMUI] = 0.f;
 
 	// 통나무 바꿔치기 술
 	CWood_Swap::SKILL_WOOD_SWAP_DESC Wood_Swap_desc{};
@@ -1713,7 +1774,75 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pWood_Swap)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Wood_Swap"), pWood_Swap);
+	m_fSkillCoolTime[SKILL_WOOD_SWAP] = 3.f;
+	m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP] = 0.f;
 
+	return S_OK;
+}
+
+HRESULT CPlayer_Custom::Add_Trails()
+{
+	CTrail_Line::Trail_Line_DESC Trail_Line_L_Desc{};
+	Trail_Line_L_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_L_Desc.pSocketMatrix = m_pBodyLowerCom->Get_CombinedBoneMatrixPtr("LeftFoot");
+	Trail_Line_L_Desc.eMyCharacter = CTrail_Line::PLAYER_CUSTOM;
+
+	CTrail_Line* pTrail_Foot_L = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_L_Desc));
+	if (nullptr == pTrail_Foot_L)
+		return E_FAIL;
+	m_PlayerTrails.emplace(TEXT("Trail_Line_Foot_L"), pTrail_Foot_L);
+
+
+	CTrail_Line::Trail_Line_DESC Trail_Line_R_Desc{};
+	Trail_Line_R_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_R_Desc.pSocketMatrix = m_pBodyLowerCom->Get_CombinedBoneMatrixPtr("RightFoot");
+	Trail_Line_R_Desc.eMyCharacter = CTrail_Line::PLAYER_CUSTOM;
+
+	CTrail_Line* pTrail_Foot_R = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_R_Desc));
+	if (nullptr == pTrail_Foot_R)
+		return E_FAIL;
+	m_PlayerTrails.emplace(TEXT("Trail_Line_Foot_R"), pTrail_Foot_R);
+
+	return S_OK;
+}
+
+HRESULT CPlayer_Custom::Add_UIs()
+{
+	CUI_Player_Status::UI_Player_Hp_DESC Hp_Desc{};
+	Hp_Desc.pCurrentHp			= &m_CurrentHp;
+	Hp_Desc.pMaxHp				= &m_MaxHp;
+	Hp_Desc.pCoolTime			= &m_fSkillCoolTime[SKILL_KAMUI];
+	Hp_Desc.pCurrentCoolTime	= &m_fSkillCurrentCoolTime[SKILL_KAMUI];
+	Hp_Desc.eMyCharacter		= CUI_Player_Status::PLAYER_CUSTOM;
+	CUI_Player_Status* pUIStatus = dynamic_cast<CUI_Player_Status*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Status"), &Hp_Desc));
+	if (nullptr == pUIStatus)
+		return E_FAIL;
+	m_PlayerUIs.emplace(TEXT("UI_Player_Status"), pUIStatus);
+	
+	CUI_Player_Skills::UI_Player_CoolTime_DESC Skill_Desc{};
+	Skill_Desc.pCoolTime[0] = &m_fSkillCoolTime[SKILL_FLAMEBOMB];
+	Skill_Desc.pCurrentCoolTime[0] = &m_fSkillCurrentCoolTime[SKILL_FLAMEBOMB];
+	Skill_Desc.pCoolTime[1] = &m_fSkillCoolTime[SKILL_CHIDORI];
+	Skill_Desc.pCurrentCoolTime[1] = &m_fSkillCurrentCoolTime[SKILL_CHIDORI];
+	Skill_Desc.pCoolTime[2] = &m_fSkillCoolTime[SKILL_WOODHAND];
+	Skill_Desc.pCurrentCoolTime[2] = &m_fSkillCurrentCoolTime[SKILL_WOODHAND];
+	Skill_Desc.pCoolTime[3] = &m_fSkillCoolTime[SKILL_WOOD_SWAP];
+	Skill_Desc.pCurrentCoolTime[3] = &m_fSkillCurrentCoolTime[SKILL_WOOD_SWAP];
+	Skill_Desc.eMyCharacter = CUI_Player_Skills::PLAYER_CUSTOM;
+	
+	CUI_Player_Skills* pUISkills = dynamic_cast<CUI_Player_Skills*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Skills"), &Skill_Desc));
+	if (nullptr == pUISkills)
+		return E_FAIL;
+	m_PlayerUIs.emplace(TEXT("UI_Player_Skills"), pUISkills);
+	
+	return S_OK;
+}
+
+HRESULT CPlayer_Custom::Add_CustomUI()
+{
+	m_Player_Custom_UI = dynamic_cast<CUI_Player_Custom*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Custom")));
+	if (nullptr == m_Player_Custom_UI)
+		return E_FAIL;
 
 	return S_OK;
 }

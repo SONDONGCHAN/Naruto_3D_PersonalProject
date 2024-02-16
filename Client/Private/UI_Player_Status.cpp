@@ -17,6 +17,13 @@ HRESULT CUI_Player_Status::Initialize_Prototype()
 
 HRESULT CUI_Player_Status::Initialize(void* pArg)
 {	
+	UI_Player_Hp_DESC* pHp_Desc = (UI_Player_Hp_DESC*)pArg;
+	m_pCurrent_Hp		= pHp_Desc->pCurrentHp;
+	m_pMax_Hp			= pHp_Desc->pMaxHp;
+	m_pCurrentCoolTime	= pHp_Desc->pCurrentCoolTime;
+	m_pCoolTime			= pHp_Desc->pCoolTime;
+	m_eMyCharacter		= pHp_Desc->eMyCharacter;
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -61,9 +68,31 @@ HRESULT CUI_Player_Status::Render()
 		if (FAILED(m_pShaderCom->Bind_RawValue("vSize", &(m_UI_Descs[i].vSize), sizeof(_float2))))
 			return E_FAIL;
 
-		if (i == 2)
+		if (i == 1)
+		{
+			iPassIndex = 2;
+			_float	fRatio = *m_pCurrentCoolTime / *m_pCoolTime;
+
+			if (fRatio <= 0)
+				fRatio = 0;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
+				return E_FAIL;
+
+		}
+		else if (i == 2)
+		{
 			iPassIndex = 1;
 
+			_float	fRatio = 1.f;
+			_vector vColor = { 0.8f, 0.f, 0.f, 1.f };
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+				return E_FAIL;
+		}
 		if (FAILED(m_pShaderCom->Begin(iPassIndex)))
 			return E_FAIL;
 
@@ -73,6 +102,39 @@ HRESULT CUI_Player_Status::Render()
 		if (FAILED(m_pVIBufferCom->Render()))
 			return E_FAIL;
 
+		if (i == 2)
+		{
+			if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+				return E_FAIL;
+
+			if (FAILED(pTextures->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("vSize", &(m_UI_Descs[i].vSize), sizeof(_float2))))
+				return E_FAIL;
+
+			_float	fRatio = *m_pCurrent_Hp / *m_pMax_Hp;
+
+			if (fRatio <= 0)
+				fRatio = 0;
+
+			_vector vColor = { 0.f, 0.8f, 0.f, 1.f };
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+				return E_FAIL;
+			
+			if (FAILED(m_pShaderCom->Begin(iPassIndex)))
+				return E_FAIL;
+			
+			if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+				return E_FAIL;
+			
+			if (FAILED(m_pVIBufferCom->Render()))
+				return E_FAIL;
+		}
 		i++;
 	}
 
@@ -90,18 +152,32 @@ HRESULT CUI_Player_Status::Add_Component()
 		return E_FAIL; 
 	m_Textures.push_back(m_pTextureBase);
 	
-	UI_Player_Status_DESC pUI_Desc_2;
-	pUI_Desc_2.vPos = { 110.f, 650.f };
-	pUI_Desc_2.vSize = { 70.f, 70.f };
-	m_UI_Descs.push_back(pUI_Desc_2);
-	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
-		TEXT("Com_Texture_Icon_Rasengun_Super"), reinterpret_cast<CComponent**>(&m_pTextureIcon))))
-		return E_FAIL;
-	m_Textures.push_back(m_pTextureIcon);
-	
+	if (m_eMyCharacter == PLAYER_NARUTO)
+	{
+		UI_Player_Status_DESC pUI_Desc_2;
+		pUI_Desc_2.vPos = { 105.f, 650.f };
+		pUI_Desc_2.vSize = { 65.f, 65.f };
+		m_UI_Descs.push_back(pUI_Desc_2);
+		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
+			TEXT("Com_Texture_Icon_Rasengun_Super"), reinterpret_cast<CComponent**>(&m_pTextureIcon))))
+			return E_FAIL;
+		m_Textures.push_back(m_pTextureIcon);
+	}
+	else if (m_eMyCharacter == PLAYER_CUSTOM)
+	{
+		UI_Player_Status_DESC pUI_Desc_2;
+		pUI_Desc_2.vPos = { 105.f, 650.f };
+		pUI_Desc_2.vSize = { 65.f, 65.f };
+		m_UI_Descs.push_back(pUI_Desc_2);
+		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Kamui"),
+			TEXT("Com_Texture_Icon_Kamui"), reinterpret_cast<CComponent**>(&m_pTextureIcon))))
+			return E_FAIL;
+		m_Textures.push_back(m_pTextureIcon);
+	}
+
 	UI_Player_Status_DESC pUI_Desc_3;
-	pUI_Desc_3.vPos = { 280.f, 666.f };
-	pUI_Desc_3.vSize = { 370.f, 40.f };
+	pUI_Desc_3.vPos = { 280.f, 665.f };
+	pUI_Desc_3.vSize = { 230.f, 18.f };
 	m_UI_Descs.push_back(pUI_Desc_3);
 	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status_Hp"),
 		TEXT("Com_Texture_Status_Hp"), reinterpret_cast<CComponent**>(&m_pTextureHp))))
@@ -142,8 +218,6 @@ void CUI_Player_Status::Free()
 	for (auto pTexture : m_Textures)
 		Safe_Release(pTexture);
 	m_Textures.clear();
-
-	Safe_Release(m_pVIBufferCom);
 
 	__super::Free();
 }

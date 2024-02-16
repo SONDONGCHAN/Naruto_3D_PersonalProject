@@ -11,11 +11,19 @@ BEGIN(Client)
 class CUI_Player_Skills : public CUI
 {
 public:
-	struct UI_Player_Skills_DESC : public CGameObject::GAMEOBJECT_DESC
+	enum PLAYER_CHARACTER {PLAYER_CUSTOM, PLAYER_NARUTO, PLAYER_END};
+
+	struct UI_Player_CoolTime_DESC : public CGameObject::GAMEOBJECT_DESC
+	{
+		_float*				pCurrentCoolTime[4];
+		_float*				pCoolTime[4];
+		PLAYER_CHARACTER	eMyCharacter;
+	};
+
+	struct UI_Player_Skills_DESC
 	{
 		_float2 vPos;
 		_float2 vSize;
-		_float*	fCoolTime;
 	};
 
 private:
@@ -42,6 +50,9 @@ private:
 private:
 	vector<UI_Player_Skills_DESC>	m_UI_Descs;
 	vector<CTexture*>				m_Textures;
+	_float*							m_pCurrentCoolTime[4];
+	_float*							m_pCoolTime[4];
+	PLAYER_CHARACTER				m_eMyCharacter = { PLAYER_END };
 
 private:
 	HRESULT Add_Component();
