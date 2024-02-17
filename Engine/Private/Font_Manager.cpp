@@ -14,13 +14,13 @@ HRESULT CFont_Manager::Initialize()
     return S_OK;
 }
 
-HRESULT CFont_Manager::Render(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vOrigin, _float fScale)
+HRESULT CFont_Manager::Render(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, FONT_ORIGIN_OPTION _option , _float fRotation, _float fScale)
 {
     CCustomFont* pFont = Find_Font(strFontTag);
     if (nullptr == pFont)
         return E_FAIL;
 
-    return pFont->Render(strText, vPosition, vColor, fRotation, vOrigin, fScale);
+    return pFont->Render(strText, vPosition, vColor, _option, fRotation, fScale);
 }
 
 HRESULT CFont_Manager::Add_Font(const wstring& strFontTag, const wstring& strFontFilePath)

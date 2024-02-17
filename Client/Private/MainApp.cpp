@@ -29,7 +29,10 @@ HRESULT CMainApp::Initialize()
 	//if (FAILED(Ready_Make_Texture()))
 	//	return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Font(TEXT("Font_Default"), TEXT("../Bin/Resources/Fonts/140.spritefont"))))
+	if (FAILED(m_pGameInstance->Add_Font(TEXT("Font_Maple"), TEXT("../Bin/Resources/Fonts/140.spritefont"))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Font(TEXT("Font_Arial"), TEXT("../Bin/Resources/Fonts/Arial.spritefont"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_Component_Static()))
@@ -56,8 +59,8 @@ HRESULT CMainApp::Render()
 		return E_FAIL;
 
 	// MakeSpriteFont "메이플스토리" /FontSize:30 /FastPack /CharacterRegion:0x0020-0x00FF /CharacterRegion:0x3131-0x3163 /CharacterRegion:0xAC00-0xD800 /DefaultCharacter:0xAC00 140.spritefont
-	if (FAILED(m_pGameInstance->Render_Font(TEXT("Font_Default"), TEXT("나루토"), _float2(0.f, 0.f), XMVectorSet(1.f, 1.f, 1.f, 1.f))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Render_Font(TEXT("Font_Default"), TEXT("테스트"), _float2(1280.f, 0.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), ORIGIN_RIGHT_TOP)))
+	//	return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Present()))
 		return E_FAIL;

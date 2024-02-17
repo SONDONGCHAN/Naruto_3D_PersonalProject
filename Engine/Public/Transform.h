@@ -40,6 +40,7 @@ public:
 
 		return XMLoadFloat4x4(&m_WorldMatrix);
 	}
+	_float4x4* Get_WorldMatrix_Pointer() { return &m_WorldMatrix; }
 
 	_matrix Get_WorldMatrix_Inverse() {
 		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));

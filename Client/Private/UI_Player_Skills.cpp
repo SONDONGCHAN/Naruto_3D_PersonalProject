@@ -26,8 +26,8 @@ HRESULT CUI_Player_Skills::Initialize(void* pArg)
 
 		m_pCurrentCoolTime[i]	= pCoolTime_Desc->pCurrentCoolTime[i];
 		m_pCoolTime[i]			= pCoolTime_Desc->pCoolTime[i];
-		m_eMyCharacter			= pCoolTime_Desc->eMyCharacter;
 	}
+	m_eMyCharacter = pCoolTime_Desc->eMyCharacter;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;

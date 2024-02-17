@@ -212,9 +212,8 @@ void CPlayer_Custom::Late_Tick(_float fTimeDelta)
 		for (auto& Pair : m_PlayerWeapon)
 			(Pair.second)->Late_Tick(fTimeDelta);
 
-		m_Player_Custom_UI->Late_Tick(fTimeDelta);
-
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+		m_Player_Custom_UI->Late_Tick(fTimeDelta);
 
 		return;
 	}
@@ -1840,7 +1839,23 @@ HRESULT CPlayer_Custom::Add_UIs()
 
 HRESULT CPlayer_Custom::Add_CustomUI()
 {
-	m_Player_Custom_UI = dynamic_cast<CUI_Player_Custom*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Custom")));
+	CUI_Player_Custom::UI_Player_Custom_DESC UI_Custom_Desc{};
+
+	UI_Custom_Desc.pParts_Cursor[CUI_Player_Custom::PARTS_HEADGEAR] = dynamic_cast<CBody_Player_Custom_HeadGear*>(m_PlayerParts.find(L"Part_Body_HeadGear")->second)->Get_Current_Index();
+	UI_Custom_Desc.iNum_Parts[CUI_Player_Custom::PARTS_HEADGEAR] = dynamic_cast<CBody_Player_Custom_HeadGear*>(m_PlayerParts.find(L"Part_Body_HeadGear")->second)->Get_Num_Models();
+
+	UI_Custom_Desc.pParts_Cursor[CUI_Player_Custom::PARTS_FACE] = dynamic_cast<CBody_Player_Custom_Face*>(m_PlayerParts.find(L"Part_Body_Face")->second)->Get_Current_Index();
+	UI_Custom_Desc.iNum_Parts[CUI_Player_Custom::PARTS_FACE] = dynamic_cast<CBody_Player_Custom_Face*>(m_PlayerParts.find(L"Part_Body_Face")->second)->Get_Num_Models();
+
+	UI_Custom_Desc.pParts_Cursor[CUI_Player_Custom::PARTS_UPPER] = dynamic_cast<CBody_Player_Custom_Upper*>(m_PlayerParts.find(L"Part_Body_Upper")->second)->Get_Current_Index();
+	UI_Custom_Desc.iNum_Parts[CUI_Player_Custom::PARTS_UPPER] = dynamic_cast<CBody_Player_Custom_Upper*>(m_PlayerParts.find(L"Part_Body_Upper")->second)->Get_Num_Models();
+
+	UI_Custom_Desc.pParts_Cursor[CUI_Player_Custom::PARTS_LOWER] = dynamic_cast<CBody_Player_Custom_Lower*>(m_PlayerParts.find(L"Part_Body_Lower")->second)->Get_Current_Index();
+	UI_Custom_Desc.iNum_Parts[CUI_Player_Custom::PARTS_LOWER] = dynamic_cast<CBody_Player_Custom_Lower*>(m_PlayerParts.find(L"Part_Body_Lower")->second)->Get_Num_Models();
+
+	UI_Custom_Desc.pTitle_Cursor = &m_iCustom_Curser;
+
+	m_Player_Custom_UI = dynamic_cast<CUI_Player_Custom*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Player_Custom"), &UI_Custom_Desc));
 	if (nullptr == m_Player_Custom_UI)
 		return E_FAIL;
 
@@ -1886,14 +1901,26 @@ void CPlayer_Custom::Free()
 	for (auto& Pair : m_PlayerWeapon)
 		Safe_Release(Pair.second);
 	m_PlayerWeapon.clear();
+
+	for (auto& Pair : m_PlayerTrails)
+		Safe_Release(Pair.second);
+	m_PlayerTrails.clear();
+
+	for (auto& Pair : m_PlayerUIs)
+		Safe_Release(Pair.second);
+	m_PlayerUIs.clear();
 	
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);
+	Safe_Release(m_pBodyLowerCom);
 	Safe_Release(m_pColliderMain);
 	Safe_Release(m_pColliderDetecting);
 	Safe_Release(m_pColliderAttack);
 	
 	Safe_Release(m_pLockOnTarget);
-	
+
+	if(m_bCustom_Mode)
+		Safe_Release(m_Player_Custom_UI);
+
 	__super::Free();
 }

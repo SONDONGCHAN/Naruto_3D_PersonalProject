@@ -16,11 +16,31 @@ HRESULT CCustomFont::Initialize(const wstring& strFontFilePath)
     return S_OK;
 }
 
-HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vOrigin, _float fScale)
+HRESULT CCustomFont::Render(const wstring& strText, const _float2& vPosition, _fvector vColor, FONT_ORIGIN_OPTION _option,_float fRotation, _float fScale)
 {
-    m_pBatch->Begin();
+    m_pContext->GSSetShader(nullptr, nullptr, 0);
 
-    m_pFont->DrawString(m_pBatch, strText.c_str(), vPosition, vColor, fRotation, vOrigin, fScale);
+    _vector vTextLH = m_pFont->MeasureString(strText.c_str(), true) * fScale;
+    _float2 OriginPos;
+
+    if(_option == ORIGIN_CENTER)
+        OriginPos = { vTextLH.m128_f32[0] , vTextLH.m128_f32[1] };
+
+    else if (_option == ORIGIN_LEFT_TOP)
+        OriginPos = { 0.f, 0.f };
+
+    else if (_option == ORIGIN_RIGHT_TOP)
+        OriginPos = { vTextLH.m128_f32[0]*2, 0.f};
+
+    else if (_option == ORIGIN_LEFT_BOTTOM)
+        OriginPos = { 0.f, vTextLH.m128_f32[1]*2 };
+
+    else if (_option == ORIGIN_RIGHT_BOTTOM)
+        OriginPos = { vTextLH.m128_f32[0]*2 , vTextLH.m128_f32[1]*2 };
+
+
+    m_pBatch->Begin();
+    m_pFont->DrawString(m_pBatch, strText.c_str(), vPosition, vColor, fRotation, OriginPos, fScale);
     m_pBatch->End();
 
     return S_OK;

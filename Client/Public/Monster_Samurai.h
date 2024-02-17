@@ -91,11 +91,14 @@ private:
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
 	map<const wstring, class CSkill*>			m_MonsterSkills;
+	map<const wstring, class CUI*>				m_MonsterUIs;
 
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Add_Skills();
+	HRESULT Add_UIs();
+
 
 public:
 	static CMonster_Samurai*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

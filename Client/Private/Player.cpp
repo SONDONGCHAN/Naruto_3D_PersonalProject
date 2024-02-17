@@ -166,7 +166,7 @@ void CPlayer::Free()
 		Safe_Release(Pair.second);
 	m_Charaters.clear();
 
-	//Safe_Release(m_pCurrentCharacter);
+	Safe_Release(m_pCurrentCharacter);
 	Safe_Release(m_pMapTransform);
 
 

@@ -17,6 +17,7 @@ public:
 	_matrix		Get_ViewMatrix_Inverse()			{ return XMLoadFloat4x4(&m_ViewMatrix_Inverse); }
 	_float4x4	Get_ViewMatrix_Float_Inverse()		{ return m_ViewMatrix_Inverse; }
 
+
 	void		Set_ProjMatrix(_fmatrix _ViewMatrix){ XMStoreFloat4x4(&m_ProjMatrix, _ViewMatrix); }
 	_matrix		Get_ProjMatrix()					{ return XMLoadFloat4x4(&m_ProjMatrix); }
 	_float4x4	Get_ProjMatrix_Float()				{ return m_ProjMatrix; }

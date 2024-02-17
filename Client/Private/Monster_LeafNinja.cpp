@@ -4,6 +4,7 @@
 #include "Skill.h"
 #include "FlameBomb.h"
 #include "Player.h"
+#include "UI_Monster_Status.h"
 
 
 CMonster_LeafNinja::CMonster_LeafNinja(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -40,11 +41,19 @@ HRESULT CMonster_LeafNinja::Initialize(void* pArg)
 	if (FAILED(Add_Skills()))
 		return E_FAIL;
 
+	m_MaxHp = 300.f;
+	m_CurrentHp = 300.f;
+
+	if (FAILED(Add_UIs()))
+		return E_FAIL;
+
 	m_CurrentState = MONSTER_STATE_IDLE;
 	_vector vStart_Pos = { 7.f, 0.f, 5.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
 	
+
+
 	return S_OK;
 }
 
@@ -91,6 +100,9 @@ void CMonster_LeafNinja::Late_Tick(_float fTimeDelta)
 
 	if (m_bSkillOn[SKILL_FLAMEBOMB])
 		m_MonsterSkills.find(L"Skill_FlameBomb")->second->Late_Tick(fTimeDelta);
+
+	for (auto& Pair : m_MonsterUIs)
+		Pair.second->Late_Tick(fTimeDelta);
 
 #ifdef _DEBUG
 	m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
@@ -489,6 +501,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 				m_iState = (MONSTER_THROW);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 20;
 			}
 			else if(pTargetCollider->Get_HitType() == HIT_STRONG)
 			{
@@ -499,6 +512,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 				m_iState = (MONSTER_STRUCK_STRONG_LEFT * m_iStruckState);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 15;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
 			{
@@ -506,6 +520,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 				m_iState = (MONSTER_BEATEN_START);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 25;
 			}
 			else if(pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
@@ -516,6 +531,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 				m_iState = (MONSTER_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 10;
 			}
 
 		}
@@ -535,6 +551,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 			m_iState = (MONSTER_BEATEN_START);
 			m_fDashSpeed = -15.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 30;
 		}
 	}
 	else if (strColliderLayerTag == L"RasenShuriken_Collider")
@@ -576,6 +593,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 			m_iState = (MONSTER_ELECTRICSHOCK);
 			m_fDashSpeed = 0.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 40;
 		}
 	}
 	
@@ -618,6 +636,7 @@ void CMonster_LeafNinja::Collider_Event_Stay(const wstring& strColliderLayerTag,
 				m_iState = (MONSTER_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -4.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 10;
 			}
 			m_fGetAttack_FrameCount--;
 		}
@@ -637,6 +656,7 @@ void CMonster_LeafNinja::Collider_Event_Stay(const wstring& strColliderLayerTag,
 				m_iState = (MONSTER_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -3.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 10;
 			}
 			m_fGetAttack_FrameCount--;
 		}
@@ -674,6 +694,7 @@ void CMonster_LeafNinja::Collider_Event_Exit(const wstring& strColliderLayerTag,
 			m_iState = MONSTER_BEATEN_START;
 			m_fDashSpeed = -15.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 20;
 		}
 	}
 	else if (strColliderLayerTag == L"Kamui_Collider")
@@ -691,6 +712,7 @@ void CMonster_LeafNinja::Collider_Event_Exit(const wstring& strColliderLayerTag,
 			m_iState = MONSTER_BEATEN_START;
 			m_fDashSpeed = -15.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 20;
 		}
 	}
 }
@@ -863,6 +885,22 @@ HRESULT CMonster_LeafNinja::Add_Skills()
 	return S_OK;
 }
 
+HRESULT CMonster_LeafNinja::Add_UIs()
+{
+	CUI_Monster_Status::UI_Monster_Hp_DESC Hp_Desc{};
+	Hp_Desc.pCurrentHp = &m_CurrentHp;
+	Hp_Desc.pMaxHp = &m_MaxHp;
+	Hp_Desc.pWorldMatrix = m_pTransformCom->Get_WorldMatrix_Pointer();
+	Hp_Desc.eMyType = CUI_Monster_Status::MONSTER_NORMAL;
+
+	CUI_Monster_Status* pUIStatus = dynamic_cast<CUI_Monster_Status*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_Monster_Hp"), &Hp_Desc));
+	if (nullptr == pUIStatus)
+		return E_FAIL;
+	m_MonsterUIs.emplace(TEXT("UI_Player_Status"), pUIStatus);
+
+	return S_OK;
+}
+
 CMonster_LeafNinja* CMonster_LeafNinja::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CMonster_LeafNinja* pInstance = new CMonster_LeafNinja(pDevice, pContext);
@@ -898,6 +936,10 @@ void CMonster_LeafNinja::Free()
 	for (auto& Pair : m_MonsterSkills)
 		Safe_Release(Pair.second);
 	m_MonsterSkills.clear();
+
+	for (auto& Pair : m_MonsterUIs)
+		Safe_Release(Pair.second);
+	m_MonsterUIs.clear();
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

@@ -38,8 +38,7 @@
 #include "UI_Player_Status.h"
 #include "UI_Player_Skills.h"
 #include "UI_Player_Custom.h"
-
-
+#include "UI_Monster_Status.h"
 
 
 
@@ -304,6 +303,16 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_SP_KamuiKakashi_BC.png"), 1))))
 		return E_FAIL;
 
+	// 몬스터 UI
+	/* For.Prototype_Component_Texture_Monster_Hp_Base */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp_Base"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_frame_M.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Monster_Hp */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_Base_BC.png"), 1))))
+		return E_FAIL;
+
 	// 스킬 UI
 	/* For.Prototype_Component_Texture_Icon_Skill_Base */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Skill_Base"),
@@ -539,6 +548,10 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	/* For.Prototype_GameObject_UI_Player_Skills*/
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Player_Skills"),
 		CUI_Player_Skills::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_UI_Monster_Hp*/
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Monster_Hp"),
+		CUI_Monster_Status::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

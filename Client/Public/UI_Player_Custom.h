@@ -10,8 +10,19 @@ BEGIN(Client)
 
 class CUI_Player_Custom : public CUI
 {
-private:
+
+public:
+	enum CUSTOM_TILTE { PARTS_HEADGEAR, PARTS_FACE, PARTS_LOWER, PARTS_UPPER, PARTS_END };
+
 	struct UI_Player_Custom_DESC
+	{
+		_uint*	pTitle_Cursor;
+		_int	iNum_Parts[PARTS_END];
+		_int*	pParts_Cursor[PARTS_END];
+	};
+	
+private:
+	struct UI_Player_Custom_UI_DESC
 	{
 		_float2 vPos;
 		_float2 vSize;
@@ -38,8 +49,12 @@ private:
 
 
 private:
-	vector<UI_Player_Custom_DESC>	m_UI_Descs;
+	vector<UI_Player_Custom_UI_DESC>	m_UI_Descs;
 	vector<CTexture*>				m_Textures;
+
+	_uint*	m_pTitle_Cursor = { nullptr };
+	_int	m_iNum_Parts[PARTS_END];
+	_int*	m_pParts_Cursor[PARTS_END];
 
 private:
 	HRESULT Add_Component();

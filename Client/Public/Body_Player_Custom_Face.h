@@ -37,6 +37,8 @@ public:
 	void	Set_Animation_State(_float fTimeDelta);
 	void	Set_Model(_bool Updown);
 	virtual CModel* Get_CurrentModel() override;
+	_int	Get_Num_Models() { return m_Num_Models; }
+	_int* Get_Current_Index() { return &m_CurrentModel_Index; }
 
 private:
 	CShader*		m_pShaderCom = { nullptr };

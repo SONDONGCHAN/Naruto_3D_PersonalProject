@@ -174,6 +174,9 @@
     <ClCompile Include="..\Private\UI_Player_Custom.cpp">
       <Filter>02.GameObjects\UI\UI_Player_Custom</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\UI_Monster_Status.cpp">
+      <Filter>02.GameObjects\UI\UI_Monster_Status</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -328,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\UI_Player_Custom.h">
       <Filter>02.GameObjects\UI\UI_Player_Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Monster_Status.h">
+      <Filter>02.GameObjects\UI\UI_Monster_Status</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -521,6 +527,9 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\UI_Player_Custom">
       <UniqueIdentifier>{e751dab6-6cad-4d6d-9b82-ac587ab23c80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\UI_Monster_Status">
+      <UniqueIdentifier>{158dfe3f-0f0f-402a-aa49-41e4ec2b8008}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

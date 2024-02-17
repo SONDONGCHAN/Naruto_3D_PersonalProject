@@ -105,6 +105,7 @@ private:
 	// 무적
 	_bool						m_bInvincible = false;
 
+	// 커스텀
 	_bool						m_bCustom_Mode = false;
 	_uint						m_iCustom_Curser = { 0 };
 

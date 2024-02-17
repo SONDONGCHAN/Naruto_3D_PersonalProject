@@ -11,7 +11,8 @@ private:
 
 public:
 	HRESULT Initialize();
-	HRESULT Render(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor = Colors::White, _float fRotation = 0.f, const _float2& vOrigin = _float2(0.f, 0.f), _float fScale = 1.f);
+	HRESULT Render(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor = Colors::White, FONT_ORIGIN_OPTION _option = ORIGIN_CENTER, _float fRotation = 0.f, _float fScale = 1.f);
+	//HRESULT Render(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor = Colors::White, _float fRotation = 0.f, const _float2& vOrigin = _float2(0.f, 0.f), _float fScale = 1.f);
 	HRESULT Add_Font(const wstring& strFontTag, const wstring& strFontFilePath);
 
 

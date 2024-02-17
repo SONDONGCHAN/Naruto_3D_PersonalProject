@@ -356,9 +356,9 @@ HRESULT CGameInstance::Add_Font(const wstring& strFontTag, const wstring& strFon
 	return m_pFont_Manager->Add_Font(strFontTag, strFontFilePath);
 }
 
-HRESULT CGameInstance::Render_Font(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vOrigin, _float fScale)
+HRESULT CGameInstance::Render_Font(const wstring& strFontTag, const wstring& strText, const _float2& vPosition, _fvector vColor, FONT_ORIGIN_OPTION _option, _float fRotation, _float fScale)
 {
-	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, fRotation, vOrigin, fScale);
+	return m_pFont_Manager->Render(strFontTag, strText, vPosition, vColor, _option, fRotation, fScale);
 }
 
 HRESULT CGameInstance::Add_RenderTarget(const wstring& strTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
