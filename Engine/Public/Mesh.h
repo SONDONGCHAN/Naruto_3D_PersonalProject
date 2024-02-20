@@ -50,7 +50,10 @@ public:
 		m_iNumIndices = NumIndices; 
 		m_pIndices = new _uint[m_iNumIndices];
 	}
-	void	Set_Indices(_uint Indices, _int IndexNum) { m_pIndices[IndexNum] = Indices ;}
+	void	Set_Indices(_uint Indices, _int IndexNum) { 
+		m_pIndices[IndexNum] = Indices ;
+		m_vecIndices.push_back(Indices);
+	}
 	void	Set_NumBones(_uint NumBones) { m_iNumBones = NumBones; }
 	void	Set_BoneIndices(vector<_uint> vecBoneIndices){ m_vecBoneIndices = vecBoneIndices;}
 	void	Set_OffsetMatrices(vector<_float4x4> vecOffsetMatrices) { m_vecOffsetMatrices = vecOffsetMatrices; }
@@ -60,11 +63,16 @@ public:
 	_uint	Get_MaterialIndex() const { return m_iMaterialIndex; }
 
 
-	//_uint		Get_NumIndices() const { return m_iNumIndices; }
-	//_uint*		Get_IndicesIndex() const { return m_pIndicesIndex; }
-	//_float3*	Get_VtxPos() const { return  m_pVertices_Pos; }
+	_uint			Get_NumIndices() const { return m_iNumIndices; }
+	_uint*			Get_IndicesIndex() { return m_pIndices; }
+	vector<_uint>*	Get_pVecIndices() { return &m_vecIndices; }
+
+
+	_float3*	Get_VtxPos() const { return  m_pVertices_Pos; }
 	//VTXMESH*	Get_Vertices() const{ return m_pVertices; }
 
+private:
+	void Set_Vertices_Pos();
 
 
 private:
@@ -80,6 +88,10 @@ private:
 	VTXANIMMESH*		m_pAnimVertices;			//O
 
 	_uint*				m_pIndices;					//O
+	vector<_uint>		m_vecIndices;
+	_uint**				m_ppIndices;				//O
+
+	_float3*			m_pVertices_Pos;
 
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eType , CModel* pModel, _fmatrix PivotMatrix = XMMatrixIdentity());

@@ -139,7 +139,12 @@ void CWood_Hand::State_Control(_float fTimeDelta)
 			return;
 		}
 		if (m_fDurTime > 0.5f)
-			m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");	
+		{
+			if(m_fDurTime < 0.52f)
+				m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+
+			m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");
+		}
 
 	}
 }

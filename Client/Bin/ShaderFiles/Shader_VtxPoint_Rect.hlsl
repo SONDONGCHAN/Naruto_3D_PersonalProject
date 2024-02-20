@@ -174,6 +174,22 @@ PS_OUT PS_SKILL(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_WORLD_HP(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vColor = g_Texture.Sample(g_LinearSampler, In.vTexcoord);
+   	
+    if (vColor.a < 0.1f)
+        discard;
+    
+   // vColor = g_vColor;
+    
+    Out.vColor = vColor;
+   
+    return Out;
+}
+
 /* EffectFramework */
 
 technique11 DefaultTechnique
@@ -214,6 +230,17 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_SKILL();
     }
 
+    pass Dynamic_Hp_World
+    {
+		/* RenderState¼³Á¤. */
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_HP();
+        PixelShader = compile ps_5_0 PS_WORLD_HP();
+    }
 }
 
 

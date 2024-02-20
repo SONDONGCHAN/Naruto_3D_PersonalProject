@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Camera_Free.h"
 
 BEGIN(Engine)
 class CTransform;
@@ -15,7 +16,10 @@ class CLandObject abstract : public CGameObject
 public:
 	struct LANDOBJ_DESC : public GAMEOBJECT_DESC
 	{
-		CTransform*				pMapTransform = { nullptr };
+		CTransform*		pMapTransform	= { nullptr };
+		CModel*			pMapModel		= { nullptr };
+		CCamera_Free*	pCamera			= { nullptr };
+
 	};
 
 protected:
@@ -31,6 +35,7 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+
 protected:
 	_float			Lerp(_float start, _float end, _float ratio);
 
@@ -39,8 +44,12 @@ public:
 
 protected:
 	CTransform*		m_pMapTransform = { nullptr };
-	CNavigation*	m_pNavigationCom = { nullptr };
+	CModel*			m_pMapModel		= { nullptr };
+	CCamera_Free*	m_pCamera		= { nullptr };
+	//
 
+	CNavigation*	m_pNavigationCom = { nullptr };
+	CCalculator*	m_pCalculator= { nullptr };
 
 protected:
 	// 중력
@@ -53,10 +62,22 @@ protected:
 	_float	m_CurrentHp = 1000.f;
 	_float	m_MaxHp		= 1000.f;
 
+	// 위치
+	_vector m_MyPos = {0.f, 0.f, 0.f, 1.f};
+	_matrix m_MyWorldMat = { };
+
 
 protected:
 	_bool Set_Gravity(class CTransform* pTargetTransform, _float fTimeDelta);
+	_bool Set_Gravity_2(class CTransform* pTargetTransform, _float fTimeDelta);
+
 	HRESULT SetUp_OnCell(class CTransform* pTargetTransform);
+	HRESULT SetUp_OnCell_2(class CTransform* pTargetTransform);
+
+public:
+	_vector*		Get_MyPos()			{ return &m_MyPos; }
+	_matrix*		Get_MyPWorldMat()	{ return &m_MyWorldMat; }
+
 		
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

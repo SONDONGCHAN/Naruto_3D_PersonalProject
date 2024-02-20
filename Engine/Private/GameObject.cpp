@@ -43,8 +43,13 @@ HRESULT CGameObject::Initialize(void* pArg)
 {
     if (nullptr != pArg)
     {
+       
         GAMEOBJECT_DESC*    pGameDesc = (GAMEOBJECT_DESC*)pArg;
-        m_fGameObjectScale = pGameDesc->fGameObjectScale;
+        if (pGameDesc->fSpeedPerSec != 5.f)
+        {
+            m_fGameObjectScale = pGameDesc->fGameObjectScale;
+        }
+
     }
 
     m_pTransformCom = CTransform::Create(m_pDevice, m_pContext);
@@ -55,6 +60,8 @@ HRESULT CGameObject::Initialize(void* pArg)
         return E_FAIL;
 
     m_Components.emplace(g_strTransformTag, m_pTransformCom);
+
+    Safe_AddRef(m_pTransformCom);
 
     return S_OK;
 }

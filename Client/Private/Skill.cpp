@@ -22,9 +22,11 @@ HRESULT CSkill::Initialize(void* pArg)
     
     m_pParentTransform  = pSkillDesc->pParentTransform;
     m_User_Type         = pSkillDesc->User_Type;
+    m_pCamera           = pSkillDesc->pCamera;
     
     Safe_AddRef(m_pParentTransform);
-    
+    Safe_AddRef(m_pCamera);
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
     
@@ -54,7 +56,7 @@ void CSkill::Free()
     __super::Free();
 
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
+    Safe_Release(m_pModelCom); 
     Safe_Release(m_pParentTransform);
-
+    Safe_Release(m_pCamera);
 }

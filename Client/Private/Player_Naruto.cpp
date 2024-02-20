@@ -96,7 +96,6 @@ void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 	if (m_bOnAir && (m_fGravity < -0.017f))
 	{
 		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom);
-
 	}
 
 	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true)
@@ -138,6 +137,9 @@ void CPlayer_Naruto::Tick(_float fTimeDelta)
 
 void CPlayer_Naruto::Late_Tick(_float fTimeDelta)
 {
+	__super::Late_Tick(fTimeDelta);
+
+
 	for (auto& Pair : m_PlayerParts)
 		(Pair.second)->Late_Tick(fTimeDelta);
 
@@ -1084,6 +1086,8 @@ void CPlayer_Naruto::Use_Skill(const wstring& strSkillName)
 {
 	if (strSkillName == L"Skill_Rasengun")
 	{
+		m_pCamera->Set_Camera_radius(2.f, 0.02f);
+
 		m_Skill_Animation_State = SKILL_RASENGUN;
 
 		dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Set_State();
@@ -1097,6 +1101,8 @@ void CPlayer_Naruto::Use_Skill(const wstring& strSkillName)
 	}
 	else if (strSkillName == L"Skill_RasenShuriken")
 	{
+		m_pCamera->Set_Camera_radius(2.f);
+
 		m_Skill_Animation_State = SKILL_RASENSHURIKEN;
 
 		dynamic_cast<CRasenShuriken*>(m_PlayerSkills.find(L"Skill_RasenShuriken")->second)->Set_State();
@@ -1111,15 +1117,20 @@ void CPlayer_Naruto::Use_Skill(const wstring& strSkillName)
 	}
 	else if (strSkillName == L"Skill_Rasengun_Super")
 	{
+		m_pCamera->Set_Camera_radius_Immediate(2.f);
+		m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
+		m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
+		m_pCamera->Set_Camera_radius(4.f, 0.03f);
+
 		m_Skill_Animation_State = SKILL_RASENGUN_SUPER;
-
+	
 		dynamic_cast<CRasengun_Super*>(m_PlayerSkills.find(L"Skill_Rasengun_Super")->second)->Set_State();
-
+	
 		if (!m_bOnAir)
 			m_iState |= PLAYER_STATE_RASENSGUN_SUPER;
 		else
 			m_iState |= PLAYER_STATE_AERIAL_RASENGUN_SUPER;
-
+	
 		m_bSkillOn[SKILL_RASENGUN_SUPER] = true;
 		m_bInvincible = true;
 	}
@@ -1148,6 +1159,8 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 	{
 		if (m_iState & PLAYER_STATE_RASENGUN_CHARGE)
 		{
+			m_pCamera->Set_Camera_radius();
+
 			m_iState = PLAYER_STATE_RASENGUN_RUN_LOOP;		
 			dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Set_Next_State();
 			m_bInvincible = true;
@@ -1217,6 +1230,8 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 	{
 		if (m_iState & PLAYER_STATE_RASENSHURIKEN)
 		{
+			m_pCamera->Set_Camera_radius();
+
 			m_Skill_Animation_State = SKILL_END;	
 			return false;
 		}
@@ -1224,6 +1239,8 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 		
 		else if (m_iState & PLAYER_STATE_AERIAL_RASENSHURIKEN)
 		{
+			m_pCamera->Set_Camera_radius();
+
 			m_Skill_Animation_State = SKILL_END;	
 			return false;
 		}
@@ -1307,6 +1324,9 @@ void CPlayer_Naruto::Skill_Tick(_float fTimeDelta)
 
 			if (m_fSkillDurTime > 2.f)
 			{
+				m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_BACK);
+				m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
+				m_pCamera->Set_Camera_radius();
 				pRasengun_Super->Set_Next_State();
 			}
 		}
@@ -1357,6 +1377,9 @@ void CPlayer_Naruto::Skill_Cancle()
 		CRasengun_Super* pRasenShuriken = dynamic_cast<CRasengun_Super*>(m_PlayerSkills.find(L"Skill_Rasengun_Super")->second);
 
 	}
+
+	m_pCamera->Set_Camera_radius();
+	m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
 }
 
 HRESULT CPlayer_Naruto::Add_Components()
@@ -1385,10 +1408,10 @@ HRESULT CPlayer_Naruto::Add_Components()
 	
 	// 록온 탐색용 콜라이더 //
 	CBounding_OBB::OBB_DESC		DetectingBoundingDesc{};
-	DetectingBoundingDesc.vExtents = {15.f ,10.f, 15.f};
+	DetectingBoundingDesc.vExtents = { 10.f , 10.f, 10.f };
 	DetectingBoundingDesc.vRadians = { 0.f ,0.f, 0.f };
-	DetectingBoundingDesc.vCenter = _float3(0.f, DetectingBoundingDesc.vExtents.y * 0.5f, 0.f);
-	
+	DetectingBoundingDesc.vCenter = _float3(0.f, -2.f, 5.f);
+
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Detecting"), reinterpret_cast<CComponent**>(&m_pColliderDetecting), &DetectingBoundingDesc)))
 		return E_FAIL;
@@ -1405,6 +1428,7 @@ HRESULT CPlayer_Naruto::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(L"Player_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
+	Off_Attack_Collider();
 
 	///////////////////////////////////////////////////
 
@@ -1440,6 +1464,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	CRasengun::SKILL_RASENGUN_DESC Rasengun_desc{};
 	Rasengun_desc.pParentTransform = m_pTransformCom;
 	Rasengun_desc.User_Type = CSkill::USER_PLAYER;
+	Rasengun_desc.pCamera = m_pCamera;
 	Rasengun_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun"), &Rasengun_desc));
 	if (nullptr == pRasengun)
@@ -1452,6 +1477,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	CRasenShuriken::SKILL_RASENSHURIKEN_DESC RasenShuriken_desc{};
 	RasenShuriken_desc.pParentTransform = m_pTransformCom;
 	RasenShuriken_desc.User_Type = CSkill::USER_PLAYER;
+	RasenShuriken_desc.pCamera = m_pCamera;
 	RasenShuriken_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasenShuriken = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_RasenShuriken"), &RasenShuriken_desc));
 	if (nullptr == pRasenShuriken)
@@ -1464,6 +1490,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	CRasengun_Super::SKILL_RASENGUN_SUPER_DESC Rasengun_Super_desc{};
 	Rasengun_Super_desc.pParentTransform = m_pTransformCom;
 	Rasengun_Super_desc.User_Type = CSkill::USER_PLAYER;
+	Rasengun_Super_desc.pCamera = m_pCamera;
 	Rasengun_Super_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun_Super = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun_Super"), &Rasengun_Super_desc));
 	if (nullptr == pRasengun_Super)
@@ -1477,6 +1504,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	Wood_Swap_desc.pParentTransform = m_pTransformCom;
 	Wood_Swap_desc.User_Type = CSkill::USER_PLAYER;
 	Wood_Swap_desc.pUser_Navigation = m_pNavigationCom;
+	Wood_Swap_desc.pCamera = m_pCamera;
 	CSkill* pWood_Swap = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Swap"), &Wood_Swap_desc));
 	if (nullptr == pWood_Swap)
 		return E_FAIL;
@@ -1595,7 +1623,8 @@ void CPlayer_Naruto::Free()
 	Safe_Release(m_pColliderDetecting);
 	Safe_Release(m_pColliderAttack);
 
-	Safe_Release(m_pLockOnTarget);
+	if (m_pLockOnTarget != nullptr)
+		Safe_Release(m_pLockOnTarget);
 
 	__super::Free();
 }

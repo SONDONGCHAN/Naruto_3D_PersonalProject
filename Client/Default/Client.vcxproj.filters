@@ -117,23 +117,20 @@
     <ClCompile Include="..\Private\PartObject.cpp">
       <Filter>02.GameObjects\PartsObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Player_Custom.cpp">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Body_Player_Custom_HeadGear.cpp">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_HeadGear</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_HeadGear</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Player.cpp">
       <Filter>02.GameObjects\LandObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Body_Player_Custom_Face.cpp">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Face</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Face</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Body_Player_Custom_Lower.cpp">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Lower</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Lower</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Body_Player_Custom_Upper.cpp">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Upper</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Upper</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_CustomRoom.cpp">
       <Filter>01.Levels\CustomRoom</Filter>
@@ -176,6 +173,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_Monster_Status.cpp">
       <Filter>02.GameObjects\UI\UI_Monster_Status</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_Custom.cpp">
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,19 +279,19 @@
       <Filter>02.GameObjects\LandObject\Player\Player_Custom</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Body_Player_Custom_HeadGear.h">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_HeadGear</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_HeadGear</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Player.h">
       <Filter>02.GameObjects\LandObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Body_Player_Custom_Face.h">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Face</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Face</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Body_Player_Custom_Lower.h">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Lower</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Lower</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Body_Player_Custom_Upper.h">
-      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Upper</Filter>
+      <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Upper</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_CustomRoom.h">
       <Filter>01.Levels\CustomRoom</Filter>
@@ -368,9 +368,6 @@
     </Filter>
     <Filter Include="01.Levels\Loading">
       <UniqueIdentifier>{a4d4b5a0-b54b-4697-9b86-12bc978301da}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Loading\Loader">
-      <UniqueIdentifier>{7d2604b7-8417-4e6e-b875-ef3010ce76c5}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\BackGround">
       <UniqueIdentifier>{94f4d0ca-521b-4303-b7ca-e3ef123cb486}</UniqueIdentifier>
@@ -465,21 +462,6 @@
     <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Parts">
       <UniqueIdentifier>{5bada7d6-1f36-4ac2-b1ee-9cf228e65a21}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Parts\Body">
-      <UniqueIdentifier>{f4506234-43b0-4279-9e24-c47d67bdf1e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Face">
-      <UniqueIdentifier>{09b76810-cf61-465d-85fa-6920cfe4876e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Upper">
-      <UniqueIdentifier>{bbc37675-6e20-4aad-b840-80000985e59a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_Lower">
-      <UniqueIdentifier>{755d1f07-753a-4127-8037-803e9382d8f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Parts\Body\Body_HeadGear">
-      <UniqueIdentifier>{12a8d1dc-f05c-4faa-84ae-c05d675d757b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\CustomRoom">
       <UniqueIdentifier>{59023e12-ed37-46bd-8016-32b6acceff0f}</UniqueIdentifier>
     </Filter>
@@ -530,6 +512,24 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\UI_Monster_Status">
       <UniqueIdentifier>{158dfe3f-0f0f-402a-aa49-41e4ec2b8008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Loading\Loader">
+      <UniqueIdentifier>{7d2604b7-8417-4e6e-b875-ef3010ce76c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Body">
+      <UniqueIdentifier>{f4506234-43b0-4279-9e24-c47d67bdf1e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Face">
+      <UniqueIdentifier>{09b76810-cf61-465d-85fa-6920cfe4876e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Upper">
+      <UniqueIdentifier>{bbc37675-6e20-4aad-b840-80000985e59a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Lower">
+      <UniqueIdentifier>{755d1f07-753a-4127-8037-803e9382d8f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Body\Body_HeadGear">
+      <UniqueIdentifier>{12a8d1dc-f05c-4faa-84ae-c05d675d757b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

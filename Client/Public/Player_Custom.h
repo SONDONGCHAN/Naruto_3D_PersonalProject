@@ -63,6 +63,7 @@ private:
 	void		Skill_Tick(_float fTimeDelta);
 	void		Skill_Cancle();
 
+
 private:
 	CCollider* m_pColliderMain = { nullptr };
 	CCollider* m_pColliderDetecting = { nullptr };
@@ -70,7 +71,6 @@ private:
 
 	CModel* m_pBodyModelCom = { nullptr };	// 상체 모델
 	CModel* m_pBodyLowerCom = { nullptr };	// 하체 모델
-
 
 private:
 	// 상태
@@ -83,7 +83,7 @@ private:
 	_float						m_fChargingtime = { 0.f };
 
 	// 록온
-	CGameObject* m_pLockOnTarget = {};
+	CGameObject*				m_pLockOnTarget = { nullptr };
 	_float						m_LockOnTargetLength = 99999.f;
 
 	//공격
@@ -116,7 +116,7 @@ private:
 	map<const wstring, class CTrail_Line*>		m_PlayerTrails;
 	map<const wstring, class CUI*>				m_PlayerUIs;
 
-	CUI* m_Player_Custom_UI;
+	CUI* m_Player_Custom_UI = {nullptr};
 
 private:
 	HRESULT Add_Components();

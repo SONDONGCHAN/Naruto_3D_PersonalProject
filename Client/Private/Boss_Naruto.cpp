@@ -1098,6 +1098,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	CRasengun::SKILL_RASENGUN_DESC Rasengun_desc{};
 	Rasengun_desc.pParentTransform = m_pTransformCom;
 	Rasengun_desc.User_Type = CSkill::USER_MONSTER;
+	Rasengun_desc.pCamera = m_pCamera;
 	Rasengun_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun"), &Rasengun_desc));
 	if (nullptr == pRasengun)
@@ -1109,6 +1110,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	CRasenShuriken::SKILL_RASENSHURIKEN_DESC RasenShuriken_desc{};
 	RasenShuriken_desc.pParentTransform = m_pTransformCom;
 	RasenShuriken_desc.User_Type = CSkill::USER_MONSTER;
+	RasenShuriken_desc.pCamera = m_pCamera;
 	RasenShuriken_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasenShuriken = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_RasenShuriken"), &RasenShuriken_desc));
 	if (nullptr == pRasenShuriken)
@@ -1120,6 +1122,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	CRasengun_Super::SKILL_RASENGUN_SUPER_DESC Rasengun_Super_desc{};
 	Rasengun_Super_desc.pParentTransform = m_pTransformCom;
 	Rasengun_Super_desc.User_Type = CSkill::USER_MONSTER;
+	Rasengun_Super_desc.pCamera = m_pCamera;
 	Rasengun_Super_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun_Super = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun_Super"), &Rasengun_Super_desc));
 	if (nullptr == pRasengun_Super)
@@ -1131,6 +1134,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	CWood_Swap::SKILL_WOOD_SWAP_DESC Wood_Swap_desc{};
 	Wood_Swap_desc.pParentTransform = m_pTransformCom;
 	Wood_Swap_desc.User_Type = CSkill::USER_MONSTER;
+	Wood_Swap_desc.pCamera = m_pCamera;
 	Wood_Swap_desc.pUser_Navigation = m_pNavigationCom;
 	CSkill* pWood_Swap = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Swap"), &Wood_Swap_desc));
 	if (nullptr == pWood_Swap)
@@ -1200,6 +1204,10 @@ void CBoss_Naruto::Free()
 		Safe_Release(Pair.second);
 	m_MonsterSkills.clear();
 	
+	for (auto& Pair : m_MonsterTrails)
+		Safe_Release(Pair.second);
+	m_MonsterTrails.clear();
+
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);
 	Safe_Release(m_pColliderMain);

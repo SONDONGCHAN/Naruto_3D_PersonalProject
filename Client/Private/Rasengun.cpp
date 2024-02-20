@@ -136,6 +136,8 @@ void CRasengun::State_Control(_float fTimeDelta)
     }
     else if (myState == STATE_HIT)
     {
+        m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+
         if (m_User_Type == USER_PLAYER)
             m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Rasengun_Collider");
         else if (m_User_Type == USER_MONSTER)
@@ -143,9 +145,13 @@ void CRasengun::State_Control(_float fTimeDelta)
 
         m_fDurTime += fTimeDelta;
 
-        if(m_fDurTime > 0.1f)
-            Set_Next_State();
+        if (m_fDurTime > 0.1f)
+        {
+            if (m_fDurTime < 0.12f)
+                m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
 
+            Set_Next_State();
+        }
         // 이펙트 채워넣기
     }
 }

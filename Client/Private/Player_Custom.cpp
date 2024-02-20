@@ -64,7 +64,8 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(Add_UIs()))
 			 return E_FAIL;
 
-		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
+		 _vector vStart_Pos = { 0.f, 20.f, -10.f, 1.f };
+		 m_bOnAir = true;
 		 m_pTransformCom->Set_Pos(vStart_Pos);
 		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
 		 m_bCustom_Mode = false;
@@ -72,11 +73,11 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 	
 	 else
 	 {
-		 LANDOBJ_DESC GameObjectDesc;
-		 GameObjectDesc.fSpeedPerSec = 7.f;
-		 GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+		 LANDOBJ_DESC pGameObjectDesc;
+		 pGameObjectDesc.fSpeedPerSec = 5.f;
+		 pGameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-		 if (FAILED(__super::Initialize(&GameObjectDesc)))
+		 if (FAILED(__super::Initialize(&pGameObjectDesc)))
 			 return E_FAIL;
 
 		 if (FAILED(Add_PartObjects(LEVEL_CUSTOMROOM)))
@@ -205,6 +206,8 @@ void CPlayer_Custom::Tick(_float fTimeDelta)
 
 void CPlayer_Custom::Late_Tick(_float fTimeDelta)
 {
+	__super::Late_Tick(fTimeDelta);
+
 	if (m_bCustom_Mode)
 	{
 		for (auto& Pair : m_PlayerParts)
@@ -1267,6 +1270,8 @@ void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 	}
 	else if (strSkillName == L"Skill_FlameBomb")
 	{
+		m_pCamera->Set_Camera_radius(2.f);
+
 		m_Skill_Animation_State = SKILL_FLAMEBOMB;
 
 		dynamic_cast<CFlameBomb*>(m_PlayerSkills.find(L"Skill_FlameBomb")->second)->Set_State();
@@ -1276,25 +1281,16 @@ void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 		else
 			m_iState |= PLAYER_STATE_AERIAL_FLAME_BOMB;
 
+		//m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_TARGET_CHASE);
+		//_vector* pPos = dynamic_cast<CLandObject*>(m_pLockOnTarget)->Get_MyPos();
+		//m_pCamera->Set_Target_Position(pPos);
+
 		m_bSkillOn[SKILL_FLAMEBOMB] = true;
-	}
-	else if (strSkillName == L"Skill_Kamui")
-	{
-		if (!m_bOnAir)
-		{
-			m_Skill_Animation_State = SKILL_KAMUI;
-
-			dynamic_cast<CKamui*>(m_PlayerSkills.find(L"Skill_Kamui")->second)->Set_State();
-
-			m_iState |= PLAYER_STATE_KAMUI;
-
-			m_bSkillOn[SKILL_KAMUI] = true;
-
-			m_bInvincible = true;
-		}
 	}
 	else if (strSkillName == L"Skill_Chidori")
 	{
+		m_pCamera->Set_Camera_radius(2.f, 0.015f);
+
 		m_Skill_Animation_State = SKILL_CHIDORI;
 		
 		dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Set_State();
@@ -1310,6 +1306,10 @@ void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 	{
 		if (!m_bOnAir)
 		{
+			m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
+			m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
+			m_pCamera->Set_Camera_radius(2.f, 0.07f);
+
 			m_Skill_Animation_State = SKILL_WOODHAND;
 
 			dynamic_cast<CWood_Hand*>(m_PlayerSkills.find(L"Skill_Wood_Hand")->second)->Set_State();
@@ -1317,6 +1317,25 @@ void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 			m_iState |= PLAYER_WOOD_HAND;
 
 			m_bSkillOn[SKILL_WOODHAND] = true;
+
+			m_bInvincible = true;
+		}
+	}
+	else if (strSkillName == L"Skill_Kamui")
+	{
+		if (!m_bOnAir)
+		{
+			m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
+			m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
+			m_pCamera->Set_Camera_radius(1.3f, 0.15f);
+
+			m_Skill_Animation_State = SKILL_KAMUI;
+
+			dynamic_cast<CKamui*>(m_PlayerSkills.find(L"Skill_Kamui")->second)->Set_State();
+
+			m_iState |= PLAYER_STATE_KAMUI;
+
+			m_bSkillOn[SKILL_KAMUI] = true;
 
 			m_bInvincible = true;
 		}
@@ -1337,6 +1356,8 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 	{
 		if (m_iState & PLAYER_STATE_KAMUI )
 		{
+			m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
+			m_pCamera->Set_Camera_radius();
 			m_Skill_Animation_State = SKILL_END;
 			m_bInvincible = false;
 			m_bSkillOn[SKILL_KAMUI] = false;
@@ -1369,6 +1390,8 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 			}
 			if (dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Get_IsHit())
 			{
+				m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
+;				m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
 				dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Set_Next_State();
 				m_iState = PLAYER_STATE_CHIDORI_ATTACK;
 				m_fDashSpeed = 40.f;
@@ -1378,6 +1401,8 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 		}
 		else if (m_iState & PLAYER_STATE_CHIDORI_ATTACK)
 		{
+			m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
+			m_pCamera->Set_Camera_radius();
 			m_bInvincible = false;
 			m_bSkillOn[SKILL_CHIDORI] = false;
 			m_Skill_Animation_State = SKILL_END;
@@ -1416,6 +1441,7 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 		}
 		else if (m_iState & PLAYER_STATE_AERIAL_CHIDORI_ATTACK)
 		{
+			m_pCamera->Set_Camera_radius();
 			m_bInvincible = false;
 			m_bSkillOn[SKILL_CHIDORI] = false;
 			m_Skill_Animation_State = SKILL_END;
@@ -1457,6 +1483,7 @@ void CPlayer_Custom::Skill_Tick(_float fTimeDelta)
 
 			if (m_fSkillDurTime > 0.5f)
 			{
+				m_pCamera->Set_Camera_radius();
 				_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				Pos.m128_f32[1] += 1.f;
 				pFlameBomb->Get_TranformCom()->Set_Pos(Pos);
@@ -1490,6 +1517,9 @@ void CPlayer_Custom::Skill_Tick(_float fTimeDelta)
 
 			if (m_fSkillDurTime > 0.7f)
 			{
+				m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_BACK);
+				m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
+				m_pCamera->Set_Camera_radius(2.f);
 
 				if (m_LockOnTargetLength < 99999.f)
 				{
@@ -1498,7 +1528,6 @@ void CPlayer_Custom::Skill_Tick(_float fTimeDelta)
 					pKamui->Set_Targeting(TargetPos);
 				}
 				pKamui->Set_Next_State();
-
 			}
 		}
 		else if (pKamui->Get_State() == CKamui::STATE_FINISH)
@@ -1514,8 +1543,12 @@ void CPlayer_Custom::Skill_Tick(_float fTimeDelta)
 		{
 			m_fSkillDurTime += fTimeDelta;
 	
-			if (m_fSkillDurTime > 0.4f)
+			if (m_fSkillDurTime > 0.55f)
 			{
+				m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_BACK);
+				m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
+				m_pCamera->Set_Camera_radius();
+				
 				if (m_LockOnTargetLength < 99999.f)
 				{
 					_vector TargetPos = m_pLockOnTarget->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
@@ -1562,11 +1595,14 @@ void CPlayer_Custom::Skill_Cancle()
 			m_bSkillOn[SKILL_CHIDORI] = false;
 
 	}
+	m_pCamera->Set_Camera_radius();
+	m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
 }
+
 
 HRESULT CPlayer_Custom::Add_Components()
 {
-	/* Com_Navigation */
+	//////////* Com_Navigation */////////
 	CNavigation::NAVI_DESC		NaviDesc{};
 	
 	NaviDesc.iStartCellIndex = 30;
@@ -1590,9 +1626,9 @@ HRESULT CPlayer_Custom::Add_Components()
 	
 	// 록온 탐색용 콜라이더 //
 	CBounding_OBB::OBB_DESC		DetectingBoundingDesc{};
-	DetectingBoundingDesc.vExtents = { 15.f ,10.f, 15.f };
-	DetectingBoundingDesc.vRadians = { 0.f ,0.f, 0.f };
-	DetectingBoundingDesc.vCenter = _float3(0.f, DetectingBoundingDesc.vExtents.y * 0.5f, 0.f);
+	DetectingBoundingDesc.vExtents = { 10.f , 10.f, 10.f };
+	DetectingBoundingDesc.vRadians = { 0.f , 0.f, 0.f };
+	DetectingBoundingDesc.vCenter = _float3(0.f, -2.f, 5.f);
 	
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Detecting"), reinterpret_cast<CComponent**>(&m_pColliderDetecting), &DetectingBoundingDesc)))
@@ -1610,6 +1646,7 @@ HRESULT CPlayer_Custom::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(L"Player_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
+	Off_Attack_Collider();
 	
 	///////////////////////////////////////////////////
 	return S_OK;
@@ -1723,6 +1760,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	CSkill::SKILL_DESC FlameBomb_desc{};
 	FlameBomb_desc.pParentTransform = m_pTransformCom;
 	FlameBomb_desc.User_Type = CSkill::USER_PLAYER;
+	FlameBomb_desc.pCamera = m_pCamera;
     CSkill* pFlameBomb = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_FlameBomb"), &FlameBomb_desc));
 	if (nullptr == pFlameBomb)
 		return E_FAIL;
@@ -1734,6 +1772,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	CChidori::SKILL_CHIDORI_DESC Chidori_desc{};
 	Chidori_desc.pParentTransform = m_pTransformCom;
 	Chidori_desc.User_Type = CSkill::USER_PLAYER;
+	Chidori_desc.pCamera = m_pCamera;
 	Chidori_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("L_Hand_Weapon_cnt_tr");
 	CSkill* pChidori = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Chidori"), &Chidori_desc));
 	if (nullptr == pChidori)
@@ -1746,6 +1785,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	CSkill::SKILL_DESC WoodHand_desc{};
 	WoodHand_desc.pParentTransform = m_pTransformCom;
 	WoodHand_desc.User_Type = CSkill::USER_PLAYER;
+	WoodHand_desc.pCamera = m_pCamera;
 	CSkill* pWoodHand= dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Hand"), &WoodHand_desc));
 	if (nullptr == pWoodHand)
 		return E_FAIL;
@@ -1757,6 +1797,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	CSkill::SKILL_DESC Kamui_desc{};
 	Kamui_desc.pParentTransform = m_pTransformCom;
 	Kamui_desc.User_Type = CSkill::USER_PLAYER;
+	Kamui_desc.pCamera = m_pCamera;
 	CSkill* pKamui = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Kamui"), &Kamui_desc));
 	if (nullptr == pKamui)
 		return E_FAIL;
@@ -1769,6 +1810,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	Wood_Swap_desc.pParentTransform = m_pTransformCom;
 	Wood_Swap_desc.User_Type = CSkill::USER_PLAYER;
 	Wood_Swap_desc.pUser_Navigation = m_pNavigationCom;
+	Wood_Swap_desc.pCamera = m_pCamera;
 	CSkill* pWood_Swap = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Swap"), &Wood_Swap_desc));
 	if (nullptr == pWood_Swap)
 		return E_FAIL;
@@ -1917,7 +1959,8 @@ void CPlayer_Custom::Free()
 	Safe_Release(m_pColliderDetecting);
 	Safe_Release(m_pColliderAttack);
 	
-	Safe_Release(m_pLockOnTarget);
+	if(m_pLockOnTarget != nullptr)
+		Safe_Release(m_pLockOnTarget);
 
 	if(m_bCustom_Mode)
 		Safe_Release(m_Player_Custom_UI);

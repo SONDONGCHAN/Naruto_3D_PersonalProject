@@ -4,6 +4,7 @@ C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Bone.
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Bounding.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Bounding.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Bounding_AABB.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Bounding_AABB.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Bounding_OBB.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Bounding_OBB.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Bounding_Sphere.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Bounding_Sphere.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Calculator.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Calculator.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Camera.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Camera.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Cell.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Cell.obj
@@ -34,7 +35,6 @@ C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\PipeL
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Renderer.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Renderer.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\RenderTarget.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\RenderTarget.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Shader.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Shader.obj
-C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Bounding_Sphere.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Bounding_Sphere.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Target_Manager.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Target_Manager.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Texture.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Texture.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Timer.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Timer.obj
@@ -43,9 +43,9 @@ C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\Trans
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Cell.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Cell.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Instancing.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Instancing.obj
-C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Point.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Point.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Particle_Point.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Particle_Point.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Particle_Rect.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Particle_Rect.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Point.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Point.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Rect.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Rect.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Terrain.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Terrain.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Public\Engine_Struct.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Engine_Struct.obj

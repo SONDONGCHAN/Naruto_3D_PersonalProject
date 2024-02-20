@@ -150,6 +150,9 @@ void CRasenShuriken::State_Control(_float fTimeDelta)
     }
     else if (myState == STATE_HIT)
     {
+        if (m_fDurTime < 0.01f)
+            m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+
         if (m_User_Type == USER_PLAYER)
             m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"RasenShuriken_Collider");
         else if (m_User_Type == USER_MONSTER)

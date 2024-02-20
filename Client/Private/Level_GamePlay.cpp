@@ -97,7 +97,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring& strLayerTag,CGameObject::GAMEOBJECT_DESC& GameObjDesc)
+HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring& strLayerTag, CLandObject::LANDOBJ_DESC& GameObjDesc)
 {
 	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Player"),&GameObjDesc)))
 		return E_FAIL;
@@ -117,7 +117,10 @@ HRESULT CLevel_GamePlay::Ready_LandObjects()
 {
 	CLandObject::LANDOBJ_DESC			LandObjDesc{};
 	
-	LandObjDesc.pMapTransform = dynamic_cast<CTransform*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Map"), g_strTransformTag));
+	LandObjDesc.pMapTransform	= dynamic_cast<CTransform*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Map"), g_strTransformTag));
+	LandObjDesc.pMapModel		= dynamic_cast<CModel*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Map"), L"Com_Model_Map_Konoha_Village"));
+	LandObjDesc.pCamera			= dynamic_cast<CCamera_Free*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera") ) );
+
 
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"), LandObjDesc)))
 		return E_FAIL;
@@ -128,7 +131,7 @@ HRESULT CLevel_GamePlay::Ready_LandObjects()
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring& strLayerTag, CGameObject::GAMEOBJECT_DESC& GameObjDesc)
+HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring& strLayerTag, CLandObject::LANDOBJ_DESC& GameObjDesc)
 {
 	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster_LeafNinja"), &GameObjDesc)))
 		return E_FAIL;

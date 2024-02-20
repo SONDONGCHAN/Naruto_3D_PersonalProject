@@ -345,6 +345,11 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Clone_BC.png"), 1))))
 		return E_FAIL;
 	
+	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
+	/* For.Prototype_Component_Calculator*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Calculator"),
+		CCalculator::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	
 	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
@@ -392,6 +397,10 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Stadium"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Map_Stadium.dat"))))
 		return E_FAIL;
+	///* For.Prototype_Component_Map_Konoha_Village */
+	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Konoha_Village"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Konaha_Village_N.dat"))))
+	//	return E_FAIL;
 
 
 	///////////Particle///////////

@@ -876,6 +876,7 @@ HRESULT CMonster_LeafNinja::Add_Skills()
 	CSkill::SKILL_DESC Skill_desc{};
 	Skill_desc.pParentTransform = m_pTransformCom;
 	Skill_desc.User_Type		= CSkill::USER_MONSTER;
+	Skill_desc.pCamera			= m_pCamera;
 
 	 CSkill* pFlameBomb = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_FlameBomb"), &Skill_desc));
 	 if (nullptr == pFlameBomb)

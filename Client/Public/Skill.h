@@ -1,12 +1,13 @@
 #pragma once
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Camera_Free.h"
+
 
 BEGIN(Engine)
 class CShader;
 class CModel;
 class CTransform;
-
 END
 
 BEGIN(Client)
@@ -20,6 +21,7 @@ public:
 	{
 		CTransform* pParentTransform;
 		USER_TYPE	User_Type; 
+		CCamera_Free* pCamera;
 	};
 
 protected:
@@ -42,9 +44,11 @@ public:
 protected:
 	CShader*		m_pShaderCom = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
-	CTransform*		m_pParentTransform = { nullptr };
 
+	CTransform*		m_pParentTransform = { nullptr };
 	USER_TYPE		m_User_Type = { USER_END };
+	CCamera_Free*	m_pCamera = { nullptr };
+	
 	_float4x4		m_WorldMatrix;
 
 protected:

@@ -55,6 +55,8 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eType, CModel* pModel, _fmatrix
 
 #pragma endregion
 
+	Set_Vertices_Pos();
+
 	return S_OK;
 }
 
@@ -109,6 +111,17 @@ void CMesh::SetUp_BoneMatrices(_Out_ _float4x4* pBoneMatrices, vector<class CBon
 	}
 }
 
+
+void CMesh::Set_Vertices_Pos()
+{
+	m_pVertices_Pos = new _float3[m_iNumVertices];
+
+	for (size_t i = 0; i < m_iNumVertices; i++)
+	{
+		m_pVertices_Pos[i] = { m_pVertices[i].vPosition.x, m_pVertices[i].vPosition.y, m_pVertices[i].vPosition.z };
+	}
+}
+
 CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eType, CModel* pModel, _fmatrix PivotMatrix)
 {
 	CMesh* pInstance = new CMesh(pDevice, pContext);
@@ -141,7 +154,7 @@ void CMesh::Free()
 	{
 		Safe_Delete_Array(m_pVertices);
 		Safe_Delete_Array(m_pAnimVertices);
-
+		Safe_Delete_Array(m_pVertices_Pos);
 		Safe_Delete_Array(m_pIndices);
 	}
 	__super::Free();

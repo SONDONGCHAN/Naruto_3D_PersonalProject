@@ -79,8 +79,12 @@ HRESULT CMap::Render()
 HRESULT CMap::Add_Model_Component()
 {
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Stadium"),
-		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+		TEXT("Com_Model_Map_Stadium"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
+
+	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Konoha_Village"),
+	//	TEXT("Com_Model_Map_Konoha_Village"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	//	return E_FAIL;
 	
 	return S_OK;
 }

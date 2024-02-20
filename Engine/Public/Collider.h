@@ -54,7 +54,7 @@ private:
 	TYPE				m_eType = { TYPE_END };
 	class	CBounding* m_pBounding = { nullptr };
 	list<CCollider*>	IsColliders = {};				// 충돌한 상대 콜라이더* 를 보관, 충돌이 되지 않을때 삭제
-	HIT_TYPE			m_HitType = { HIT_NORMAL };
+	HIT_TYPE			m_HitType = { HIT_END };
 
 #ifdef _DEBUG
 private:

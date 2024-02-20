@@ -53,26 +53,33 @@ HRESULT CUI_Monster_Status::Render()
 	_vector Monster_Pos;
 	memcpy(&Monster_Pos, &((*m_pWorldMatrix).m[3]), sizeof(_float4));
 
+
+	Monster_Pos.m128_f32[1] += 1.7f;
 	_matrix		ViewMatrix	= m_pGameInstance->Get_ViewMatrix();
 	_matrix		ProjMatrix	= m_pGameInstance->Get_ProjMatrix();
 
 	Monster_Pos = XMVector3TransformCoord(Monster_Pos, ViewMatrix);
 	Monster_Pos = XMVector3TransformCoord(Monster_Pos, ProjMatrix);
 
-	_float2 vPos;
-	vPos.x = Monster_Pos.m128_f32[0];
-	vPos.y = Monster_Pos.m128_f32[1];
+	if (Monster_Pos.m128_f32[2] < 0)
+		return S_OK;
 
-	vPos.x = vPos.x * g_iWinSizeX * 0.5f;
-	vPos.y = vPos.y * g_iWinSizeY * 0.5f;
+	_float2 vPos;
+	vPos.x = Monster_Pos.m128_f32[0]* g_iWinSizeX * 0.5f;
+	vPos.y = Monster_Pos.m128_f32[1]* g_iWinSizeY * 0.5f;
 
 	__super::Render();
 
 	_uint i = { 0 };
 
 	for (auto pTextures : m_Textures)
-	{
-		
+	{		
+		if (   (vPos.x + (m_UI_Descs[i].vSize.x * 0.5f)) < (-(g_iWinSizeX * 0.5f))
+			|| (vPos.x - (m_UI_Descs[i].vSize.x * 0.5f)) > (  g_iWinSizeX * 0.5f)
+			|| (vPos.y + (m_UI_Descs[i].vSize.y * 0.5f)) < (-(g_iWinSizeY * 0.5f))
+			|| (vPos.y - (m_UI_Descs[i].vSize.y * 0.5f)) > (  g_iWinSizeY * 0.5f) )
+		return S_OK;
+
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(vPos.x, vPos.y, 0.f, 1.f));
 		XMStoreFloat4x4(&m_WorldMatrix, m_pTransformCom->Get_WorldMatrix());
 
@@ -91,7 +98,7 @@ HRESULT CUI_Monster_Status::Render()
 		if (i == 0)
 		{
 			fRatio = 1.f;
-			vColor = { 0.7f, 0.f, 0.f, 1.f };
+			vColor = { 0.5f, 0.f, 0.f, 1.f };
 		}
 
 		else if (i == 1)
@@ -101,7 +108,7 @@ HRESULT CUI_Monster_Status::Render()
 			if (fRatio <= 0)
 				fRatio = 0;
 
-			vColor = { 0.f, 0.7f, 0.f, 1.f };
+			vColor = { 0.f, 0.5f, 0.f, 1.f };
 
 		}
 
@@ -130,7 +137,7 @@ HRESULT CUI_Monster_Status::Render()
 HRESULT CUI_Monster_Status::Add_Component()
 {
 	UI_Monster_Status_DESC pUI_Desc_1;
-	pUI_Desc_1.vSize = { 100.f, 50.f };
+	pUI_Desc_1.vSize = { 30.f, 6.5f };
 	m_UI_Descs.push_back(pUI_Desc_1);
 	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp_Base"),
 		TEXT("Com_Texture_Base"), reinterpret_cast<CComponent**>(&m_pTextureBase))))
@@ -138,7 +145,7 @@ HRESULT CUI_Monster_Status::Add_Component()
 	m_Textures.push_back(m_pTextureBase);
 
 	UI_Monster_Status_DESC pUI_Desc_2;
-	pUI_Desc_2.vSize = { 100.f, 50.f };
+	pUI_Desc_2.vSize = { 30.f, 6.5f };
 	m_UI_Descs.push_back(pUI_Desc_2);
 	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp"),
 		TEXT("Com_Texture_Hp"), reinterpret_cast<CComponent**>(&m_pTextureHp))))

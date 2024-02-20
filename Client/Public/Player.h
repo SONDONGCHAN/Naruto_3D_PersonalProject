@@ -27,14 +27,12 @@ private:
 	void	Key_Input(_float fTimeDelta);
 	void	Check_Tag();
 
-
 private:
 	map<const wstring, class CLandObject*>		m_Charaters;
 	_uint	m_iCurrent_Character_Index = { 0 };
 	_bool	m_bTagging = false;
 
 	CLandObject* m_pCurrentCharacter = { nullptr };
-	CTransform*  m_pMapTransform = { nullptr };
 
 private:
 	HRESULT Add_Character();

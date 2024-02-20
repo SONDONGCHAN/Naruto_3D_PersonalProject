@@ -22,8 +22,8 @@ HRESULT CPlayer::Initialize_Prototype()
 
 HRESULT CPlayer::Initialize(void* pArg)
 {
-	LANDOBJ_DESC* pGameObjectDesc = (LANDOBJ_DESC*)pArg;
-	m_pMapTransform = pGameObjectDesc->pMapTransform;
+	//LANDOBJ_DESC* pGameObjectDesc = (LANDOBJ_DESC*)pArg;
+	//m_pMapTransform = pGameObjectDesc->pMapTransform;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -42,12 +42,12 @@ void CPlayer::Priority_Tick(_float fTimeDelta)
 
 void CPlayer::Tick(_float fTimeDelta)
 {
-	Check_Tag();
 	m_pCurrentCharacter->Tick(fTimeDelta);
 }
 
 void CPlayer::Late_Tick(_float fTimeDelta)
 {
+	Check_Tag();
 	m_pCurrentCharacter->Late_Tick(fTimeDelta);
 }
 
@@ -115,7 +115,11 @@ void CPlayer::Check_Tag()
 HRESULT CPlayer::Add_Character()
 {
 	CLandObject::LANDOBJ_DESC			Player_Naruto_Desc{};
-	Player_Naruto_Desc.pMapTransform = m_pMapTransform;
+	Player_Naruto_Desc.pMapTransform	= m_pMapTransform;
+	Player_Naruto_Desc.pMapModel		= m_pMapModel;
+	Player_Naruto_Desc.pCamera			= m_pCamera;
+
+
 
 	CPlayer_Naruto* pNaruto = dynamic_cast<CPlayer_Naruto*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Player_Naruto"), &Player_Naruto_Desc));
 	if (nullptr == pNaruto)
@@ -162,13 +166,12 @@ CGameObject* CPlayer::Clone(void* pArg)
 
 void CPlayer::Free()
 {
+	__super::Free();
+
 	for (auto& Pair : m_Charaters)
 		Safe_Release(Pair.second);
 	m_Charaters.clear();
 
-	Safe_Release(m_pCurrentCharacter);
+	//Safe_Release(m_pCurrentCharacter);
 	Safe_Release(m_pMapTransform);
-
-
-	__super::Free();
 }
