@@ -17,6 +17,8 @@ public:
 	HRESULT Initialize();
 	HRESULT Add_Collider(class CCollider* pCollider);
 
+	list<class CCollider*>* Get_Colliders() { return &m_Colliders; }
+
 private:
 	list<class CCollider*>			m_Colliders;
 	_uint	m_iColliderNum = { 0 };

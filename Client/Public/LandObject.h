@@ -19,7 +19,6 @@ public:
 		CTransform*		pMapTransform	= { nullptr };
 		CModel*			pMapModel		= { nullptr };
 		CCamera_Free*	pCamera			= { nullptr };
-
 	};
 
 protected:
@@ -59,8 +58,8 @@ protected:
 	_bool	m_bOnAir = false;
 	_uint	m_iJumpState = 0;
 
-	_float	m_CurrentHp = 1000.f;
-	_float	m_MaxHp		= 1000.f;
+	_float	m_CurrentHp = { 1000.f };
+	_float	m_MaxHp		= { 1000.f };
 
 	// À§Ä¡
 	_vector m_MyPos = {0.f, 0.f, 0.f, 1.f};

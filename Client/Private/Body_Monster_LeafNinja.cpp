@@ -133,6 +133,10 @@ void CBody_Monster_LeafNinja::Set_Animation_State(_float fTimeDelta)
     else if (*m_iMonsterState & MONSTER_GET_UP) {
         m_pModelCom->Set_Animation(70, 0.05f, false, 1.5f, false, false);
     }
+    else if (*m_iMonsterState & MONSTER_DEAD) {
+        m_pModelCom->Set_Animation(49, 0.05f, false, 1.5f, true, false);
+    }
+
 }
 
 HRESULT CBody_Monster_LeafNinja::Add_Component()

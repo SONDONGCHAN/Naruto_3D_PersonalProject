@@ -45,6 +45,9 @@ HRESULT CBoss_Naruto::Initialize(void* pArg)
 	if (FAILED(Add_Trails()))
 		return E_FAIL;
 
+	m_MaxHp = 500.f;
+	m_CurrentHp = 500.f;
+
 	m_CurrentState = MONSTER_STATE_IDLE;
 	_vector vStart_Pos = { 0.f, 0.f, 7.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
@@ -153,8 +156,21 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 	m_fCoolRasengun			-= fTimeDelta;
 	m_fCoolRasenshuriken	-= fTimeDelta;
 	m_fCoolRasengun_Super	-= fTimeDelta;
-
 	m_fWaitingTime += fTimeDelta;
+
+	if (m_CurrentHp <= 0)
+	{
+		if (!m_bDeadCheck)
+		{
+			m_bDeadCheck = true;
+			m_pGameInstance->Kill_Dead_Collider(m_pColliderMain);
+			m_pGameInstance->Kill_Dead_Collider(m_pColliderAttack);
+			m_pColliderMain->Delete_All_IsCollider();
+			m_pColliderAttack->Delete_All_IsCollider();
+			m_iState = PLAYER_DEAD;
+			return;
+		}
+	}
 
 	if (m_iState & PLAYER_STATE_COMBO_STRONG_3)
 	{
@@ -228,6 +244,12 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 
 	if (!(m_iState & PLAYER_STATE_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
+
+	if (m_iState & PLAYER_DEAD)
+	{
+		m_bDead = true;
+		return;
+	}
 
 	if (m_iState & PLAYER_BEATEN)
 	{
@@ -635,6 +657,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			_vector		vDir = TargetPos - MyPos;
 			vDir.m128_f32[1] = 0.f;
 			m_pTransformCom->Set_Look(vDir);
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 2.f, 0.05f);
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{
@@ -642,6 +665,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 				m_iState = (PLAYER_THROW);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 20;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_STRONG)
 			{
@@ -652,6 +676,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 				m_iState = (PLAYER_STRUCK_STRONG_LEFT * m_iStruckState);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 15;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
 			{
@@ -659,6 +684,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 				m_iState = (PLAYER_BEATEN_START);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 25;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
@@ -669,6 +695,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -15.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 10;
 			}
 
 		}
@@ -688,6 +715,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			m_iState = (PLAYER_BEATEN_START);
 			m_fDashSpeed = -15.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 30;
 		}
 	}
 	else if (strColliderLayerTag == L"RasenShuriken_Collider")
@@ -729,6 +757,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			m_iState = (PLAYER_ELECTRICSHOCK);
 			m_fDashSpeed = 0.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 40;
 		}
 	}
 }
@@ -773,6 +802,7 @@ void CBoss_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -3.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 10;
 			}
 			m_fGetAttack_FrameCount--;
 		}
@@ -792,6 +822,7 @@ void CBoss_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -3.f;
 				m_fWaitingTime = 0.f;
+				m_CurrentHp -= 10;
 			}
 			m_fGetAttack_FrameCount--;
 		}
@@ -831,6 +862,7 @@ void CBoss_Naruto::Collider_Event_Exit(const wstring& strColliderLayerTag, CColl
 			m_iState = PLAYER_BEATEN_START;
 			m_fDashSpeed = -15.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 20;
 		}
 	}
 	else if (strColliderLayerTag == L"Kamui_Collider")
@@ -848,6 +880,7 @@ void CBoss_Naruto::Collider_Event_Exit(const wstring& strColliderLayerTag, CColl
 			m_iState = PLAYER_BEATEN_START;
 			m_fDashSpeed = -15.f;
 			m_fWaitingTime = 0.f;
+			m_CurrentHp -= 20;
 		}
 	}
 }

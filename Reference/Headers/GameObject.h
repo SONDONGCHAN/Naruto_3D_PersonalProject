@@ -39,6 +39,10 @@ public:
 
 
 	CTransform*		Get_TranformCom() { return m_pTransformCom; }
+	_bool			Get_isDead()	{ return m_bDead; }
+	_bool			Get_DeadCheck() { return m_bDeadCheck; }
+
+
 
 protected:
 	ID3D11Device*			m_pDevice = { nullptr };
@@ -46,6 +50,9 @@ protected:
 
 	class CGameInstance*	m_pGameInstance = { nullptr };
 	class CTransform*		m_pTransformCom = { nullptr };
+
+	_bool					m_bDead			= { false };
+	_bool					m_bDeadCheck	= { false };
 
 
 protected:

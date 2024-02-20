@@ -125,6 +125,14 @@ void CCollider::Delete_IsCollider(CCollider* Target_Collider)
 	}
 }
 
+void CCollider::Delete_All_IsCollider()
+{
+	for (auto iter : IsColliders)
+	{
+		Safe_Release(iter);
+	}
+}
+
 void CCollider::Set_Center(_float3 vCenter)
 {
 	m_pBounding->Set_Center(vCenter);

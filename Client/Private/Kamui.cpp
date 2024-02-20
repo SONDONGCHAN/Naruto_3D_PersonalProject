@@ -99,6 +99,7 @@ void CKamui::Set_Next_State()
     }
     else if (myState == STATE_FINISH)
     {
+        m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
         m_pColliderMain->Set_Radius(0.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Kamui_Collider");

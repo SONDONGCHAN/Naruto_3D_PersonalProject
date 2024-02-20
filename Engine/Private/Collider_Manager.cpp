@@ -50,6 +50,9 @@ void CCollider_Manager::Check_Collision_For_MyEvent(CCollider* MyColliderCom, co
 		if (pTargetCollider == nullptr)
 			break;
 
+		if (pTargetCollider->Get_Collider_GameObject()->Get_DeadCheck())
+			continue;
+		
 		if (MyColliderCom->Intersect(pTargetCollider))
 		{
 			if (MyColliderCom->Find_IsCollider(pTargetCollider))
@@ -84,7 +87,10 @@ void CCollider_Manager::Check_Collision_For_TargetEvent(CCollider* MyColliderCom
 	
 		if (pTargetCollider == nullptr)
 			break;
-	
+
+		if (pTargetCollider->Get_Collider_GameObject()->Get_DeadCheck())
+			continue;
+		
 		if (MyColliderCom->Intersect(pTargetCollider))
 		{
 			if (pTargetCollider->Find_IsCollider(MyColliderCom))
@@ -128,6 +134,21 @@ _bool CCollider_Manager::Is_Collision(CCollider* MyColliderCom, const wstring& s
 	}
 
 	return false;
+}
+
+void CCollider_Manager::Kill_Dead_Collider(CCollider* DeadCollider)
+{
+	for (auto& Pair : m_pCollider_Layer)
+	{
+		list<class CCollider*>* pColliders = Pair.second->Get_Colliders();
+
+		for (auto pCollier : *pColliders)
+		{
+			if (pCollier->Find_IsCollider(DeadCollider))
+				pCollier->Delete_IsCollider(DeadCollider);
+		}
+
+	}
 }
 
 CCollider_Layer* CCollider_Manager::Find_Collider_Layer(const wstring& strLayerTag)

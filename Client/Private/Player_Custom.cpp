@@ -64,8 +64,8 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(Add_UIs()))
 			 return E_FAIL;
 
-		 _vector vStart_Pos = { 0.f, 20.f, -10.f, 1.f };
-		 m_bOnAir = true;
+		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
+		// m_bOnAir = true;
 		 m_pTransformCom->Set_Pos(vStart_Pos);
 		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
 		 m_bCustom_Mode = false;
@@ -1626,9 +1626,9 @@ HRESULT CPlayer_Custom::Add_Components()
 	
 	// 록온 탐색용 콜라이더 //
 	CBounding_OBB::OBB_DESC		DetectingBoundingDesc{};
-	DetectingBoundingDesc.vExtents = { 10.f , 10.f, 10.f };
+	DetectingBoundingDesc.vExtents = { 8.f , 10.f, 8.f };
 	DetectingBoundingDesc.vRadians = { 0.f , 0.f, 0.f };
-	DetectingBoundingDesc.vCenter = _float3(0.f, -2.f, 5.f);
+	DetectingBoundingDesc.vCenter = _float3(0.f, -2.f, 7.f);
 	
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Detecting"), reinterpret_cast<CComponent**>(&m_pColliderDetecting), &DetectingBoundingDesc)))

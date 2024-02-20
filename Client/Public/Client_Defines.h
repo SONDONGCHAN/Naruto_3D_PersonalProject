@@ -129,6 +129,9 @@ namespace Client
 
 	const _ulonglong PLAYER_ELECTRICSHOCK					= 0x0002000000000000; ///Naruto : 63
 
+	const _ulonglong PLAYER_DEAD							= 0x0004000000000000; ///Naruto : 77
+
+
 
 	////////////////////////////////////////////////////////////////////////////////////
 
@@ -178,6 +181,10 @@ namespace Client
 
 	const _uint MONSTER_GET_UP			= 0x00008000; // LeafNinja : 70 / Samurai : 101 or 102
 	const _uint MONSTER_ELECTRICSHOCK	= 0x00010000; // LeafNinja : 35 / Samurai : 101 or 57
+
+	const _uint MONSTER_DEAD			= 0x00020000; // LeafNinja : 49 / Samurai : 72
+
+
 
 	enum MONSTER_STATE{ 
 		MONSTER_STATE_IDLE, 

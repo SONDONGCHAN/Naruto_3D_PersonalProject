@@ -351,6 +351,11 @@ _bool CGameInstance::Is_Collision(CCollider* MyColliderCom, const wstring& strCo
 	return m_pCollider_Manager->Is_Collision(MyColliderCom, strColliderLayerTag);
 }
 
+void CGameInstance::Kill_Dead_Collider(CCollider* DeadColliderCom)
+{
+	return m_pCollider_Manager->Kill_Dead_Collider(DeadColliderCom);
+}
+
 HRESULT CGameInstance::Add_Font(const wstring& strFontTag, const wstring& strFontFilePath)
 {
 	return m_pFont_Manager->Add_Font(strFontTag, strFontFilePath);

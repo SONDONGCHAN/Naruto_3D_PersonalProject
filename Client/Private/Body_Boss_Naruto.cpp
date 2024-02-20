@@ -81,32 +81,35 @@ void CBody_Boss_Naruto::Set_Animation_State(_float fTimeDelta)
 {
 	if (*m_iMonsterState & PLAYER_STATE_IDLE) {
 		m_pModelCom->Set_Animation(135, 0.1f, true, 1.0f, false, false);
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_FALL_LOOP) {
 		m_pModelCom->Set_Animation(118, 0.f, true, 1.0f, true, false);
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_LAND) {
 		m_pModelCom->Set_Animation(138, 0.1f, false, 2.5f, false, false);
-		m_fAnimationPlayRatio = 0.7f;
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_DASH_FRONT) {
 		m_pModelCom->Set_Animation(101, 0.1f, false, 2.0f, false, false);
-		m_fAnimationPlayRatio = 0.7f;
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_DASH_BACK) {
 		m_pModelCom->Set_Animation(102, 0.1f, false, 2.0f, false, false);
-		m_fAnimationPlayRatio = 1.0f;
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_DASH_LEFT) {
 		m_pModelCom->Set_Animation(104, 0.1f, false, 2.0f, false, false);
-		m_fAnimationPlayRatio = 1.0f;
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_DASH_RIGHT) {
 		m_pModelCom->Set_Animation(105, 0.1f, false, 2.0f, false, false);
-		m_fAnimationPlayRatio = 1.0f;
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_RUN) {
 		m_pModelCom->Set_Animation(169, 0.1f, true, 1.0f, false, false);
+		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_iMonsterState & PLAYER_STATE_COMBO_1) {
 		m_pModelCom->Set_Animation(32, 0.05f, false, 4.f, false, false);
@@ -156,31 +159,6 @@ void CBody_Boss_Naruto::Set_Animation_State(_float fTimeDelta)
 		m_pModelCom->Set_Animation(149, 0.1f, false, 1.3f, false, false);
 		m_fAnimationPlayRatio = 1.f;
 	}
-	/*else if (*m_iMonsterState & PLAYER_STATE_AERIAL_RASENGUN_CHARGE) {
-		m_pModelCom->Set_Animation(146, 0.1f, false, 1.5f, false, false);
-		m_fAnimationPlayRatio = 1.f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}
-	else if (*m_iMonsterState & PLAYER_STATE_AERIAL_RASENGUN_RUN_LOOP) {
-		m_pModelCom->Set_Animation(143, 0.1f, true, 1.f, false, false);
-		m_fAnimationPlayRatio = 1.f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}
-	else if (*m_iMonsterState & PLAYER_STATE_AERIAL_RASENGUN_ATTACK) {
-		m_pModelCom->Set_Animation(142, 0.1f, false, 1.5f, false, false);
-		m_fAnimationPlayRatio = 1.f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}
-	else if (*m_iMonsterState & PLAYER_STATE_AERIAL_RASENSHURIKEN) {
-		m_pModelCom->Set_Animation(148, 0.1f, false, 2.0f, false, false);
-		m_fAnimationPlayRatio = 1.f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}
-	else if (*m_iMonsterState & PLAYER_STATE_AERIAL_RASENGUN_SUPER) {
-		m_pModelCom->Set_Animation(141, 0.1f, false, 1.3f, false, false);
-		m_fAnimationPlayRatio = 1.f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}*/
 	else if (*m_iMonsterState & PLAYER_STATE_JUMP) {
 		m_pModelCom->Set_Animation(136, 0.1f, false, 3.0f, false, false);
 		m_fAnimationPlayRatio = 0.2f;
@@ -189,26 +167,6 @@ void CBody_Boss_Naruto::Set_Animation_State(_float fTimeDelta)
 		m_pModelCom->Set_Animation(108, 0.1f, false, 6.0f, false, false);
 		m_fAnimationPlayRatio = 0.5f;
 	}
-	/*else if (*m_iMonsterState & PLAYER_STATE_AERIAL_COMBO_1) {
-		m_pModelCom->Set_Animation(21, 0.1f, false, 4.0f, false, false);
-		m_fAnimationPlayRatio = 0.5f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}
-	else if (*m_iMonsterState & PLAYER_STATE_AERIAL_COMBO_2) {
-		m_pModelCom->Set_Animation(19, 0.1f, false, 4.0f, false, false);
-		m_fAnimationPlayRatio = 0.6f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}
-	else if (*m_iMonsterState & PLAYER_STATE_AERIAL_COMBO_3) {
-		m_pModelCom->Set_Animation(20, 0.1f, false, 4.0f, false, false);
-		m_fAnimationPlayRatio = 0.9f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}
-	else if (*m_iMonsterState & PLAYER_STATE_AERIAL_DASH_START) {
-		m_pModelCom->Set_Animation(2, 0.1f, false, 6.f, false, true, 0);
-		m_fAnimationPlayRatio = 1.f;
-		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
-	}*/
 	else if (*m_iMonsterState & PLAYER_STATE_CHAKRAJUMP_START) {
 		m_pModelCom->Set_Animation(99, 0.1f, false, 3.f, false, false);
 		m_fAnimationPlayRatio = 0.7f;
@@ -260,6 +218,11 @@ void CBody_Boss_Naruto::Set_Animation_State(_float fTimeDelta)
 		m_pModelCom->Set_Animation(63, 0.05f, false, 0.8f, true, false);
 		m_fAnimationPlayRatio = 1.f;
 	}
+	else if (*m_iMonsterState & PLAYER_DEAD) {
+		m_pModelCom->Set_Animation(77, 0.05f, false, 1.5f, true, false);
+	}
+
+	
 }
 
 HRESULT CBody_Boss_Naruto::Add_Component()

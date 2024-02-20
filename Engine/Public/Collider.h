@@ -35,6 +35,9 @@ public:
 	void			Add_IsCollider(CCollider* Target_Collider);				// Target_Collider* 를 받아서 보관중인 list 에다 추가
 	void			Delete_IsCollider(CCollider* Target_Collider);			// Target_Collider* 를 받아서 보관중인 list 에서 삭제
 
+	void			Delete_All_IsCollider();			// Target_Collider* 를 받아서 보관중인 list 에서 삭제
+
+
 	void			Set_Center(_float3 vCenter);
 	void			Set_Extents_AABB(_float3 vExtents);
 	void			Set_Extents_OBB(_float3 vExtents);

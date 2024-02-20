@@ -19,8 +19,10 @@ public:
 	void		Check_Collision_For_MyEvent(CCollider* MyColliderCom, const wstring& strRaegetColliderLayerTag);
 	void		Check_Collision_For_TargetEvent(CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag);
 
-	
 	_bool		Is_Collision(CCollider* MyColliderCom, const wstring& strColliderLayerTag);
+
+	void		Kill_Dead_Collider(CCollider* MyColliderCom);
+
 
 
 private:

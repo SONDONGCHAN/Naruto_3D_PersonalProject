@@ -61,7 +61,7 @@ HRESULT CUI_Monster_Status::Render()
 	Monster_Pos = XMVector3TransformCoord(Monster_Pos, ViewMatrix);
 	Monster_Pos = XMVector3TransformCoord(Monster_Pos, ProjMatrix);
 
-	if (Monster_Pos.m128_f32[2] < 0)
+	if (Monster_Pos.m128_f32[2] < 0 || Monster_Pos.m128_f32[2] > 1)
 		return S_OK;
 
 	_float2 vPos;

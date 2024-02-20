@@ -48,7 +48,7 @@ HRESULT CMonster_LeafNinja::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_CurrentState = MONSTER_STATE_IDLE;
-	_vector vStart_Pos = { 7.f, 0.f, 5.f, 1.f };
+	_vector vStart_Pos = { 7.f, 0.f, 10.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
 	
@@ -135,6 +135,20 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 	m_fNinjutsu -= fTimeDelta;
 	m_fWaitingTime += fTimeDelta;
 
+	if (m_CurrentHp <= 0)
+	{
+		if (!m_bDeadCheck)
+		{
+			m_bDeadCheck = true;
+			m_pGameInstance->Kill_Dead_Collider(m_pColliderMain);
+			m_pGameInstance->Kill_Dead_Collider(m_pColliderAttack);
+			m_pColliderMain->Delete_All_IsCollider();
+			m_pColliderAttack->Delete_All_IsCollider();
+			m_iState = MONSTER_DEAD;
+			return;
+		}
+	}
+
 	if (m_iState & MONSTER_RUSH_ATTACK)
 	{
 		m_ColliderDelay += fTimeDelta;
@@ -182,6 +196,11 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 	if (!(m_iState & MONSTER_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
 
+	if (m_iState & MONSTER_DEAD)
+	{
+		m_bDead = true;
+		return;
+	}
 	if (m_iState & MONSTER_BEATEN)
 	{
 		if (m_iState != MONSTER_BEATEN_END)
@@ -494,6 +513,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 			_vector		vDir = TargetPos - MyPos;
 			vDir.m128_f32[1] = 0.f;
 			m_pTransformCom->Set_Look(vDir);
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 2.f, 0.05f);
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{

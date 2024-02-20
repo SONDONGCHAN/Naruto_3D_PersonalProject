@@ -80,6 +80,8 @@ public: /* For.Collider_Manager */
 	void	Check_Collision_For_MyEvent(CCollider* MyColliderCom, const wstring& strColliderLayerTag);
 	void	Check_Collision_For_TargetEvent(CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag);
 	_bool	Is_Collision(CCollider* MyColliderCom, const wstring& strColliderLayerTag);
+	void	Kill_Dead_Collider(CCollider* DeadColliderCom);
+
 
 public: /* For.Font_Manager */
 	HRESULT Add_Font(const wstring& strFontTag, const wstring& strFontFilePath);
