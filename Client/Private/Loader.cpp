@@ -415,11 +415,6 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 
 	m_strLoadingText = TEXT("네비게이션를(을) 로딩 중 입니다.");
 
-	/* For.Prototype_Component_Navigation */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/Navi_KonohaVillage_Robby.dat")))))
-		return E_FAIL;
-
 	/* For.Prototype_Component_Navi_Map_Stadium */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/Navi_Map_Stadium.dat")))))

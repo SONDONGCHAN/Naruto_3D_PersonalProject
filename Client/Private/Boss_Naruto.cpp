@@ -45,13 +45,13 @@ HRESULT CBoss_Naruto::Initialize(void* pArg)
 	if (FAILED(Add_Trails()))
 		return E_FAIL;
 
-	m_MaxHp = 500.f;
-	m_CurrentHp = 500.f;
+	m_MaxHp		= 100.f;
+	m_CurrentHp = 100.f;
 
 	m_CurrentState = MONSTER_STATE_IDLE;
 	_vector vStart_Pos = { 0.f, 0.f, 7.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
-	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	
 	return S_OK;
 }
@@ -240,7 +240,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 
 
 	if (m_iState & PLAYER_STATE_RUN)
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 
 	if (!(m_iState & PLAYER_STATE_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
@@ -643,7 +643,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Player_Attack_Collider")
@@ -777,7 +777,7 @@ void CBoss_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 
@@ -901,7 +901,7 @@ void CBoss_Naruto::Off_Attack_Collider()
 void CBoss_Naruto::Dash_Move(_float ratio, _float fTimeDelta)
 {
 	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
-	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 }
 
 void CBoss_Naruto::Use_Skill(const wstring& strSkillName)
@@ -966,7 +966,7 @@ _bool CBoss_Naruto::Skill_State(_float fTimeDelta)
 		}
 		else if (m_iState & PLAYER_STATE_RASENGUN_RUN_LOOP)
 		{
-			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom);
+			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		
 			if (dynamic_cast<CRasengun*>(m_MonsterSkills.find(L"Skill_Rasengun")->second)->Get_IsHit())
 			{

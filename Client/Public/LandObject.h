@@ -57,6 +57,8 @@ protected:
 	_float	m_fGForcePersec	 = 1.f;
 	_bool	m_bOnAir = false;
 	_uint	m_iJumpState = 0;
+	_bool	m_bisLand = { true };
+
 
 	_float	m_CurrentHp = { 1000.f };
 	_float	m_MaxHp		= { 1000.f };

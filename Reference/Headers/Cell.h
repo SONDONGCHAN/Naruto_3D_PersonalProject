@@ -29,6 +29,8 @@ public:
 	HRESULT Initialize(const _float3* pPoints, _uint iCellIndex);
 	_bool Compare_Points(const _float3& vSourPoint, const _float3& vDestPoint);
 	_bool isIn(_fvector vPosition, _int* pNeighborIndex, _float3* vNormal);
+	_bool Get_isLand() { return m_isLand; }
+
 
 #ifdef _DEBUG
 public:
@@ -41,11 +43,13 @@ private:
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
 private:
-	_float3					m_vPoints[POINT_END];
-	_uint					m_iIndex = { 0 };
-	_float3					m_vNormals[LINE_END];
+	_float3		m_vPoints[POINT_END];
+	_uint		m_iIndex = { 0 };
+	_float3		m_vNormals[LINE_END];
 
-	_int					m_iNeighborIndices[LINE_END] = { -1, -1, -1 };
+	_int		m_iNeighborIndices[LINE_END] = { -1, -1, -1 };
+
+	_bool		m_isLand = { true };
 
 #ifdef _DEBUG
 private:

@@ -41,8 +41,8 @@ HRESULT CMonster_LeafNinja::Initialize(void* pArg)
 	if (FAILED(Add_Skills()))
 		return E_FAIL;
 
-	m_MaxHp = 300.f;
-	m_CurrentHp = 300.f;
+	m_MaxHp		= 100.f;
+	m_CurrentHp = 100.f;
 
 	if (FAILED(Add_UIs()))
 		return E_FAIL;
@@ -50,7 +50,7 @@ HRESULT CMonster_LeafNinja::Initialize(void* pArg)
 	m_CurrentState = MONSTER_STATE_IDLE;
 	_vector vStart_Pos = { 7.f, 0.f, 10.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
-	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	
 
 
@@ -191,7 +191,7 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 
 
 	if (m_iState & MONSTER_RUN)
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 
 	if (!(m_iState & MONSTER_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
@@ -499,7 +499,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Player_Attack_Collider")
@@ -631,7 +631,7 @@ void CMonster_LeafNinja::Collider_Event_Stay(const wstring& strColliderLayerTag,
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 
@@ -756,7 +756,7 @@ void CMonster_LeafNinja::Off_Attack_Collider()
 void CMonster_LeafNinja::Dash_Move(_float ratio, _float fTimeDelta)
 {
 	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
-	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 }
 
 void CMonster_LeafNinja::Use_Skill(const wstring& strSkillName)

@@ -82,33 +82,6 @@
     <Filter Include="01. Utility\04. Component">
       <UniqueIdentifier>{8f776145-6717-4c0b-accb-aa1d38bb05e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer">
-      <UniqueIdentifier>{d65b49ec-5991-4df2-8039-4310c92d031e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Rect">
-      <UniqueIdentifier>{973bba3f-2951-4c5e-877b-88196bf7a468}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Terrain">
-      <UniqueIdentifier>{c2f04248-8ec7-4b52-a5ed-d5905d355de2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Cell">
-      <UniqueIdentifier>{7ae36b77-20d2-4eb3-b8a1-75d890538505}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing">
-      <UniqueIdentifier>{2b48bfeb-82d7-427c-8533-fa3add61fe04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle">
-      <UniqueIdentifier>{676f23da-f516-462c-bd94-0b7a5dff68e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle\Rect">
-      <UniqueIdentifier>{8c73d0ad-3cd4-46a3-8c8f-bac0cc6edb5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle\Point">
-      <UniqueIdentifier>{6167b282-645e-4ced-ae5e-4baa86d8d5d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Utility\04. Component\VIBuffer\Point">
-      <UniqueIdentifier>{39878be0-f189-43f8-bdad-3db2e52fdf2f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Utility\04. Component\Shader">
       <UniqueIdentifier>{6eb3521f-1e1f-4f76-b9e8-6d44a36b9bbf}</UniqueIdentifier>
     </Filter>
@@ -168,6 +141,33 @@
     </Filter>
     <Filter Include="01. Utility\04. Component\Navigation\Cell">
       <UniqueIdentifier>{0e64d2db-cc9b-4924-a99b-0de6a7e57936}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer">
+      <UniqueIdentifier>{d65b49ec-5991-4df2-8039-4310c92d031e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Rect">
+      <UniqueIdentifier>{973bba3f-2951-4c5e-877b-88196bf7a468}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Terrain">
+      <UniqueIdentifier>{c2f04248-8ec7-4b52-a5ed-d5905d355de2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Cell">
+      <UniqueIdentifier>{7ae36b77-20d2-4eb3-b8a1-75d890538505}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing">
+      <UniqueIdentifier>{2b48bfeb-82d7-427c-8533-fa3add61fe04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle">
+      <UniqueIdentifier>{676f23da-f516-462c-bd94-0b7a5dff68e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle\Rect">
+      <UniqueIdentifier>{8c73d0ad-3cd4-46a3-8c8f-bac0cc6edb5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Instancing\Particle\Point">
+      <UniqueIdentifier>{6167b282-645e-4ced-ae5e-4baa86d8d5d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Point">
+      <UniqueIdentifier>{39878be0-f189-43f8-bdad-3db2e52fdf2f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -67,7 +67,7 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
 		// m_bOnAir = true;
 		 m_pTransformCom->Set_Pos(vStart_Pos);
-		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
+		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		 m_bCustom_Mode = false;
 	 }
 	
@@ -153,10 +153,10 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 
 	if (m_bOnAir && (m_fGravity < -0.017f))
 	{
-		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom);
+		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	}
 
-	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true)
+	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true && m_bisLand)
 	{
 		m_bOnAir = false;
 		m_iState = 0x0000000000000000;
@@ -841,7 +841,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 			}
 
 			m_iState |= PLAYER_STATE_RUN;
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 			return;
 		}
 
@@ -908,7 +908,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 				}
 				Set_Direc_Lerf(DIR_RIGHT, 0.1f);
 			}
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 
@@ -1031,13 +1031,13 @@ void CPlayer_Custom::Dash_Move(_float End_Speed, _float ratio, _float fTimeDelta
 {
 	m_fDashSpeed = Lerp(End_Speed, m_fDashSpeed, ratio);
 	if (DashDir == DIR_FRONT)
-		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	else if (DashDir == DIR_BACK)
-		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	else if (DashDir == DIR_LEFT)
-		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	else if (DashDir == DIR_RIGHT)
-		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 }
 
 void CPlayer_Custom::TranslateRootAnimation()
@@ -1077,7 +1077,7 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Monster_Attack_Collider")
@@ -1173,7 +1173,7 @@ void CPlayer_Custom::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 
 
@@ -1382,11 +1382,11 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 				_vector MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_vector LockOnDir = TargetPos - MyPos;
 				m_pTransformCom->Set_Look(LockOnDir);
-				m_pTransformCom->MoveTo(TargetPos, 50.f, fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->MoveTo(TargetPos, 50.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 			}
 			else
 			{
-				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 50.f, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 50.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 			}
 			if (dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Get_IsHit())
 			{
@@ -1423,12 +1423,12 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 				_vector MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_vector LockOnDir = TargetPos - MyPos;
 				m_pTransformCom->Set_Look(LockOnDir);
-				m_pTransformCom->MoveTo(TargetPos, 30.f, fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->MoveTo(TargetPos, 30.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 
 			}
 			else
 			{
-				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 30.f, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 30.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 
 			}
 			if (dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Get_IsHit())
@@ -1959,8 +1959,8 @@ void CPlayer_Custom::Free()
 	Safe_Release(m_pColliderDetecting);
 	Safe_Release(m_pColliderAttack);
 	
-	if(m_pLockOnTarget != nullptr)
-		Safe_Release(m_pLockOnTarget);
+	//if(m_pLockOnTarget != nullptr)
+		//Safe_Release(m_pLockOnTarget);
 
 	if(m_bCustom_Mode)
 		Safe_Release(m_Player_Custom_UI);

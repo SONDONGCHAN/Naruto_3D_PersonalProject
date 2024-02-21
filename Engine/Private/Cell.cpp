@@ -30,7 +30,13 @@ HRESULT CCell::Initialize(const _float3* pPoints, _uint iCellIndex)
 	XMStoreFloat3(&m_vNormals[LINE_CA], XMLoadFloat3(&m_vPoints[POINT_A]) - XMLoadFloat3(&m_vPoints[POINT_C]));
 	XMStoreFloat3(&m_vNormals[LINE_CA], XMVector3Normalize(XMLoadFloat3(&_float3(m_vNormals[LINE_CA].z * -1.f, 0.f, m_vNormals[LINE_CA].x))));
 
+	_vector vDirAB = XMLoadFloat3(&m_vPoints[POINT_B]) - XMLoadFloat3(&m_vPoints[POINT_A]);
+	_vector vDirAC = XMLoadFloat3(&m_vPoints[POINT_C]) - XMLoadFloat3(&m_vPoints[POINT_A]);
 
+	_vector vCellNormal = XMVector3Normalize(XMVector3Cross(vDirAB, vDirAC));
+
+	if (cos(XMConvertToRadians(70.f)) > vCellNormal.m128_f32[1])
+		m_isLand = false;
 
 #ifdef _DEBUG
 	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);

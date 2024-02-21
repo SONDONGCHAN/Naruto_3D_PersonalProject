@@ -93,7 +93,7 @@ void CNavigation::Tick(_fmatrix MapWorldMatrix)
 	XMStoreFloat4x4(&m_WorldMatrix, MapWorldMatrix);
 }
 
-_bool CNavigation::isMove(_fvector vPosition, _vector Dir, _Out_ _vector* ResultDir)
+_bool CNavigation::isMove(_fvector vPosition, _vector Dir, _Out_ _vector* ResultDir, _Out_ _bool* isLand)
 {
 	_int		iNeighborIndex = { -1 };
 	_float3		vLineNormal = { 0.f, 0.f, 0.f };
@@ -116,9 +116,24 @@ _bool CNavigation::isMove(_fvector vPosition, _vector Dir, _Out_ _vector* Result
 
 				if (true == m_vecCells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex, &vLineNormal))
 				{
-					m_iCurrentIndex = iNeighborIndex;
-					*ResultDir = Dir;
-					return true;
+					if (m_vecCells[iNeighborIndex]->Get_isLand())
+					{
+						m_iCurrentIndex = iNeighborIndex;
+						*ResultDir = Dir;
+
+						return true;
+
+					}
+					else
+					{
+						_vector vCounterNormal = XMVector3Cross(XMVector3Cross(XMLoadFloat3(&vLineNormal), Dir), XMLoadFloat3(&vLineNormal));
+						vCounterNormal = XMVector3Normalize(vCounterNormal);
+
+						_float fScale = XMVectorGetX(XMVector3Dot(vCounterNormal, Dir));
+						*ResultDir = vCounterNormal * fScale;
+						*isLand = false;
+						return false;
+					}
 				}
 			}
 		}

@@ -69,28 +69,28 @@ public:
 
 
 public:
-	void Go_Straight(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Straight_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr);
-	void Go_Backward(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Backward_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr);
-	void Go_Left(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Left_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr);
-	void Go_Right(_float fTimeDelta, class CNavigation* pNavigation = nullptr);
-	void Go_Right_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr);
-	void Go_Custom_Direction(_float fTimeDelta, _float fSpeed, _vector vDirection, CNavigation* pNavigation = nullptr);
+	void Go_Straight(_float fTimeDelta, class CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
+	void Go_Straight_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr, _bool onAir= false, _bool* isLand = nullptr);
+	void Go_Backward(_float fTimeDelta, class CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
+	void Go_Backward_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
+	void Go_Left(_float fTimeDelta, class CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
+	void Go_Left_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
+	void Go_Right(_float fTimeDelta, class CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
+	void Go_Right_Custom(_float fTimeDelta, _float fSpeed, class CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
+	void Go_Custom_Direction(_float fTimeDelta, _float fSpeed, _vector vDirection, CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
 
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fRadian);
-	void MoveTo(_fvector vPoint, _float fSpeed, _float fTimeDelta, CNavigation* pNavigation = nullptr);
+	void MoveTo(_fvector vPoint, _float fSpeed, _float fTimeDelta, CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
 	void LookAt(_fvector vPoint);
 	void LookAt_ForLandObject(_fvector vPoint);
 	void Set_Pos(_fvector vPoint);
-	void Set_LandObject_Pos(_fvector vPoint, CNavigation* pNavigation = nullptr);
+	void Set_LandObject_Pos(_fvector vPoint, CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
 	void Set_Look(_fvector direction);
 	void Set_Look_IncludeY(_fvector direction);
 
 
-	void SetAnimationMove(_fvector vPoint, CNavigation* pNavigation = nullptr);
+	void SetAnimationMove(_fvector vPoint, CNavigation* pNavigation = nullptr, _bool onAir = false, _bool* isLand = nullptr);
 
 private:
 	_float4x4			m_WorldMatrix = {};

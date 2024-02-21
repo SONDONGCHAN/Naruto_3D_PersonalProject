@@ -41,191 +41,272 @@ HRESULT CTransform::Bind_ShaderResource(CShader* pShader, const _char* pContantN
 	return pShader->Bind_Matrix(pContantName, &m_WorldMatrix);
 }
 
-void CTransform::Go_Straight(_float fTimeDelta,CNavigation* pNavigation)
+void CTransform::Go_Straight(_float fTimeDelta,CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vLook = Get_State(STATE_LOOK);
 	_vector		ResultDir;
-	
+	_bool		isLand = true;
+
 	vPosition += XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 	
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 
-	else if(false == pNavigation->isMove(vPosition, vLook, &ResultDir))
+	else if(false == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir * m_fSpeedPerSec * fTimeDelta;
-	
-		if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			*_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir * m_fSpeedPerSec * fTimeDelta;
+
+			if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Straight_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation)
+void CTransform::Go_Straight_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vLook = Get_State(STATE_LOOK);
 	_vector		ResultDir;
-	
+	_bool		isLand = true;
+
 	vPosition += XMVector3Normalize(vLook) * fSpeed * fTimeDelta;
 	
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
-	
-	else if (false == pNavigation->isMove(vPosition, vLook, &ResultDir))
+
+	else if (false == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir * fSpeed * fTimeDelta;
-	
-		if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else 
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir * fSpeed * fTimeDelta;
+
+			if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation)
+void CTransform::Go_Backward(_float fTimeDelta, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vLook = Get_State(STATE_LOOK);
 	_vector		ResultDir;
-	
+	_bool		isLand = true;
+
 	vPosition -= XMVector3Normalize(vLook) * m_fSpeedPerSec * fTimeDelta;
 	
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 	
-	else if (false == pNavigation->isMove(vPosition, vLook, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos -= ResultDir * m_fSpeedPerSec * fTimeDelta;
-	
-		if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos -= ResultDir * m_fSpeedPerSec * fTimeDelta;
+
+			if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Backward_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation)
+void CTransform::Go_Backward_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vLook = Get_State(STATE_LOOK);
 	_vector		ResultDir;
-	
+	_bool		isLand = true;
+
 	vPosition -= XMVector3Normalize(vLook) * fSpeed * fTimeDelta;
 	
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 	
-	else if (false == pNavigation->isMove(vPosition, vLook, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vLook, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos -= ResultDir * fSpeed * fTimeDelta;
-	
-		if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos -= ResultDir * fSpeed * fTimeDelta;
+
+			if (true == pNavigation->isMove(vSlidingPos, vLook, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Left(_float fTimeDelta, CNavigation* pNavigation)
+void CTransform::Go_Left(_float fTimeDelta, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vRight = Get_State(STATE_RIGHT);
 	_vector		ResultDir;
+	_bool		isLand = true;
 
 	vPosition -= XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 
-	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos -= ResultDir * m_fSpeedPerSec * fTimeDelta;
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos -= ResultDir * m_fSpeedPerSec * fTimeDelta;
 
-		if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+			if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Left_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation)
+void CTransform::Go_Left_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vRight = Get_State(STATE_RIGHT);
 	_vector		ResultDir;
+	_bool		isLand = true;
 
 	vPosition -= XMVector3Normalize(vRight) * fSpeed * fTimeDelta;
 
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 
-	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos -= ResultDir * fSpeed * fTimeDelta;
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos -= ResultDir * fSpeed * fTimeDelta;
 
-		if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+			if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Right(_float fTimeDelta, CNavigation* pNavigation)
+void CTransform::Go_Right(_float fTimeDelta, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vRight = Get_State(STATE_RIGHT);
 	_vector		ResultDir;
+	_bool		isLand = true;
 
 	vPosition += XMVector3Normalize(vRight) * m_fSpeedPerSec * fTimeDelta;
 
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 
-	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir * m_fSpeedPerSec * fTimeDelta;
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir * m_fSpeedPerSec * fTimeDelta;
 
-		if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+			if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Right_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation)
+void CTransform::Go_Right_Custom(_float fTimeDelta, _float fSpeed, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vRight = Get_State(STATE_RIGHT);
 	_vector		ResultDir;
-	
+	_bool		isLand = true;
+
 	vPosition += XMVector3Normalize(vRight) * fSpeed * fTimeDelta;
 	
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 	
-	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vRight, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir * fSpeed * fTimeDelta;
-	
-		if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir * fSpeed * fTimeDelta;
+
+			if (true == pNavigation->isMove(vSlidingPos, vRight, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
-void CTransform::Go_Custom_Direction(_float fTimeDelta, _float fSpeed, _vector vDirection, CNavigation* pNavigation)
+void CTransform::Go_Custom_Direction(_float fTimeDelta, _float fSpeed, _vector vDirection, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		ResultDir;
-	
+	_bool		isLand = true;
+
 	vPosition += XMVector3Normalize(vDirection) * fSpeed * fTimeDelta;
 	
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDirection, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDirection, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 	
-	else if (false == pNavigation->isMove(vPosition, vDirection, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vDirection, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir * fSpeed * fTimeDelta;
-	
-		if (true == pNavigation->isMove(vSlidingPos, vDirection, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir * fSpeed * fTimeDelta;
+
+			if (true == pNavigation->isMove(vSlidingPos, vDirection, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
@@ -258,27 +339,36 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 	}
 }
 
-void CTransform::MoveTo(_fvector vPoint, _float fSpeed, _float fTimeDelta, CNavigation* pNavigation)
+void CTransform::MoveTo(_fvector vPoint, _float fSpeed, _float fTimeDelta, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vDir = vPoint - vPosition;
 	_vector		ResultDir;
+	_bool		isLand = true;
 
 	//_float		fDistance = XMVector3Length(vDir).m128_f32[0];
 
 	//if (fDistance >= fLimit)
 	vPosition += XMVector3Normalize(vDir) * fSpeed * fTimeDelta;
 
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDir, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDir, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 
-	else if (false == pNavigation->isMove(vPosition, vDir, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vDir, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir * fSpeed * fTimeDelta;
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir * fSpeed * fTimeDelta;
 
-		if (true == pNavigation->isMove(vSlidingPos, vDir, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+			if (true == pNavigation->isMove(vSlidingPos, vDir, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
@@ -317,24 +407,33 @@ void CTransform::Set_Pos(_fvector vPoint)
 	Set_State(STATE_POSITION, vPoint);
 }
 
-void CTransform::Set_LandObject_Pos(_fvector vPoint, CNavigation* pNavigation)
+void CTransform::Set_LandObject_Pos(_fvector vPoint, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vDir = vPoint - vPosition;
 	_vector		ResultDir;
+	_bool		isLand = true;
 
 	vPosition += vDir;
 
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDir, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDir, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 
-	else if (false == pNavigation->isMove(vPosition, vDir, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vDir, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir;
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir;
 
-		if (true == pNavigation->isMove(vSlidingPos, vDir, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+			if (true == pNavigation->isMove(vSlidingPos, vDir, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 }
 
@@ -360,24 +459,33 @@ void CTransform::Set_Look_IncludeY(_fvector direction)
 	Set_State(STATE_LOOK, XMVector3Normalize(vLook));
 }
 
-void CTransform::SetAnimationMove(_fvector vPoint, CNavigation* pNavigation)
+void CTransform::SetAnimationMove(_fvector vPoint, CNavigation* pNavigation, _bool onAir, _bool* _isLand)
 {
 	_vector		vPosition = Get_State(STATE_POSITION);
 	_vector		vDir = vPoint;
 	_vector		ResultDir;
+	_bool		isLand = true;
 
 	vPosition += vDir;
 
-	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDir, &ResultDir))
+	if (nullptr == pNavigation || true == pNavigation->isMove(vPosition, vDir, &ResultDir, &isLand))
 		Set_State(STATE_POSITION, vPosition);
 
-	else if (false == pNavigation->isMove(vPosition, vDir, &ResultDir))
+	else if (false == pNavigation->isMove(vPosition, vDir, &ResultDir, &isLand))
 	{
-		_vector		vSlidingPos = Get_State(STATE_POSITION);
-		vSlidingPos += ResultDir;
+		if ((!isLand) && onAir)
+		{
+			Set_State(STATE_POSITION, vPosition);
+			_isLand = false;
+		}
+		else
+		{
+			_vector		vSlidingPos = Get_State(STATE_POSITION);
+			vSlidingPos += ResultDir;
 
-		if (true == pNavigation->isMove(vSlidingPos, vDir, &ResultDir))
-			Set_State(STATE_POSITION, vSlidingPos);
+			if (true == pNavigation->isMove(vSlidingPos, vDir, &ResultDir, &isLand))
+				Set_State(STATE_POSITION, vSlidingPos);
+		}
 	}
 
 }

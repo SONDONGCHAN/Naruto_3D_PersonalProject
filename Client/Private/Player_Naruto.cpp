@@ -57,7 +57,7 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 	
 	_vector vStart_Pos = { -10.f, 0.f, -10.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
-	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 
 	return S_OK;
 }
@@ -95,10 +95,10 @@ void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 
 	if (m_bOnAir && (m_fGravity < -0.017f))
 	{
-		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom);
+		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	}
 
-	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true)
+	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true && m_bisLand)
 	{
 		m_bOnAir = false;
 		m_iState = 0x0000000000000000;
@@ -672,7 +672,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 			}
 
 			m_iState |= PLAYER_STATE_RUN;
-			m_pTransformCom->Go_Straight(fTimeDelta,m_pNavigationCom);
+			m_pTransformCom->Go_Straight(fTimeDelta,m_pNavigationCom, m_bOnAir, &m_bisLand);
 			return;
 		}
 
@@ -739,7 +739,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 				 }
 				 Set_Direc_Lerf(DIR_RIGHT, 0.1f);
 			}
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 
@@ -863,24 +863,24 @@ void CPlayer_Naruto::Dash_Move(_float End_Speed, _float ratio, _float fTimeDelta
 {
 	m_fDashSpeed = Lerp(End_Speed, m_fDashSpeed, ratio);
 	if(DashDir == DIR_FRONT)
-		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	else if (DashDir == DIR_BACK)
-		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	else if (DashDir == DIR_LEFT)
-		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 	else if (DashDir == DIR_RIGHT)
-		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom);
+		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
 }
 
 void CPlayer_Naruto::TranslateRootAnimation()
 {
-	// 움직임을 World이동으로치환
-	_float3 fmovevalue = m_pBodyModelCom->Get_FramePos();
-	_float3 fInversemovevalue;
-	fInversemovevalue.x = -fmovevalue.x;
-	fInversemovevalue.y = 0.f;
-	fInversemovevalue.z = -fmovevalue.y;
-	m_pTransformCom->SetAnimationMove(XMLoadFloat3(&fInversemovevalue));
+	//// 움직임을 World이동으로치환
+	//_float3 fmovevalue = m_pBodyModelCom->Get_FramePos();
+	//_float3 fInversemovevalue;
+	//fInversemovevalue.x = -fmovevalue.x;
+	//fInversemovevalue.y = 0.f;
+	//fInversemovevalue.z = -fmovevalue.y;
+	//m_pTransformCom->SetAnimationMove(XMLoadFloat3(&fInversemovevalue));
 }
 
 _bool CPlayer_Naruto::Front_Dash()
@@ -908,7 +908,7 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 			_float		Length = pMyCollider->Get_Radius() + pTargetCollider->Get_Radius();
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Monster_Attack_Collider")
@@ -1003,7 +1003,7 @@ void CPlayer_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 	
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 	
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
 		}
 	
 		
@@ -1160,7 +1160,6 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 		if (m_iState & PLAYER_STATE_RASENGUN_CHARGE)
 		{
 			m_pCamera->Set_Camera_radius();
-
 			m_iState = PLAYER_STATE_RASENGUN_RUN_LOOP;		
 			dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Set_Next_State();
 			m_bInvincible = true;
@@ -1168,7 +1167,7 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 		}
 		else if (m_iState & PLAYER_STATE_RASENGUN_RUN_LOOP)
 		{
-			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom);
+			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 			Player_Moving(fTimeDelta);
 
 			if (dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Get_IsHit())
@@ -1187,6 +1186,7 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 
 		else if (m_iState & PLAYER_STATE_AERIAL_RASENGUN_CHARGE)
 		{
+			m_pCamera->Set_Camera_radius();
 			m_iState = PLAYER_STATE_AERIAL_RASENGUN_RUN_LOOP;
 			dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Set_Next_State();
 			m_bInvincible = true;
@@ -1200,13 +1200,13 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 				_vector MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_vector LockOnDir = TargetPos - MyPos;
 				m_pTransformCom->Set_Look(LockOnDir);
-				m_pTransformCom->MoveTo(TargetPos, 20.f, fTimeDelta, m_pNavigationCom);
+				m_pTransformCom->MoveTo(TargetPos, 20.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
 
 			}
 			else
 			{
 				Player_Moving(fTimeDelta);
-				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 20.f, m_pNavigationCom);
+				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 20.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
 			}
 
 			if (dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Get_IsHit())
