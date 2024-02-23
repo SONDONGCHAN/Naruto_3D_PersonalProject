@@ -49,7 +49,7 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(Add_Components()))
 			 return E_FAIL;
 
-		 if (FAILED(Add_PartObjects(LEVEL_GAMEPLAY)))
+		 if (FAILED(Add_PartObjects(m_Current_Level)))
 			 return E_FAIL;
 
 		 if(FAILED(Add_Weapon()))
@@ -65,9 +65,15 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 			 return E_FAIL;
 
 		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
-		// m_bOnAir = true;
+
+		if(m_Current_Level == LEVEL_GAMEPLAY)
+			 vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
+		else if (m_Current_Level == LEVEL_BOSS)
+			 vStart_Pos = { -114.5f, 23.f, 82.5f, 1.f };
+
+		// m_bOnAir = true;a
 		 m_pTransformCom->Set_Pos(vStart_Pos);
-		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		 m_bCustom_Mode = false;
 	 }
 	
@@ -133,12 +139,19 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 	for (auto& Pair : m_PlayerWeapon)
 		(Pair.second)->Priority_Tick(fTimeDelta);
 
-	m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Monster_Main_Collider");
-	m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderDetecting, L"Monster_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderAttack, L"Monster_Main_Collider", L"Player_Attack_Collider");
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider");
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderDetecting, L"Monster_Main_Collider");
+	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Monster_Main_Collider", L"Player_Attack_Collider");
+	
+	bool bCurrentLand = m_bCellisLand;
 
 	Player_Dash(fTimeDelta);
 	Key_Input(fTimeDelta);
+
+	if (bCurrentLand != m_bCellisLand)
+	{
+		int a = 0;
+	}
 
 	if (m_bSkillOn[SKILL_WOOD_SWAP])
 		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Priority_Tick(fTimeDelta);
@@ -151,14 +164,14 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 	if (m_bSkillOn[SKILL_WOODHAND])
 		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Priority_Tick(fTimeDelta);
 
-	if (m_bOnAir && (m_fGravity < -0.017f))
+	if (m_bOnAir && (m_fGravity < -0.017f) && m_bCellisLand)
 	{
-		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	}
 
-	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true && m_bisLand)
+	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true && m_bCellisLand)
 	{
-		m_bOnAir = false;
+ 		m_bOnAir = false;
 		m_iState = 0x0000000000000000;
 		m_iState |= PLAYER_STATE_LAND;
 	}
@@ -684,11 +697,11 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 			m_iJumpState++;
 			m_bOnAir = true;
 			m_iState |= PLAYER_STATE_JUMP;
-			if (m_fChargingtime >= 4.f)
-				m_fChargingtime = 4.f;
+			if (m_fChargingtime >= 3.f)
+				m_fChargingtime = 3.f;
 
-			m_fGravity = Lerp(-0.4f, -1.f, m_fChargingtime / 4.f);
-			m_fJumpSpeed = Lerp(7.f, 30.f, m_fChargingtime / 4.f);
+			m_fGravity = Lerp(-0.4f, -1.f, m_fChargingtime / 3.f);
+			m_fJumpSpeed = Lerp(7.f, 30.f, m_fChargingtime / 3.f);
 
 			m_vJumpDirection = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 			m_fChargingtime = 0.f;
@@ -841,7 +854,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 			}
 
 			m_iState |= PLAYER_STATE_RUN;
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			return;
 		}
 
@@ -908,7 +921,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 				}
 				Set_Direc_Lerf(DIR_RIGHT, 0.1f);
 			}
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 
@@ -1031,13 +1044,13 @@ void CPlayer_Custom::Dash_Move(_float End_Speed, _float ratio, _float fTimeDelta
 {
 	m_fDashSpeed = Lerp(End_Speed, m_fDashSpeed, ratio);
 	if (DashDir == DIR_FRONT)
-		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	else if (DashDir == DIR_BACK)
-		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	else if (DashDir == DIR_LEFT)
-		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	else if (DashDir == DIR_RIGHT)
-		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 }
 
 void CPlayer_Custom::TranslateRootAnimation()
@@ -1077,7 +1090,7 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Monster_Attack_Collider")
@@ -1173,7 +1186,7 @@ void CPlayer_Custom::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 
 
@@ -1382,11 +1395,11 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 				_vector MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_vector LockOnDir = TargetPos - MyPos;
 				m_pTransformCom->Set_Look(LockOnDir);
-				m_pTransformCom->MoveTo(TargetPos, 50.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+				m_pTransformCom->MoveTo(TargetPos, 50.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			}
 			else
 			{
-				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 50.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 50.f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			}
 			if (dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Get_IsHit())
 			{
@@ -1423,12 +1436,12 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 				_vector MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_vector LockOnDir = TargetPos - MyPos;
 				m_pTransformCom->Set_Look(LockOnDir);
-				m_pTransformCom->MoveTo(TargetPos, 30.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+				m_pTransformCom->MoveTo(TargetPos, 30.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 			}
 			else
 			{
-				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 30.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 30.f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 			}
 			if (dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Get_IsHit())
@@ -1607,9 +1620,20 @@ HRESULT CPlayer_Custom::Add_Components()
 	
 	NaviDesc.iStartCellIndex = 30;
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
-		return E_FAIL;
+	if (m_Current_Level == LEVEL_GAMEPLAY)
+	{
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Stadium"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
+	else if (m_Current_Level == LEVEL_BOSS)
+	{
+		NaviDesc.iStartCellIndex = 114;
+
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
 	
 	/////////* Com_Collider *//////////////
 	
@@ -1618,10 +1642,10 @@ HRESULT CPlayer_Custom::Add_Components()
 	MainBoundingDesc.fRadius = 0.7f;
 	MainBoundingDesc.vCenter = _float3(0.f, MainBoundingDesc.fRadius, 0.f);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &MainBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Player_Main_Collider", m_pColliderMain);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 	
 	// 록온 탐색용 콜라이더 //
@@ -1630,10 +1654,10 @@ HRESULT CPlayer_Custom::Add_Components()
 	DetectingBoundingDesc.vRadians = { 0.f , 0.f, 0.f };
 	DetectingBoundingDesc.vCenter = _float3(0.f, -2.f, 7.f);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Detecting"), reinterpret_cast<CComponent**>(&m_pColliderDetecting), &DetectingBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Player_Detecting_Collider", m_pColliderDetecting);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
 	m_pColliderDetecting->Set_Collider_GameObject(this);
 	
 	// 콤보공격 콜라이더 //
@@ -1641,10 +1665,10 @@ HRESULT CPlayer_Custom::Add_Components()
 	AttackBoundingDesc.fRadius = 0.f;
 	AttackBoundingDesc.vCenter = _float3(0.f, AttackBoundingDesc.fRadius, AttackBoundingDesc.fRadius);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Attack"), reinterpret_cast<CComponent**>(&m_pColliderAttack), &AttackBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Player_Attack_Collider", m_pColliderAttack);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
 	Off_Attack_Collider();
 	
@@ -1761,6 +1785,8 @@ HRESULT CPlayer_Custom::Add_Skills()
 	FlameBomb_desc.pParentTransform = m_pTransformCom;
 	FlameBomb_desc.User_Type = CSkill::USER_PLAYER;
 	FlameBomb_desc.pCamera = m_pCamera;
+	FlameBomb_desc.Current_Level = m_Current_Level;
+
     CSkill* pFlameBomb = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_FlameBomb"), &FlameBomb_desc));
 	if (nullptr == pFlameBomb)
 		return E_FAIL;
@@ -1773,6 +1799,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	Chidori_desc.pParentTransform = m_pTransformCom;
 	Chidori_desc.User_Type = CSkill::USER_PLAYER;
 	Chidori_desc.pCamera = m_pCamera;
+	Chidori_desc.Current_Level = m_Current_Level;
 	Chidori_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("L_Hand_Weapon_cnt_tr");
 	CSkill* pChidori = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Chidori"), &Chidori_desc));
 	if (nullptr == pChidori)
@@ -1786,6 +1813,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	WoodHand_desc.pParentTransform = m_pTransformCom;
 	WoodHand_desc.User_Type = CSkill::USER_PLAYER;
 	WoodHand_desc.pCamera = m_pCamera;
+	WoodHand_desc.Current_Level = m_Current_Level;
 	CSkill* pWoodHand= dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Hand"), &WoodHand_desc));
 	if (nullptr == pWoodHand)
 		return E_FAIL;
@@ -1798,6 +1826,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	Kamui_desc.pParentTransform = m_pTransformCom;
 	Kamui_desc.User_Type = CSkill::USER_PLAYER;
 	Kamui_desc.pCamera = m_pCamera;
+	Kamui_desc.Current_Level = m_Current_Level;
 	CSkill* pKamui = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Kamui"), &Kamui_desc));
 	if (nullptr == pKamui)
 		return E_FAIL;
@@ -1811,6 +1840,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	Wood_Swap_desc.User_Type = CSkill::USER_PLAYER;
 	Wood_Swap_desc.pUser_Navigation = m_pNavigationCom;
 	Wood_Swap_desc.pCamera = m_pCamera;
+	Wood_Swap_desc.Current_Level = m_Current_Level;
 	CSkill* pWood_Swap = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Swap"), &Wood_Swap_desc));
 	if (nullptr == pWood_Swap)
 		return E_FAIL;

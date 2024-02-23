@@ -110,9 +110,9 @@ void CWood_Dragon::State_Control(_float fTimeDelta)
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         
         if (m_User_Type == USER_PLAYER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Wood_Dragon_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Wood_Dragon_Collider");
         else if (m_User_Type == USER_MONSTER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Player_Main_Collider", L"Wood_Dragon_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider", L"Wood_Dragon_Collider");
         
         if (m_fDurTime > 4.f)
             Set_Next_State();
@@ -137,9 +137,9 @@ void CWood_Dragon::Set_Next_State()
         m_pColliderMain->Set_Extents_OBB({0.f, 0.f, 0.f});
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         if (m_User_Type == USER_PLAYER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Wood_Dragon_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Wood_Dragon_Collider");
         else if (m_User_Type == USER_MONSTER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Player_Main_Collider", L"Wood_Dragon_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider", L"Wood_Dragon_Collider");
         m_fDurTime = 0;
         m_bIsHit = false;
     }
@@ -164,11 +164,11 @@ void CWood_Dragon::RootAnimation()
 
 HRESULT CWood_Dragon::Add_Components()
 {
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
 
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Skill_Wood_Dragon"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Skill_Wood_Dragon"),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
             return E_FAIL;
 
@@ -177,11 +177,11 @@ HRESULT CWood_Dragon::Add_Components()
     BoundingDesc.vExtents = { 2.f, 2.f, 6.f };
     BoundingDesc.vRadians = { 0.f, 0.f, 0.f};
     BoundingDesc.vCenter = _float3(0.f, 0.f, -4.f);
-    if (FAILED( __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
+    if (FAILED( __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
         TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
         return E_FAIL;
 
-    m_pGameInstance->Add_Collider(TEXT("Wood_Dragon_Collider"), m_pColliderMain);
+    m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Wood_Dragon_Collider"), m_pColliderMain);
     m_pColliderMain->Set_Collider_GameObject(this);
 
     return S_OK;

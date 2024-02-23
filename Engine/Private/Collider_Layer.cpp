@@ -50,5 +50,8 @@ CCollider_Layer* CCollider_Layer::Create()
 
 void CCollider_Layer::Free()
 {
+	//for (auto& pCollider : m_Colliders)
+	//	Safe_Release(pCollider);
+
 	m_Colliders.clear();
 }

@@ -46,6 +46,8 @@ private:
 	HRESULT Loading_For_LogoLevel();
 	HRESULT Loading_For_CustomRoomLevel();
 	HRESULT Loading_For_GamePlayLevel();
+	HRESULT Loading_For_BossStageLevel();
+
 
 
 public:

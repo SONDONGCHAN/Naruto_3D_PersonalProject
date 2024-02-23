@@ -118,9 +118,9 @@ void CFlameBomb::State_Control(_float fTimeDelta)
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
         if (m_User_Type == USER_PLAYER)
-            m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Monster_Main_Collider");
+            m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider");
         else if (m_User_Type == USER_MONSTER)
-            m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Player_Main_Collider");
+            m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
 
         if (m_fDurTime > 1.f)
         {
@@ -133,9 +133,9 @@ void CFlameBomb::State_Control(_float fTimeDelta)
     else if (myState == STATE_HIT)
     {
         if (m_User_Type == USER_PLAYER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"FlameBomb_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"FlameBomb_Collider");
         else if (m_User_Type == USER_MONSTER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Player_Main_Collider", L"FlameBomb_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider", L"FlameBomb_Collider");
 
         m_fDurTime += fTimeDelta;
 
@@ -169,9 +169,9 @@ void CFlameBomb::Set_Next_State()
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
         if (m_User_Type == USER_PLAYER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"FlameBomb_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"FlameBomb_Collider");
         else if (m_User_Type == USER_MONSTER)
-            m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Player_Main_Collider", L"FlameBomb_Collider");
+            m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider", L"FlameBomb_Collider");
 
         m_fDurTime = 0;
         m_bTargeting = false;
@@ -192,7 +192,7 @@ void CFlameBomb::Set_Targeting(_vector Target_Pos)
 
 HRESULT CFlameBomb::Add_Components()
 {
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxMesh"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
 
@@ -204,11 +204,11 @@ HRESULT CFlameBomb::Add_Components()
     CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
     BoundingDesc.fRadius = 0.f;
     BoundingDesc.vCenter = _float3(0.f, 0.f, 0.f);
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
         TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
         return E_FAIL;
 
-    m_pGameInstance->Add_Collider(TEXT("FlameBomb_Collider"), m_pColliderMain);
+    m_pGameInstance->Add_Collider(m_Current_Level, TEXT("FlameBomb_Collider"), m_pColliderMain);
     m_pColliderMain->Set_Collider_GameObject(this);
 
     return S_OK;

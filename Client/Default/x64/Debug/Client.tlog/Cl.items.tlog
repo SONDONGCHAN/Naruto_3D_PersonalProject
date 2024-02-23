@@ -15,6 +15,7 @@ C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Flame
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Item.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Item.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Kamui.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Kamui.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\LandObject.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\LandObject.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Level_BossStage.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Level_BossStage.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Level_CustomRoom.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Level_CustomRoom.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Level_GamePlay.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Level_GamePlay.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Level_Loading.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Level_Loading.obj
@@ -37,10 +38,12 @@ C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Skill
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Terrain.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Terrain.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Trail_Line.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Trail_Line.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\UI.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\UI.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\UI_Boss_Status.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\UI_Boss_Status.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\UI_Monster_Status.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\UI_Monster_Status.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\UI_Player_Custom.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\UI_Player_Custom.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\UI_Player_Skills.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\UI_Player_Skills.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\UI_Player_Status.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\UI_Player_Status.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\UI_System.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\UI_System.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Weapon.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Weapon.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Wood_Dragon.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Wood_Dragon.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Wood_Hand.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Wood_Hand.obj

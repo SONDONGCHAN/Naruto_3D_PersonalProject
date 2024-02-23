@@ -24,8 +24,11 @@ public:
 	HRESULT Initialize_Prototype(const wstring& strNavigationDataFilePath);
 	HRESULT Initialize(void* pArg) override;
 	void Tick(_fmatrix TerrainWorldMatrix);
-	_bool isMove(_fvector vPosition, _vector Dir, _Out_ _vector* ResultDir, _Out_ _bool* isLand);
+	_bool isMove(_fvector vPosition, _vector Dir, _Out_ _vector* ResultDir, _Out_ _bool* isLand, _bool onAir);
 	_float Compute_Height(_fvector vLocalPos );
+	_float Compute_Width(_fvector vLocalPos);
+	_float Compute_Depth(_fvector vLocalPos);
+
 
 
 #ifdef _DEBUG

@@ -96,9 +96,9 @@ void CRasengun_Super::State_Control(_float fTimeDelta)
 		m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
 		if (m_User_Type == USER_PLAYER)
-			m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Rasengun_Super_Collider");
+			m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Rasengun_Super_Collider");
 		else if (m_User_Type == USER_MONSTER)
-			m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Player_Main_Collider", L"Rasengun_Super_Collider");
+			m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider", L"Rasengun_Super_Collider");
 	
 		if (m_fDurTime > 1.2f)
 			Set_Next_State();
@@ -124,9 +124,9 @@ void CRasengun_Super::Set_Next_State()
 		m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
 		if (m_User_Type == USER_PLAYER)
-			m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Rasengun_Super_Collider");
+			m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Rasengun_Super_Collider");
 		else if (m_User_Type == USER_MONSTER)
-			m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Player_Main_Collider", L"Rasengun_Super_Collider");
+			m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider", L"Rasengun_Super_Collider");
 
 		m_fDurTime = 0;
 	}
@@ -139,7 +139,7 @@ void CRasengun_Super::Set_State()
 
 HRESULT CRasengun_Super::Add_Components()
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxMesh"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
@@ -151,11 +151,11 @@ HRESULT CRasengun_Super::Add_Components()
 	CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
 	BoundingDesc.fRadius = 0.f;
 	BoundingDesc.vCenter = _float3(0.f, 0.f, 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
 		return E_FAIL;
 	
-	m_pGameInstance->Add_Collider(TEXT("Rasengun_Super_Collider"), m_pColliderMain);
+	m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Rasengun_Super_Collider"), m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 	
 	return S_OK;

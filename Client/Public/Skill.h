@@ -19,9 +19,11 @@ public:
 
 	struct SKILL_DESC
 	{
-		CTransform* pParentTransform;
-		USER_TYPE	User_Type; 
-		CCamera_Free* pCamera;
+		CTransform*		pParentTransform;
+		USER_TYPE		User_Type; 
+		CCamera_Free*	pCamera;
+		LEVEL			Current_Level;
+
 	};
 
 protected:
@@ -53,6 +55,8 @@ protected:
 
 protected:
 	_float		m_fSkill_Power = { 0.f };
+	LEVEL		m_Current_Level = { LEVEL_END };
+	
 
 
 public:

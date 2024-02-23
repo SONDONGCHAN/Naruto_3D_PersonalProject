@@ -17,6 +17,9 @@ public:
 
 public:
 	_float Compute_Height(_fvector vLocalPos);
+	_float Compute_Width (_fvector vLocalPos);
+	_float Compute_Depth (_fvector vLocalPos);
+
 
 public:
 	static CVIBuffer_Cell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints);

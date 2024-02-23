@@ -41,16 +41,22 @@ HRESULT CMonster_Samurai::Initialize(void* pArg)
 	if (FAILED(Add_Skills()))
 		return E_FAIL;
 
-	m_MaxHp		= 100.f;
-	m_CurrentHp = 100.f;
+	m_MaxHp		= 10.f;
+	m_CurrentHp = 10.f;
 
 	if (FAILED(Add_UIs()))
 		return E_FAIL;
 
 	m_CurrentState = MONSTER_STATE_IDLE;
 	_vector vStart_Pos = { -7.f, 0.f, 10.f, 1.f };
+
+	if (m_Current_Level == LEVEL_GAMEPLAY)
+		vStart_Pos = { -7.f, 0.f, 10.f, 1.f };
+	else if (m_Current_Level == LEVEL_BOSS)
+		vStart_Pos = { -94.43f, 6.91f, 51.8f, 1.f };
+
 	m_pTransformCom->Set_Pos(vStart_Pos);
-	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 
 	
@@ -88,8 +94,8 @@ void CMonster_Samurai::Tick(_float fTimeDelta)
 void CMonster_Samurai::Late_Tick(_float fTimeDelta)
 {
 	//Collision_ToPlayer();
-	m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Player_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
+	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
 
 
 	for (auto& Pair : m_MonsterParts)
@@ -140,8 +146,8 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 		if (!m_bDeadCheck)
 		{
 			m_bDeadCheck = true;
-			m_pGameInstance->Kill_Dead_Collider(m_pColliderMain);
-			m_pGameInstance->Kill_Dead_Collider(m_pColliderAttack);
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderMain);
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderAttack);
 			m_pColliderMain->Delete_All_IsCollider();
 			m_pColliderAttack->Delete_All_IsCollider();
 			m_iState = MONSTER_DEAD;
@@ -191,7 +197,7 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 
 
 	if (m_iState & MONSTER_RUN)
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 	if (!(m_iState & MONSTER_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
@@ -455,7 +461,7 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 
 void CMonster_Samurai::Set_Direction()
 {
-	_vector Pos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+	_vector Pos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 	_vector Dir = Pos - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	Dir.m128_f32[3] = 0.f;
 
@@ -499,7 +505,7 @@ void CMonster_Samurai::Collider_Event_Enter(const wstring& strColliderLayerTag, 
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Player_Attack_Collider")
@@ -630,7 +636,7 @@ void CMonster_Samurai::Collider_Event_Stay(const wstring& strColliderLayerTag, C
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 
@@ -754,7 +760,7 @@ void CMonster_Samurai::Off_Attack_Collider()
 void CMonster_Samurai::Dash_Move(_float ratio, _float fTimeDelta)
 {
 	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
-		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 }
 
 void CMonster_Samurai::Use_Skill(const wstring& strSkillName)
@@ -802,7 +808,7 @@ void CMonster_Samurai::Skill_Tick(_float fTimeDelta)
 				_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				Pos.m128_f32[1] += 1.5f;
 				pWood_Dragon->Get_TranformCom()->Set_Pos(Pos);
-				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 				TargetPos.m128_f32[1] += 1.5f;
 				_vector Dir = TargetPos - Pos;
 				pWood_Dragon->Get_TranformCom()->Set_Look_IncludeY(Dir);
@@ -836,19 +842,29 @@ HRESULT CMonster_Samurai::Add_Components()
 	CNavigation::NAVI_DESC		NaviDesc{};
 	NaviDesc.iStartCellIndex = 30;
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
-		return E_FAIL;
+	if (m_Current_Level == LEVEL_GAMEPLAY)
+	{
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Stadium"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
+	else if (m_Current_Level == LEVEL_BOSS)
+	{
+		NaviDesc.iStartCellIndex = 69;
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
 	
 	/* Com_Collider */
 	CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
 	BoundingDesc.fRadius = 0.7f;
 	BoundingDesc.vCenter = _float3(0.f, BoundingDesc.fRadius, 0.f);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(TEXT("Monster_Main_Collider"), m_pColliderMain);
+	m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Monster_Main_Collider"), m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 
 
@@ -856,10 +872,10 @@ HRESULT CMonster_Samurai::Add_Components()
 	AttackBoundingDesc.fRadius = 0.f;
 	AttackBoundingDesc.vCenter = _float3(0.f, AttackBoundingDesc.fRadius, AttackBoundingDesc.fRadius);
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Attack"), reinterpret_cast<CComponent**>(&m_pColliderAttack), &AttackBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Monster_Attack_Collider", m_pColliderAttack);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Monster_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
 	return S_OK;                           
 } 
@@ -920,6 +936,7 @@ HRESULT CMonster_Samurai::Add_Skills()
 	CSkill::SKILL_DESC Skill_desc{};
 	Skill_desc.pParentTransform = m_pTransformCom;
 	Skill_desc.User_Type		= CSkill::USER_MONSTER;
+	Skill_desc.Current_Level = m_Current_Level;
 
 	 CSkill* pWood_Dragon = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Dragon"), &Skill_desc));
 	 if (nullptr == pWood_Dragon)

@@ -7,6 +7,7 @@
 #include "Wood_Swap.h"
 #include "Trail_Line.h"
 #include "Player.h"
+#include "UI_Boss_Status.h"
 
 CBoss_Naruto::CBoss_Naruto(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLandObject(pDevice, pContext)
@@ -45,13 +46,16 @@ HRESULT CBoss_Naruto::Initialize(void* pArg)
 	if (FAILED(Add_Trails()))
 		return E_FAIL;
 
-	m_MaxHp		= 100.f;
-	m_CurrentHp = 100.f;
+	m_MaxHp		= 10.f;
+	m_CurrentHp = 10.f;
+
+	if (FAILED(Add_UIs()))
+		return E_FAIL;
 
 	m_CurrentState = MONSTER_STATE_IDLE;
 	_vector vStart_Pos = { 0.f, 0.f, 7.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
-	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	
 	return S_OK;
 }
@@ -98,8 +102,8 @@ void CBoss_Naruto::Tick(_float fTimeDelta)
 
 void CBoss_Naruto::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Player_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level,m_pColliderMain, L"Player_Main_Collider");
+	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
 
 	for (auto& Pair : m_MonsterParts)
 		(Pair.second)->Late_Tick(fTimeDelta);
@@ -116,14 +120,17 @@ void CBoss_Naruto::Late_Tick(_float fTimeDelta)
 	if (m_bSkillOn[SKILL_WOOD_SWAP])
 		m_MonsterSkills.find(L"Skill_Wood_Swap")->second->Late_Tick(fTimeDelta);
 
+	for (auto& Pair : m_MonsterTrails)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+
+	for (auto& Pair : m_MonsterUIs)
+		Pair.second->Late_Tick(fTimeDelta);
+
 #ifdef _DEBUG
 	m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
 	m_pGameInstance->Add_DebugComponent(m_pColliderMain);
 	m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
 #endif
-
-	for (auto& Pair : m_MonsterTrails)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
 }
 
 HRESULT CBoss_Naruto::Render()
@@ -163,8 +170,8 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 		if (!m_bDeadCheck)
 		{
 			m_bDeadCheck = true;
-			m_pGameInstance->Kill_Dead_Collider(m_pColliderMain);
-			m_pGameInstance->Kill_Dead_Collider(m_pColliderAttack);
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level,m_pColliderMain);
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderAttack);
 			m_pColliderMain->Delete_All_IsCollider();
 			m_pColliderAttack->Delete_All_IsCollider();
 			m_iState = PLAYER_DEAD;
@@ -240,7 +247,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 
 
 	if (m_iState & PLAYER_STATE_RUN)
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 	if (!(m_iState & PLAYER_STATE_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
@@ -597,7 +604,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 
 void CBoss_Naruto::Set_Direction()
 {
-	_vector Pos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+	_vector Pos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 	_vector Dir = Pos - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	Dir.m128_f32[3] = 0.f;
 
@@ -643,7 +650,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Player_Attack_Collider")
@@ -777,7 +784,7 @@ void CBoss_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 
@@ -901,7 +908,7 @@ void CBoss_Naruto::Off_Attack_Collider()
 void CBoss_Naruto::Dash_Move(_float ratio, _float fTimeDelta)
 {
 	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
-	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 }
 
 void CBoss_Naruto::Use_Skill(const wstring& strSkillName)
@@ -966,7 +973,7 @@ _bool CBoss_Naruto::Skill_State(_float fTimeDelta)
 		}
 		else if (m_iState & PLAYER_STATE_RASENGUN_RUN_LOOP)
 		{
-			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		
 			if (dynamic_cast<CRasengun*>(m_MonsterSkills.find(L"Skill_Rasengun")->second)->Get_IsHit())
 			{
@@ -1001,7 +1008,7 @@ void CBoss_Naruto::Skill_Tick(_float fTimeDelta)
 				Pos.m128_f32[1] += 1.f;
 				pRasenShuriken->Get_TranformCom()->Set_Pos(Pos);
 				pRasenShuriken->Get_TranformCom()->Set_Look(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 				TargetPos.m128_f32[1] += 0.7f;
 				pRasenShuriken->Set_Targeting(TargetPos);
 				pRasenShuriken->Set_Next_State();
@@ -1078,21 +1085,29 @@ HRESULT CBoss_Naruto::Add_Components()
 {
 	/* Com_Navigation */
 	CNavigation::NAVI_DESC		NaviDesc{};
-	NaviDesc.iStartCellIndex = 30;
+	NaviDesc.iStartCellIndex = 32;
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
-		return E_FAIL;
-
+	if (m_Current_Level == LEVEL_GAMEPLAY)
+	{
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Stadium"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
+	else if (m_Current_Level == LEVEL_BOSS)
+	{
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
 	/* Com_Collider */
 	CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
 	BoundingDesc.fRadius = 0.7f;
 	BoundingDesc.vCenter = _float3(0.f, BoundingDesc.fRadius, 0.f);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(TEXT("Monster_Main_Collider"), m_pColliderMain);
+	m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Monster_Main_Collider"), m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 	
 	
@@ -1100,10 +1115,10 @@ HRESULT CBoss_Naruto::Add_Components()
 	AttackBoundingDesc.fRadius = 0.f;
 	AttackBoundingDesc.vCenter = _float3(0.f, AttackBoundingDesc.fRadius, AttackBoundingDesc.fRadius);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Attack"), reinterpret_cast<CComponent**>(&m_pColliderAttack), &AttackBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Monster_Attack_Collider", m_pColliderAttack);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Monster_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
 
 	return S_OK;
@@ -1132,6 +1147,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	Rasengun_desc.pParentTransform = m_pTransformCom;
 	Rasengun_desc.User_Type = CSkill::USER_MONSTER;
 	Rasengun_desc.pCamera = m_pCamera;
+	Rasengun_desc.Current_Level = m_Current_Level;
 	Rasengun_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun"), &Rasengun_desc));
 	if (nullptr == pRasengun)
@@ -1144,6 +1160,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	RasenShuriken_desc.pParentTransform = m_pTransformCom;
 	RasenShuriken_desc.User_Type = CSkill::USER_MONSTER;
 	RasenShuriken_desc.pCamera = m_pCamera;
+	RasenShuriken_desc.Current_Level = m_Current_Level;
 	RasenShuriken_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasenShuriken = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_RasenShuriken"), &RasenShuriken_desc));
 	if (nullptr == pRasenShuriken)
@@ -1156,6 +1173,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	Rasengun_Super_desc.pParentTransform = m_pTransformCom;
 	Rasengun_Super_desc.User_Type = CSkill::USER_MONSTER;
 	Rasengun_Super_desc.pCamera = m_pCamera;
+	Rasengun_Super_desc.Current_Level = m_Current_Level;
 	Rasengun_Super_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun_Super = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun_Super"), &Rasengun_Super_desc));
 	if (nullptr == pRasengun_Super)
@@ -1169,6 +1187,7 @@ HRESULT CBoss_Naruto::Add_Skills()
 	Wood_Swap_desc.User_Type = CSkill::USER_MONSTER;
 	Wood_Swap_desc.pCamera = m_pCamera;
 	Wood_Swap_desc.pUser_Navigation = m_pNavigationCom;
+	Wood_Swap_desc.Current_Level = m_Current_Level;
 	CSkill* pWood_Swap = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Swap"), &Wood_Swap_desc));
 	if (nullptr == pWood_Swap)
 		return E_FAIL;
@@ -1197,6 +1216,21 @@ HRESULT CBoss_Naruto::Add_Trails()
 	if (nullptr == pTrail_Foot_R)
 		return E_FAIL;
 	m_MonsterTrails.emplace(TEXT("Trail_Line_Foot_R"), pTrail_Foot_R);
+
+	return S_OK;
+}
+
+HRESULT CBoss_Naruto::Add_UIs()
+{
+	CUI_Boss_Status::UI_Boss_Hp_DESC Hp_Desc{};
+	Hp_Desc.pCurrentHp = &m_CurrentHp;
+	Hp_Desc.pMaxHp = &m_MaxHp;
+	Hp_Desc.eMyCharacter = CUI_Boss_Status::BOSS_NARUTO;
+
+	CUI_Boss_Status* pUIStatus = dynamic_cast<CUI_Boss_Status*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_CUI_Boss_Status"), &Hp_Desc));
+	if (nullptr == pUIStatus)
+		return E_FAIL;
+	m_MonsterUIs.emplace(TEXT("UI_Boss_Status"), pUIStatus);
 
 	return S_OK;
 }
@@ -1240,6 +1274,10 @@ void CBoss_Naruto::Free()
 	for (auto& Pair : m_MonsterTrails)
 		Safe_Release(Pair.second);
 	m_MonsterTrails.clear();
+
+	for (auto& Pair : m_MonsterUIs)
+		Safe_Release(Pair.second);
+	m_MonsterUIs.clear();
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

@@ -147,7 +147,7 @@ HRESULT CUI_Player_Status::Add_Component()
 	pUI_Desc_1.vPos = { 230.f, 646.f };
 	pUI_Desc_1.vSize = { 400.f, 102.f };
 	m_UI_Descs.push_back(pUI_Desc_1);
-	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status"),
+	if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Status"),
 		TEXT("Com_Texture_Status"), reinterpret_cast<CComponent**>(&m_pTextureBase))))
 		return E_FAIL; 
 	m_Textures.push_back(m_pTextureBase);
@@ -158,7 +158,7 @@ HRESULT CUI_Player_Status::Add_Component()
 		pUI_Desc_2.vPos = { 105.f, 650.f };
 		pUI_Desc_2.vSize = { 65.f, 65.f };
 		m_UI_Descs.push_back(pUI_Desc_2);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
 			TEXT("Com_Texture_Icon_Rasengun_Super"), reinterpret_cast<CComponent**>(&m_pTextureIcon))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon);
@@ -169,7 +169,7 @@ HRESULT CUI_Player_Status::Add_Component()
 		pUI_Desc_2.vPos = { 105.f, 650.f };
 		pUI_Desc_2.vSize = { 65.f, 65.f };
 		m_UI_Descs.push_back(pUI_Desc_2);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Kamui"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Kamui"),
 			TEXT("Com_Texture_Icon_Kamui"), reinterpret_cast<CComponent**>(&m_pTextureIcon))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon);
@@ -179,7 +179,7 @@ HRESULT CUI_Player_Status::Add_Component()
 	pUI_Desc_3.vPos = { 280.f, 665.f };
 	pUI_Desc_3.vSize = { 230.f, 18.f };
 	m_UI_Descs.push_back(pUI_Desc_3);
-	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status_Hp"),
+	if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Status_Hp"),
 		TEXT("Com_Texture_Status_Hp"), reinterpret_cast<CComponent**>(&m_pTextureHp))))
 		return E_FAIL;
 	m_Textures.push_back(m_pTextureHp);

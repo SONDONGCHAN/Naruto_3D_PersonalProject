@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "Level_GamePlay.h"
+#include "Level_Loading.h"
 #include "Camera_Free.h"
 #include "Item.h"
 #include "LandObject.h"
 #include "Player_Custom.h"
+#include "UI_System.h"
+
 
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -32,6 +35,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_LandObjects()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_UI( TEXT("Layer_System_UI") )))
+		return E_FAIL;
+	
 
 	//if (FAILED(Ready_Layer_Item(TEXT("Layer_Item"))))
 	//		return E_FAIL;
@@ -41,6 +47,29 @@ HRESULT CLevel_GamePlay::Initialize()
 
 void CLevel_GamePlay::Tick(_float fTimeDelta)
 {
+	m_fRun_Time+= fTimeDelta;
+
+	Add_Run_Time_Object();
+
+	if (Check_Can_NextLevel())
+	{
+		m_fEnd_Time += fTimeDelta;
+
+		if (m_fEnd_Time > 10.f)
+		{
+			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_BOSS))))
+				return;
+		}
+		return;
+	}
+
+	if (GetKeyState(VK_RETURN) & 0x8000)
+	{
+		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_BOSS))))
+			return;
+
+		return;
+	}
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -97,17 +126,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring& strLayerTag, CLandObject::LANDOBJ_DESC& GameObjDesc)
-{
-	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Player"),&GameObjDesc)))
-		return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CLevel_GamePlay::Ready_Layer_Map(const wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Map"))))
+	_uint Map_Index = 0;
+
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Map"),&Map_Index)))
 		return E_FAIL;
 
 	return S_OK;
@@ -117,10 +140,9 @@ HRESULT CLevel_GamePlay::Ready_LandObjects()
 {
 	CLandObject::LANDOBJ_DESC			LandObjDesc{};
 	
-	LandObjDesc.pMapTransform	= dynamic_cast<CTransform*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Map"), g_strTransformTag));
-	LandObjDesc.pMapModel		= dynamic_cast<CModel*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Map"), L"Com_Model_Map_Konoha_Village"));
-	LandObjDesc.pCamera			= dynamic_cast<CCamera_Free*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera") ) );
-
+	LandObjDesc.pMapTransform	= dynamic_cast<CTransform*>(m_pGameInstance->Get_Component(LEVEL_GAMEPLAY, TEXT("Layer_Map"), g_strTransformTag)); 
+	LandObjDesc.pCamera			= dynamic_cast<CCamera_Free*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Camera")));
+	LandObjDesc.Current_Level	= LEVEL_GAMEPLAY;
 
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"), LandObjDesc)))
 		return E_FAIL;
@@ -130,7 +152,13 @@ HRESULT CLevel_GamePlay::Ready_LandObjects()
 	
 	return S_OK;
 }
+HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring& strLayerTag, CLandObject::LANDOBJ_DESC& GameObjDesc)
+{
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Player"), &GameObjDesc)))
+		return E_FAIL;
 
+	return S_OK;
+}
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring& strLayerTag, CLandObject::LANDOBJ_DESC& GameObjDesc)
 {
 	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Monster_LeafNinja"), &GameObjDesc)))
@@ -141,7 +169,17 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const wstring& strLayerTag, CLandOb
 
 	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Boss_Naruto"), &GameObjDesc)))
 		return E_FAIL;
-	
+
+	CGameObject* pMonster_LeafNinja = m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), 0);
+	pMonsters.push_back(pMonster_LeafNinja);
+	m_iNumEnemy++;
+	CGameObject* pMonster_Samurai	= m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), 1);
+	pMonsters.push_back(pMonster_Samurai);
+	m_iNumEnemy++;
+	CGameObject* pBoss_Naruto		= m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Monster"), 2);
+	pMonsters.push_back(pBoss_Naruto);
+	m_iNumEnemy++;
+
 	return S_OK;
 }
 
@@ -165,6 +203,61 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Particle_Point"))))
 		return E_FAIL;
 	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring& strLayerTag)
+{
+	return S_OK;
+}
+
+void CLevel_GamePlay::Add_Run_Time_Object()
+{
+	if (m_fRun_Time > 1.f && !m_bCreated[0])
+	{
+		m_bCreated[0] = true;
+
+		CUI_System::UI_System_DESC desc;
+
+		desc.vPos = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+		desc.vSize = { 1000.f, 200.f };
+		desc.strPrototypeTag = TEXT("Prototype_Component_Texture_Battle_Start");
+		desc.fRenderingTime = 3.f;
+		desc.fAppearTime = 0.7f;
+
+		m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, TEXT("Layer_System_UI"), TEXT("Prototype_GameObject_UI_System"), &desc);
+	}
+
+	if (m_fEnd_Time > 2.f && !m_bCreated[1])
+	{
+		m_bCreated[1] = true;
+		
+		CUI_System::UI_System_DESC desc;
+		
+		desc.vPos = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f };
+		desc.vSize = { 1000.f, 200.f };
+		desc.strPrototypeTag = TEXT("Prototype_Component_Texture_Battle_Victory");
+		desc.fRenderingTime = 3.f;
+		desc.fAppearTime = 0.7f;
+		
+		m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, TEXT("Layer_System_UI"), TEXT("Prototype_GameObject_UI_System"), &desc);
+	}
+}
+
+_bool CLevel_GamePlay::Check_Can_NextLevel()
+{
+	_uint DeadCheck = { 0 };
+
+	for (_uint i = 0 ; i< m_iNumEnemy ; i++)
+	{
+		if (pMonsters[i]->Get_DeadCheck())
+			DeadCheck++;
+	}
+
+	if(DeadCheck == m_iNumEnemy)
+		return true;
+
+	else
+		return false;
 }
 
 CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

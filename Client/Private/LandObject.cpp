@@ -25,16 +25,11 @@ HRESULT CLandObject::Initialize(void* pArg)
 		if (pGameObjectDesc->fSpeedPerSec != 5.f)
 		{
 			m_pMapTransform = pGameObjectDesc->pMapTransform;
-			m_pMapModel = pGameObjectDesc->pMapModel;
 			m_pCamera = pGameObjectDesc->pCamera;
+			m_Current_Level = pGameObjectDesc->Current_Level;
 
 			Safe_AddRef(m_pMapTransform);
-			Safe_AddRef(m_pMapModel);
 			Safe_AddRef(m_pCamera);
-
-			if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Calculator"),
-				TEXT("Com_Calculator"), reinterpret_cast<CComponent**>(&m_pCalculator))))
-				return E_FAIL;
 		}
 	}
 
@@ -70,9 +65,7 @@ _float CLandObject::Lerp(_float start, _float end, _float ratio)
 }
 
 _bool CLandObject::Set_Gravity(CTransform* pTargetTransform, _float fTimeDelta)
-{
-	//m_bisLand
-	
+{	
 	if (m_bOnAir)
 	{
 		if(m_fMaxGravity > m_fGravity)
@@ -82,20 +75,41 @@ _bool CLandObject::Set_Gravity(CTransform* pTargetTransform, _float fTimeDelta)
 
 		vTargetPos.m128_f32[1] -= m_fGravity;  // 현재 중력을 적용하여 타겟의 Y좌표 위치를 조정한다.
 	
-		if (m_bisLand)
-		{
-			_float fCellHeight = m_pNavigationCom->Compute_Height(vTargetPos); // 현재 셀의 높이를 계산 
+		
+		_float fCellHeight = m_pNavigationCom->Compute_Height(vTargetPos); // 현재 셀의 높이를 계산 
 
-			if (fCellHeight >= vTargetPos.m128_f32[1])
+		if (fCellHeight >= vTargetPos.m128_f32[1])
+		{
+			//m_pTransformCom->Go_Straight_Custom(fTimeDelta,0.000000001f,m_pNavigationCom, true, &m_bCellisLand);
+
+			if (m_bCellisLand)
 			{
-				vTargetPos = XMVectorSetY(vTargetPos, fCellHeight);
-				//m_bOnAir = false;
 				m_fGravity = 0.f;
 				m_iJumpState = 0;
-
-				pTargetTransform->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(vTargetPos, m_pMapTransform->Get_WorldMatrix())); //WorldMat에 적용한다.
-				return false;
+				vTargetPos = XMVectorSetY(vTargetPos, fCellHeight);
+				//m_bOnAir = false;				
 			}
+			else
+			{
+				_float fCellDepth = m_pNavigationCom->Compute_Depth(vTargetPos); // 현재 Z를 계산 
+				vTargetPos = XMVectorSetZ(vTargetPos, fCellDepth);
+
+				_float fCellWidth = m_pNavigationCom->Compute_Width(vTargetPos); // 현재 X를 계산 
+				vTargetPos = XMVectorSetX(vTargetPos, fCellWidth);
+
+				fCellDepth = m_pNavigationCom->Compute_Depth(vTargetPos); // 현재 Z를 계산 
+				vTargetPos = XMVectorSetZ(vTargetPos, fCellDepth);
+				
+				fCellWidth = m_pNavigationCom->Compute_Width(vTargetPos); // 현재 X를 계산 
+				vTargetPos = XMVectorSetX(vTargetPos, fCellWidth);
+
+				m_fGravity = 0.f;
+				m_iJumpState = 1;
+			}
+
+			pTargetTransform->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(vTargetPos, m_pMapTransform->Get_WorldMatrix())); //WorldMat에 적용한다.
+			return false;
+			
 		}
 
 		pTargetTransform->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(vTargetPos, m_pMapTransform->Get_WorldMatrix())); //WorldMat에 적용한다.
@@ -122,67 +136,11 @@ HRESULT CLandObject::SetUp_OnCell(CTransform* pTargetTransform)
 	return S_OK;
 }
 
-_bool CLandObject::Set_Gravity_2(CTransform* pTargetTransform, _float fTimeDelta)
-{
-	if (m_bOnAir)
-	{
-		if (m_fMaxGravity > m_fGravity)
-			m_fGravity += fTimeDelta * m_fGForcePersec;
-
-		_vector		vTargetPos = pTargetTransform->Get_State(CTransform::STATE_POSITION); // 타겟의 위치를 가져온다.
-		vTargetPos.m128_f32[1] -= m_fGravity;  // 현재 중력을 적용하여 타겟의 Y좌표 위치를 조정한다.
-
-		_vector		RayDir = { 0.f, -1.f, 0.f, 0.f };
-		_matrix Map_PivotMat = XMMatrixIdentity();
-		_float3 vCalPos = m_pCalculator->Ray_Picking_OnModel(m_pMapTransform, m_pMapModel, Map_PivotMat, vTargetPos, RayDir);
-		_float fCellHeight = vCalPos.y;
-
-		if (fCellHeight >= vTargetPos.m128_f32[1])
-		{
-			vTargetPos = XMVectorSetY(vTargetPos, fCellHeight);
-			//m_bOnAir = false;
-			m_fGravity = 0.f;
-			m_iJumpState = 0;
-
-			pTargetTransform->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(vTargetPos, m_pMapTransform->Get_WorldMatrix())); //WorldMat에 적용한다.
-			return false;
-		}
-		pTargetTransform->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(vTargetPos, m_pMapTransform->Get_WorldMatrix())); //WorldMat에 적용한다.
-		return true;
-
-	}
-	else
-	{
-		SetUp_OnCell_2(pTargetTransform);
-		return false;
-	}
-}
-
-HRESULT CLandObject::SetUp_OnCell_2(CTransform* pTargetTransform)
-{
-	_vector		vTargetPos = pTargetTransform->Get_State(CTransform::STATE_POSITION);// 타겟의 위치를 가져온다.
-	
-	vTargetPos = XMVector3TransformCoord(vTargetPos, m_pMapTransform->Get_WorldMatrix_Inverse()); // 맵의 WorldMat을 가져온다
-
-	_vector		RayDir = { 0.f, -1.f, 0.f, 0.f };
-	_matrix Map_PivotMat = XMMatrixIdentity();
-	_float3 vCalPos = m_pCalculator->Ray_Picking_OnModel(m_pMapTransform, m_pMapModel, Map_PivotMat, vTargetPos, RayDir);
-	_float fCellHeight = vCalPos.y;
-	
-	vTargetPos = XMVectorSetY(vTargetPos, fCellHeight); //타겟의 Y위치를 맵의 셀의 높이에 맞춰준다.
-	
-	pTargetTransform->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(vTargetPos, m_pMapTransform->Get_WorldMatrix())); //WorldMat에 적용한다.
-	
-	return S_OK;
-}
-
 void CLandObject::Free()
 {
 	__super::Free();
 
 	Safe_Release(m_pMapTransform);
 	Safe_Release(m_pNavigationCom);
-	Safe_Release(m_pMapModel);
-	Safe_Release(m_pCalculator);
 	Safe_Release(m_pCamera);
 }

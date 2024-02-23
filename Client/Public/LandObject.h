@@ -17,8 +17,8 @@ public:
 	struct LANDOBJ_DESC : public GAMEOBJECT_DESC
 	{
 		CTransform*		pMapTransform	= { nullptr };
-		CModel*			pMapModel		= { nullptr };
 		CCamera_Free*	pCamera			= { nullptr };
+		LEVEL			Current_Level;
 	};
 
 protected:
@@ -43,22 +43,20 @@ public:
 
 protected:
 	CTransform*		m_pMapTransform = { nullptr };
-	CModel*			m_pMapModel		= { nullptr };
 	CCamera_Free*	m_pCamera		= { nullptr };
 	//
 
 	CNavigation*	m_pNavigationCom = { nullptr };
-	CCalculator*	m_pCalculator= { nullptr };
 
 protected:
 	// ม฿ทย
 	_float	m_fGravity = 0.f;
 	_float	m_fMaxGravity = 0.3f;
 	_float	m_fGForcePersec	 = 1.f;
-	_bool	m_bOnAir = false;
+	_bool	m_bOnAir = { false };
+	_bool	m_bOnWall = { false };
 	_uint	m_iJumpState = 0;
-	_bool	m_bisLand = { true };
-
+	_bool	m_bCellisLand = { true };
 
 	_float	m_CurrentHp = { 1000.f };
 	_float	m_MaxHp		= { 1000.f };
@@ -67,13 +65,13 @@ protected:
 	_vector m_MyPos = {0.f, 0.f, 0.f, 1.f};
 	_matrix m_MyWorldMat = { };
 
+	LEVEL	m_Current_Level = { LEVEL_END };
+
 
 protected:
 	_bool Set_Gravity(class CTransform* pTargetTransform, _float fTimeDelta);
-	_bool Set_Gravity_2(class CTransform* pTargetTransform, _float fTimeDelta);
 
 	HRESULT SetUp_OnCell(class CTransform* pTargetTransform);
-	HRESULT SetUp_OnCell_2(class CTransform* pTargetTransform);
 
 public:
 	_vector*		Get_MyPos()			{ return &m_MyPos; }

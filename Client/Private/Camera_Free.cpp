@@ -45,7 +45,7 @@ void CCamera_Free::Tick(_float fTimeDelta)
 
 void CCamera_Free::Late_Tick(_float fTimeDelta)
 {
-	if (m_Current_LEVEL == LEVEL_GAMEPLAY)
+	if (m_Current_LEVEL == LEVEL_GAMEPLAY || m_Current_LEVEL == LEVEL_BOSS)
 	{
 		m_radius = Float_Lerp(m_radius, m_Target_radius, m_fLerpRatio);
 
@@ -87,7 +87,7 @@ void CCamera_Free::Late_Tick(_float fTimeDelta)
 			_float3 camPos = Cal_Pos(m_radius, m_degree_Horizontal, m_degree_Vertical);
 
 			// 플레이어를 중심으로 회전 할 수 있도록 플레이어 위치를 받아오자
-			CTransform* pPlayerTransform = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom();
+			CTransform* pPlayerTransform = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_LEVEL, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom();
 			_vector vPlayerPos = pPlayerTransform->Get_State(CTransform::STATE_POSITION);
 			_float4 revisePos;
 			XMStoreFloat4(&revisePos, vPlayerPos);

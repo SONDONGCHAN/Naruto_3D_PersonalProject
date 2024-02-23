@@ -24,6 +24,9 @@ public:
 		m_iNeighborIndices[eLine] = pNeighbor->m_iIndex;
 	}
 	_float Compute_Height(_fvector vLocalPos);
+	_float Compute_Width(_fvector vLocalPos);
+	_float Compute_Depth(_fvector vLocalPos);
+
 
 public:
 	HRESULT Initialize(const _float3* pPoints, _uint iCellIndex);

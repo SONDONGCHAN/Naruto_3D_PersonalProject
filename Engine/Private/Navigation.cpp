@@ -93,7 +93,7 @@ void CNavigation::Tick(_fmatrix MapWorldMatrix)
 	XMStoreFloat4x4(&m_WorldMatrix, MapWorldMatrix);
 }
 
-_bool CNavigation::isMove(_fvector vPosition, _vector Dir, _Out_ _vector* ResultDir, _Out_ _bool* isLand)
+_bool CNavigation::isMove(_fvector vPosition, _vector Dir, _Out_ _vector* ResultDir, _Out_ _bool* isLand, _bool onAir)
 {
 	_int		iNeighborIndex = { -1 };
 	_float3		vLineNormal = { 0.f, 0.f, 0.f };
@@ -101,42 +101,98 @@ _bool CNavigation::isMove(_fvector vPosition, _vector Dir, _Out_ _vector* Result
 	/* 현재 존재하고 있던 셀 안에서 움직였다. */
 	if (true == m_vecCells[m_iCurrentIndex]->isIn(vPosition, &iNeighborIndex, &vLineNormal))
 	{
+		if(!m_vecCells[m_iCurrentIndex]->Get_isLand())
+			*isLand = false;
+
 		*ResultDir = Dir;
 		return true;
 	}
 	/* 현재 셀을 나갔다. */
 	else
 	{
+
 		if (-1 != iNeighborIndex)
 		{
 			while (true)
 			{
 				if (-1 == iNeighborIndex)
 					return false;
-
+		
 				if (true == m_vecCells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex, &vLineNormal))
 				{
 					if (m_vecCells[iNeighborIndex]->Get_isLand())
 					{
+						if (m_vecCells[m_iCurrentIndex]->Get_isLand() == false)
+						{
+							if (vPosition.m128_f32[1] < m_vecCells[iNeighborIndex]->Compute_Height(vPosition))
+							{
+								*ResultDir = Dir;
+								*isLand = false;
+								return false;
+							}
+						}
 						m_iCurrentIndex = iNeighborIndex;
 						*ResultDir = Dir;
-
+		
 						return true;
-
+		
 					}
 					else
 					{
-						_vector vCounterNormal = XMVector3Cross(XMVector3Cross(XMLoadFloat3(&vLineNormal), Dir), XMLoadFloat3(&vLineNormal));
-						vCounterNormal = XMVector3Normalize(vCounterNormal);
+						if (onAir == true)
+						{
+							m_iCurrentIndex = iNeighborIndex;
+							*ResultDir = Dir;
+							*isLand = false;
+							return true;
+						}
+						else
+						{
 
-						_float fScale = XMVectorGetX(XMVector3Dot(vCounterNormal, Dir));
-						*ResultDir = vCounterNormal * fScale;
-						*isLand = false;
-						return false;
+
+							_vector vCounterNormal = XMVector3Cross(XMVector3Cross(XMLoadFloat3(&vLineNormal), Dir), XMLoadFloat3(&vLineNormal));
+							vCounterNormal = XMVector3Normalize(vCounterNormal);
+							_float fScale = XMVectorGetX(XMVector3Dot(vCounterNormal, Dir));
+							*ResultDir = vCounterNormal * fScale;
+							return false;
+						}
 					}
 				}
 			}
 		}
+		/*if (-1 != iNeighborIndex)
+{
+	while (true)
+	{
+		if (-1 == iNeighborIndex)
+			return false;
+
+		if (true == m_vecCells[iNeighborIndex]->isIn(vPosition, &iNeighborIndex, &vLineNormal))
+		{
+			if (m_vecCells[iNeighborIndex]->Get_isLand())
+			{
+				m_iCurrentIndex = iNeighborIndex;
+				*ResultDir = Dir;
+
+				return true;
+
+			}
+			else
+			{
+				if(onAir == true)
+					m_iCurrentIndex = iNeighborIndex;
+
+				_vector vCounterNormal = XMVector3Cross(XMVector3Cross(XMLoadFloat3(&vLineNormal), Dir), XMLoadFloat3(&vLineNormal));
+				vCounterNormal = XMVector3Normalize(vCounterNormal);
+
+				_float fScale = XMVectorGetX(XMVector3Dot(vCounterNormal, Dir));
+				*ResultDir = vCounterNormal * fScale;
+				*isLand = false;
+				return false;
+			}
+		}
+	}
+}*/
 
 		else
 		{
@@ -153,6 +209,16 @@ _bool CNavigation::isMove(_fvector vPosition, _vector Dir, _Out_ _vector* Result
 _float CNavigation::Compute_Height(_fvector vLocalPos)
 {
 	return m_vecCells[m_iCurrentIndex]->Compute_Height(vLocalPos);
+}
+
+_float CNavigation::Compute_Width(_fvector vLocalPos)
+{
+	return m_vecCells[m_iCurrentIndex]->Compute_Width(vLocalPos);
+}
+
+_float CNavigation::Compute_Depth(_fvector vLocalPos)
+{
+	return m_vecCells[m_iCurrentIndex]->Compute_Depth(vLocalPos);
 }
 
 #ifdef _DEBUG

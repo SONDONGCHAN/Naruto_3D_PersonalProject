@@ -166,6 +166,7 @@
     <ClInclude Include="..\Public\Item.h" />
     <ClInclude Include="..\Public\Kamui.h" />
     <ClInclude Include="..\Public\LandObject.h" />
+    <ClInclude Include="..\Public\Level_BossStage.h" />
     <ClInclude Include="..\Public\Level_CustomRoom.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
@@ -188,10 +189,12 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Trail_Line.h" />
     <ClInclude Include="..\Public\UI.h" />
+    <ClInclude Include="..\Public\UI_Boss_Status.h" />
     <ClInclude Include="..\Public\UI_Monster_Status.h" />
     <ClInclude Include="..\Public\UI_Player_Custom.h" />
     <ClInclude Include="..\Public\UI_Player_Skills.h" />
     <ClInclude Include="..\Public\UI_Player_Status.h" />
+    <ClInclude Include="..\Public\UI_System.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\Wood_Dragon.h" />
     <ClInclude Include="..\Public\Wood_Hand.h" />
@@ -219,6 +222,7 @@
     <ClCompile Include="..\Private\Item.cpp" />
     <ClCompile Include="..\Private\Kamui.cpp" />
     <ClCompile Include="..\Private\LandObject.cpp" />
+    <ClCompile Include="..\Private\Level_BossStage.cpp" />
     <ClCompile Include="..\Private\Level_CustomRoom.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
@@ -241,10 +245,12 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Trail_Line.cpp" />
     <ClCompile Include="..\Private\UI.cpp" />
+    <ClCompile Include="..\Private\UI_Boss_Status.cpp" />
     <ClCompile Include="..\Private\UI_Monster_Status.cpp" />
     <ClCompile Include="..\Private\UI_Player_Custom.cpp" />
     <ClCompile Include="..\Private\UI_Player_Skills.cpp" />
     <ClCompile Include="..\Private\UI_Player_Status.cpp" />
+    <ClCompile Include="..\Private\UI_System.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\Wood_Dragon.cpp" />
     <ClCompile Include="..\Private\Wood_Hand.cpp" />

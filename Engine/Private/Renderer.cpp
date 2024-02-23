@@ -62,11 +62,11 @@ HRESULT CRenderer::Initialize()
     XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewPortDesc.Width, ViewPortDesc.Height, 0.f, 1.f));
 
 #ifdef _DEBUG
-    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Diffuse"), 100.f, 100.f, 200.f, 200.f)))
+    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Diffuse"), 50.f, 50.f, 100.f, 100.f)))
         return E_FAIL;
-    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Normal"), 100.f, 300.f, 200.f, 200.f)))
+    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Normal"), 50.f, 150.f, 100.f, 100.f)))
         return E_FAIL;
-    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Shade"), 300.f, 100.f, 200.f, 200.f)))
+    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Shade"), 150.f, 50.f, 100.f, 100.f)))
         return E_FAIL;
 #endif // _DEBUG
 
@@ -267,6 +267,9 @@ HRESULT CRenderer::Render_Debug()
 
     for (auto& pComponent : m_DebugCom)
     {
+        if (pComponent == nullptr)
+            continue;
+
         pComponent->Render();
 
         Safe_Release(pComponent);

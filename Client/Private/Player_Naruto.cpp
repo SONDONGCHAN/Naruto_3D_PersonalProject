@@ -57,7 +57,7 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 	
 	_vector vStart_Pos = { -10.f, 0.f, -10.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
-	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 	return S_OK;
 }
@@ -77,9 +77,9 @@ void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 	for (auto& Pair : m_PlayerParts)
 		(Pair.second)->Priority_Tick(fTimeDelta);
 
-	m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Monster_Main_Collider");
-	m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderDetecting, L"Monster_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderAttack, L"Monster_Main_Collider", L"Player_Attack_Collider");
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider");
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderDetecting, L"Monster_Main_Collider");
+	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Monster_Main_Collider", L"Player_Attack_Collider");
 	
 	Player_Dash(fTimeDelta);
 	Key_Input(fTimeDelta);
@@ -93,12 +93,12 @@ void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 	if (m_bSkillOn[SKILL_WOOD_SWAP])
 		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Priority_Tick(fTimeDelta);
 
-	if (m_bOnAir && (m_fGravity < -0.017f))
+	if (m_bOnAir && (m_fGravity < -0.017f) && m_bCellisLand)
 	{
-		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	}
 
-	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true && m_bisLand)
+	if (!Set_Gravity(m_pTransformCom, fTimeDelta) && m_bOnAir == true && m_bCellisLand)
 	{
 		m_bOnAir = false;
 		m_iState = 0x0000000000000000;
@@ -523,11 +523,11 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 			m_iJumpState++;
 			m_bOnAir = true;
 			m_iState |= PLAYER_STATE_JUMP;
-			if (m_fChargingtime >= 4.f)
-				m_fChargingtime = 4.f;
+			if (m_fChargingtime >= 3.f)
+				m_fChargingtime = 3.f;
 
-			m_fGravity		= Lerp(-0.4f, -1.f, m_fChargingtime / 4.f);
-			m_fJumpSpeed	= Lerp(7.f, 30.f, m_fChargingtime / 4.f);
+			m_fGravity		= Lerp(-0.4f, -1.f, m_fChargingtime / 3.f);
+			m_fJumpSpeed	= Lerp(7.f, 30.f, m_fChargingtime / 3.f);
 			
 			m_vJumpDirection = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 			m_fChargingtime = 0.f;
@@ -672,7 +672,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 			}
 
 			m_iState |= PLAYER_STATE_RUN;
-			m_pTransformCom->Go_Straight(fTimeDelta,m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Straight(fTimeDelta,m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			return;
 		}
 
@@ -739,7 +739,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 				 }
 				 Set_Direc_Lerf(DIR_RIGHT, 0.1f);
 			}
-			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 
@@ -863,13 +863,13 @@ void CPlayer_Naruto::Dash_Move(_float End_Speed, _float ratio, _float fTimeDelta
 {
 	m_fDashSpeed = Lerp(End_Speed, m_fDashSpeed, ratio);
 	if(DashDir == DIR_FRONT)
-		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	else if (DashDir == DIR_BACK)
-		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	else if (DashDir == DIR_LEFT)
-		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	else if (DashDir == DIR_RIGHT)
-		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 }
 
 void CPlayer_Naruto::TranslateRootAnimation()
@@ -908,7 +908,7 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 			_float		Length = pMyCollider->Get_Radius() + pTargetCollider->Get_Radius();
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Monster_Attack_Collider")
@@ -1003,7 +1003,7 @@ void CPlayer_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CCo
 	
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 	
-			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 3, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	
 		
@@ -1167,7 +1167,7 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 		}
 		else if (m_iState & PLAYER_STATE_RASENGUN_RUN_LOOP)
 		{
-			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Straight_Custom(fTimeDelta, 15.f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			Player_Moving(fTimeDelta);
 
 			if (dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Get_IsHit())
@@ -1200,13 +1200,13 @@ _bool CPlayer_Naruto::Skill_State(_float fTimeDelta)
 				_vector MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_vector LockOnDir = TargetPos - MyPos;
 				m_pTransformCom->Set_Look(LockOnDir);
-				m_pTransformCom->MoveTo(TargetPos, 20.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+				m_pTransformCom->MoveTo(TargetPos, 20.f, fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 			}
 			else
 			{
 				Player_Moving(fTimeDelta);
-				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 20.f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+				m_pTransformCom->Go_Straight_Custom(fTimeDelta, 20.f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			}
 
 			if (dynamic_cast<CRasengun*>(m_PlayerSkills.find(L"Skill_Rasengun")->second)->Get_IsHit())
@@ -1389,9 +1389,18 @@ HRESULT CPlayer_Naruto::Add_Components()
 	
 	NaviDesc.iStartCellIndex = 30;
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
-		return E_FAIL;
+	if (m_Current_Level == LEVEL_GAMEPLAY)
+	{
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Stadium"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
+	else if (m_Current_Level == LEVEL_BOSS)
+	{
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
 
 	/////////* Com_Collider *//////////////
 
@@ -1400,10 +1409,10 @@ HRESULT CPlayer_Naruto::Add_Components()
 	MainBoundingDesc.fRadius = 0.7f;
 	MainBoundingDesc.vCenter = _float3(0.f, MainBoundingDesc.fRadius, 0.f);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &MainBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Player_Main_Collider", m_pColliderMain);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 	
 	// 록온 탐색용 콜라이더 //
@@ -1412,10 +1421,10 @@ HRESULT CPlayer_Naruto::Add_Components()
 	DetectingBoundingDesc.vRadians = { 0.f ,0.f, 0.f };
 	DetectingBoundingDesc.vCenter = _float3(0.f, -2.f, 7.f);
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Detecting"), reinterpret_cast<CComponent**>(&m_pColliderDetecting), &DetectingBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Player_Detecting_Collider", m_pColliderDetecting);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
 	m_pColliderDetecting->Set_Collider_GameObject(this);
 
 	// 콤보공격 콜라이더 //
@@ -1423,10 +1432,10 @@ HRESULT CPlayer_Naruto::Add_Components()
 	AttackBoundingDesc.fRadius = 0.f;
 	AttackBoundingDesc.vCenter = _float3(0.f, AttackBoundingDesc.fRadius, AttackBoundingDesc.fRadius);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Attack"), reinterpret_cast<CComponent**>(&m_pColliderAttack), &AttackBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Player_Attack_Collider", m_pColliderAttack);
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
 	Off_Attack_Collider();
 
@@ -1465,6 +1474,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	Rasengun_desc.pParentTransform = m_pTransformCom;
 	Rasengun_desc.User_Type = CSkill::USER_PLAYER;
 	Rasengun_desc.pCamera = m_pCamera;
+	Rasengun_desc.Current_Level = m_Current_Level;
 	Rasengun_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun"), &Rasengun_desc));
 	if (nullptr == pRasengun)
@@ -1478,6 +1488,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	RasenShuriken_desc.pParentTransform = m_pTransformCom;
 	RasenShuriken_desc.User_Type = CSkill::USER_PLAYER;
 	RasenShuriken_desc.pCamera = m_pCamera;
+	RasenShuriken_desc.Current_Level = m_Current_Level;
 	RasenShuriken_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasenShuriken = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_RasenShuriken"), &RasenShuriken_desc));
 	if (nullptr == pRasenShuriken)
@@ -1491,6 +1502,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	Rasengun_Super_desc.pParentTransform = m_pTransformCom;
 	Rasengun_Super_desc.User_Type = CSkill::USER_PLAYER;
 	Rasengun_Super_desc.pCamera = m_pCamera;
+	Rasengun_Super_desc.Current_Level = m_Current_Level;
 	Rasengun_Super_desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("R_Hand_Weapon_cnt_tr");
 	CSkill* pRasengun_Super = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Rasengun_Super"), &Rasengun_Super_desc));
 	if (nullptr == pRasengun_Super)
@@ -1505,6 +1517,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	Wood_Swap_desc.User_Type = CSkill::USER_PLAYER;
 	Wood_Swap_desc.pUser_Navigation = m_pNavigationCom;
 	Wood_Swap_desc.pCamera = m_pCamera;
+	Wood_Swap_desc.Current_Level = m_Current_Level;
 	CSkill* pWood_Swap = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Wood_Swap"), &Wood_Swap_desc));
 	if (nullptr == pWood_Swap)
 		return E_FAIL;
@@ -1579,6 +1592,7 @@ CPlayer_Naruto* CPlayer_Naruto::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 		MSG_BOX("Failed to Created : CPlayer_Naruto");
 		Safe_Release(pInstance);
 	}
+
 
 	return pInstance;
 }

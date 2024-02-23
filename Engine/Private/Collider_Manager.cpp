@@ -7,18 +7,22 @@ CCollider_Manager::CCollider_Manager()
 {
 }
 
-HRESULT CCollider_Manager::Initialize()
+HRESULT CCollider_Manager::Initialize(_uint iNumLevels)
 {	
+	m_iNumLevels = iNumLevels;
+
+	m_pCollider_Layers = new COLLIDER_LAYERS[iNumLevels];
+
 	return S_OK;
 }
 
 
-HRESULT CCollider_Manager::Add_Collider(const wstring& strLayerTag, CCollider* _pCollider , void* pArg)
+HRESULT CCollider_Manager::Add_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* _pCollider , void* pArg)
 {
 	if (nullptr == _pCollider)
 		return E_FAIL;
 
-	CCollider_Layer* pCollider_Layer = Find_Collider_Layer(strLayerTag);
+	CCollider_Layer* pCollider_Layer = Find_Collider_Layer(iLevelIndex, strLayerTag);
 	
 	if (nullptr == pCollider_Layer)
 	{
@@ -29,7 +33,7 @@ HRESULT CCollider_Manager::Add_Collider(const wstring& strLayerTag, CCollider* _
 	
 		pCollider_Layer->Add_Collider(_pCollider);
 	
-		m_pCollider_Layer.emplace(strLayerTag, pCollider_Layer);
+		m_pCollider_Layers[iLevelIndex].emplace(strLayerTag, pCollider_Layer);
 	}
 	else
 	{
@@ -39,9 +43,9 @@ HRESULT CCollider_Manager::Add_Collider(const wstring& strLayerTag, CCollider* _
 	return S_OK;
 }
 
-void CCollider_Manager::Check_Collision_For_MyEvent(CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag)
+void CCollider_Manager::Check_Collision_For_MyEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag)
 {   
-	CCollider_Layer* pColliderLayer = Find_Collider_Layer(strTargetColliderLayerTag);
+	CCollider_Layer* pColliderLayer = Find_Collider_Layer(iLevelIndex, strTargetColliderLayerTag);
 
 	for (_uint i = 0; ; i++)
 	{
@@ -77,9 +81,9 @@ void CCollider_Manager::Check_Collision_For_MyEvent(CCollider* MyColliderCom, co
 	return;
 }
 
-void CCollider_Manager::Check_Collision_For_TargetEvent(CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag)
+void CCollider_Manager::Check_Collision_For_TargetEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag)
 {
-	CCollider_Layer* pColliderLayer = Find_Collider_Layer(strTargetColliderLayerTag);
+	CCollider_Layer* pColliderLayer = Find_Collider_Layer(iLevelIndex, strTargetColliderLayerTag);
 	
 	for (_uint i = 0; ; i++)
 	{
@@ -115,9 +119,9 @@ void CCollider_Manager::Check_Collision_For_TargetEvent(CCollider* MyColliderCom
 	return;
 }
 
-_bool CCollider_Manager::Is_Collision(CCollider* MyColliderCom, const wstring& strColliderLayerTag)
+_bool CCollider_Manager::Is_Collision(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strColliderLayerTag)
 {	
-	CCollider_Layer* pColliderLayer = Find_Collider_Layer(strColliderLayerTag);
+	CCollider_Layer* pColliderLayer = Find_Collider_Layer(iLevelIndex,strColliderLayerTag);
 	
 	for (_uint i = 0; ; i++)
 	{
@@ -136,9 +140,9 @@ _bool CCollider_Manager::Is_Collision(CCollider* MyColliderCom, const wstring& s
 	return false;
 }
 
-void CCollider_Manager::Kill_Dead_Collider(CCollider* DeadCollider)
+void CCollider_Manager::Kill_Dead_Collider(_uint iLevelIndex, CCollider* DeadCollider)
 {
-	for (auto& Pair : m_pCollider_Layer)
+	for (auto& Pair : m_pCollider_Layers[iLevelIndex])
 	{
 		list<class CCollider*>* pColliders = Pair.second->Get_Colliders();
 
@@ -151,20 +155,31 @@ void CCollider_Manager::Kill_Dead_Collider(CCollider* DeadCollider)
 	}
 }
 
-CCollider_Layer* CCollider_Manager::Find_Collider_Layer(const wstring& strLayerTag)
+void CCollider_Manager::Collider_Clear(_uint iLevelIndex)
+{
+	for (auto& Pair : m_pCollider_Layers[iLevelIndex])
+		Safe_Release(Pair.second);
+
+	m_pCollider_Layers[iLevelIndex].clear();
+}
+
+CCollider_Layer* CCollider_Manager::Find_Collider_Layer(_uint iLevelIndex, const wstring& strLayerTag)
 {	
-	auto	iter = m_pCollider_Layer.find(strLayerTag);
-	if (iter == m_pCollider_Layer.end())
+	if (iLevelIndex >= m_iNumLevels)
+		return nullptr;
+
+	auto	iter = m_pCollider_Layers[iLevelIndex].find(strLayerTag);
+	if (iter == m_pCollider_Layers[iLevelIndex].end())
 		return nullptr;
 	
 	return iter->second;
 }
 
-CCollider_Manager* CCollider_Manager::Create()
+CCollider_Manager* CCollider_Manager::Create(_uint iNumLevels)
 {
 	CCollider_Manager* pInstance = new CCollider_Manager();
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize(iNumLevels)))
 	{
 		MSG_BOX("Failed to Created : CCollider_Manager");
 		Safe_Release(pInstance);
@@ -175,9 +190,13 @@ CCollider_Manager* CCollider_Manager::Create()
 
 void CCollider_Manager::Free()
 {
-	for (auto& Pair : m_pCollider_Layer)
-		Safe_Release(Pair.second);
+	for (size_t i = 0; i < m_iNumLevels; i++)
+	{
+		for (auto& Pair : m_pCollider_Layers[i])
+			Safe_Release(Pair.second);
 
-	m_pCollider_Layer.clear();
+		m_pCollider_Layers[i].clear();
+	}
+	Safe_Delete_Array(m_pCollider_Layers);
 
 }

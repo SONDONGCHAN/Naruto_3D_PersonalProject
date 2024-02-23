@@ -103,12 +103,15 @@ private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
 	map<const wstring, class CSkill*>			m_MonsterSkills;
 	map<const wstring, class CTrail_Line*>		m_MonsterTrails;
+	map<const wstring, class CUI*>				m_MonsterUIs;
+
 
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Add_Skills();
 	HRESULT Add_Trails();
+	HRESULT Add_UIs();
 
 public:
 	static CBoss_Naruto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

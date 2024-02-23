@@ -23,6 +23,7 @@ HRESULT CSkill::Initialize(void* pArg)
     m_pParentTransform  = pSkillDesc->pParentTransform;
     m_User_Type         = pSkillDesc->User_Type;
     m_pCamera           = pSkillDesc->pCamera;
+    m_Current_Level     = pSkillDesc->Current_Level;
     
     Safe_AddRef(m_pParentTransform);
     Safe_AddRef(m_pCamera);

@@ -116,10 +116,8 @@ HRESULT CPlayer::Add_Character()
 {
 	CLandObject::LANDOBJ_DESC			Player_Naruto_Desc{};
 	Player_Naruto_Desc.pMapTransform	= m_pMapTransform;
-	Player_Naruto_Desc.pMapModel		= m_pMapModel;
 	Player_Naruto_Desc.pCamera			= m_pCamera;
-
-
+	Player_Naruto_Desc.Current_Level	= m_Current_Level;
 
 	CPlayer_Naruto* pNaruto = dynamic_cast<CPlayer_Naruto*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Player_Naruto"), &Player_Naruto_Desc));
 	if (nullptr == pNaruto)

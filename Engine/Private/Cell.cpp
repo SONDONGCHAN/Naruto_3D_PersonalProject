@@ -14,6 +14,16 @@ _float CCell::Compute_Height(_fvector vLocalPos)
 	return m_pVIBuffer->Compute_Height(vLocalPos);
 }
 
+_float CCell::Compute_Width(_fvector vLocalPos)
+{
+	return m_pVIBuffer->Compute_Width(vLocalPos);
+}
+
+_float CCell::Compute_Depth(_fvector vLocalPos)
+{
+	return m_pVIBuffer->Compute_Depth(vLocalPos);
+}
+
 HRESULT CCell::Initialize(const _float3* pPoints, _uint iCellIndex)
 {
 	for (size_t i = 0; i < POINT_END; i++)

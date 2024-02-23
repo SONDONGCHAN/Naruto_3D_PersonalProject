@@ -26,7 +26,7 @@ HRESULT CMap::Initialize(void* pArg)
 {
 	m_pMapIndex = (_uint*)pArg;
 
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize(nullptr)))
 		return E_FAIL;
 
 	if (FAILED(Add_Component()))
@@ -78,29 +78,41 @@ HRESULT CMap::Render()
 
 HRESULT CMap::Add_Model_Component()
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Stadium"),
-		TEXT("Com_Model_Map_Stadium"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-		return E_FAIL;
+	if (*m_pMapIndex == 0)
+	{
+		/* Com_Model_Map_Stadium */
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Stadium"),
+			TEXT("Com_Model_Map_Stadium"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+			return E_FAIL;
 
-	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Konoha_Village"),
-	//	TEXT("Com_Model_Map_Konoha_Village"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-	//	return E_FAIL;
-	
+		/* Com_Navigatiom */
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
+			TEXT("Com_Navigatiom"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			return E_FAIL;
+	}
+	else if (*m_pMapIndex == 1)
+	{
+		/* Com_Model_Map_Konoha_Village */
+		if (FAILED(__super::Add_Component(LEVEL_BOSS, TEXT("Prototype_Component_Map_Konaha_Village"),
+			TEXT("Com_Model_Map_Konoha_Village"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+			return E_FAIL;
+
+		/* Com_Navigatiom */
+		if (FAILED(__super::Add_Component(LEVEL_BOSS, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+			TEXT("Com_Navigatiom"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 
 HRESULT CMap::Add_Component()
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxMesh"),
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	Add_Model_Component();
-
-	/* Com_Navigatiom */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
-		TEXT("Com_Navigatiom"), reinterpret_cast<CComponent**>(&m_pNavigationCom))))
-		return E_FAIL;
 
 	return S_OK;
 }

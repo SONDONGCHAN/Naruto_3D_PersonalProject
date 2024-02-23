@@ -237,7 +237,7 @@ void CBody_Player_Naruto::Set_Animation_State(_float fTimeDelta)
 		m_fAnimationPlayRatio = 0.7f;
 		}
 	else if (*m_pPlayerState & PLAYER_STATE_CHAKRAJUMP_LOOP) {
-		m_pModelCom->Set_Animation(98, 0.1f, true, 3.f, false, false);
+		m_pModelCom->Set_Animation(98, 0.1f, true, 1.5f, false, false);
 		}
 	else if (*m_pPlayerState & PLAYER_STATE_STRUCK_LEFT) {
 		m_pModelCom->Set_Animation(73, 0.05f, false, 2.f, true, false);
@@ -275,7 +275,7 @@ void CBody_Player_Naruto::Set_Animation_State(_float fTimeDelta)
 
 HRESULT CBody_Player_Naruto::Add_Component()
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom)))) 
 		return E_FAIL;
 
@@ -283,7 +283,7 @@ HRESULT CBody_Player_Naruto::Add_Component()
 		TEXT("Com_Shader_OutLine"), reinterpret_cast<CComponent**>(&m_pShaderOutLine))))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Player_Naruto"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Player_Naruto"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 

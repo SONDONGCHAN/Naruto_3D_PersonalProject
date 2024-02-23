@@ -7,6 +7,7 @@
 #include "Level_Logo.h"
 #include "Level_CustomRoom.h"
 #include "Level_GamePlay.h"
+#include "Level_BossStage.h"
 #include "BackGround.h"
 
 
@@ -46,6 +47,8 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 		//{
 			CLevel* pLevel = { nullptr };
 
+			//m_pGameInstance->Collider_Clear();
+
 			switch (m_eNextLevel)
 			{
 			case LEVEL_LOGO:
@@ -58,6 +61,10 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 			case LEVEL_GAMEPLAY:
 				pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+				break;
+
+			case LEVEL_BOSS:
+				pLevel = CLevel_BossStage::Create(m_pDevice, m_pContext);
 				break;
 
 			}

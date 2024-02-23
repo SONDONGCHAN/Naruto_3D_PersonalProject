@@ -245,7 +245,7 @@ void CBody_Player_Custom_Face::Set_Animation_State(_float fTimeDelta)
 		m_fAnimationPlayRatio = 0.7f;
 	}
 	else if (*m_pPlayerState & PLAYER_STATE_CHAKRAJUMP_LOOP) {
-		m_pCurrentModel->Set_Animation(114, 0.1f, true, 3.f, false, false);
+		m_pCurrentModel->Set_Animation(114, 0.1f, true, 1.5f, false, false);
 	}
 	else if (*m_pPlayerState & PLAYER_STATE_STRUCK_LEFT) {
 		m_pCurrentModel->Set_Animation(80, 0.05f, false, 2.f, true, false);

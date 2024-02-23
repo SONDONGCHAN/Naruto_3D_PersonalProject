@@ -87,14 +87,37 @@ _float CVIBuffer_Cell::Compute_Height(_fvector vLocalPos)
 	_float3		vTargetPos;
 	XMStoreFloat3(&vTargetPos, vLocalPos);
 
-
 	_vector		vPlane;
 
 	vPlane = XMPlaneFromPoints(XMLoadFloat3(&m_pVerticesPos[0]), XMLoadFloat3(&m_pVerticesPos[1]), XMLoadFloat3(&m_pVerticesPos[2]));
 	
-
 	return (-vPlane.m128_f32[0] * vTargetPos.x - vPlane.m128_f32[2] * vTargetPos.z - vPlane.m128_f32[3]) / vPlane.m128_f32[1];
 }
+
+_float CVIBuffer_Cell::Compute_Width(_fvector vLocalPos)
+{
+	_float3		vTargetPos;
+	XMStoreFloat3(&vTargetPos, vLocalPos);
+	
+	_vector		vPlane;
+	
+	vPlane = XMPlaneFromPoints(XMLoadFloat3(&m_pVerticesPos[0]), XMLoadFloat3(&m_pVerticesPos[1]), XMLoadFloat3(&m_pVerticesPos[2]));
+	
+	return (-vPlane.m128_f32[1] * vTargetPos.y - vPlane.m128_f32[2] * vTargetPos.z - vPlane.m128_f32[3]) / vPlane.m128_f32[0];
+}
+
+_float CVIBuffer_Cell::Compute_Depth(_fvector vLocalPos)
+{
+	_float3		vTargetPos;
+	XMStoreFloat3(&vTargetPos, vLocalPos);
+
+	_vector		vPlane;
+
+	vPlane = XMPlaneFromPoints(XMLoadFloat3(&m_pVerticesPos[0]), XMLoadFloat3(&m_pVerticesPos[1]), XMLoadFloat3(&m_pVerticesPos[2]));
+
+	return (-vPlane.m128_f32[0] * vTargetPos.x - vPlane.m128_f32[1] * vTargetPos.y - vPlane.m128_f32[3]) / vPlane.m128_f32[2];
+}
+
 
 CVIBuffer_Cell* CVIBuffer_Cell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints)
 {

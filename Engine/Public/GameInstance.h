@@ -76,11 +76,11 @@ public: /* For.Light_Manager */
 	HRESULT Render_Light(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 
 public: /* For.Collider_Manager */
-	HRESULT Add_Collider(const wstring& strLayerTag, CCollider* pCollider, void* pArg = nullptr);
-	void	Check_Collision_For_MyEvent(CCollider* MyColliderCom, const wstring& strColliderLayerTag);
-	void	Check_Collision_For_TargetEvent(CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag);
-	_bool	Is_Collision(CCollider* MyColliderCom, const wstring& strColliderLayerTag);
-	void	Kill_Dead_Collider(CCollider* DeadColliderCom);
+	HRESULT Add_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* pCollider, void* pArg = nullptr);
+	void	Check_Collision_For_MyEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strColliderLayerTag);
+	void	Check_Collision_For_TargetEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag);
+	_bool	Is_Collision(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strColliderLayerTag);
+	void	Kill_Dead_Collider(_uint iLevelIndex, CCollider* DeadColliderCom);
 
 
 public: /* For.Font_Manager */

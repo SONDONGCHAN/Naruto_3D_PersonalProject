@@ -99,8 +99,8 @@ void CChidori::State_Control(_float fTimeDelta)
     
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
     
-        m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Monster_Main_Collider");
-        m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Chidori_Collider");
+        m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider");
+        m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Chidori_Collider");
 
         if (m_fDurTime > 0.4f)
         {
@@ -124,7 +124,7 @@ void CChidori::Set_Next_State()
     {
         m_pColliderMain->Set_Radius(0.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
-        m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Chidori_Collider");
+        m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level,m_pColliderMain, L"Monster_Main_Collider", L"Chidori_Collider");
 
         m_fDurTime = 0;
         m_bIsHit = false;
@@ -138,7 +138,7 @@ void CChidori::Set_State()
 
 HRESULT CChidori::Add_Components()
 {
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxMesh"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
     
@@ -150,11 +150,11 @@ HRESULT CChidori::Add_Components()
     CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
     BoundingDesc.fRadius = 0.f;
     BoundingDesc.vCenter = _float3(0.f, 0.f, 0.f);
-    if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
         TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
         return E_FAIL;
     
-    m_pGameInstance->Add_Collider(TEXT("Chidori_Collider"), m_pColliderMain);
+    m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Chidori_Collider"), m_pColliderMain);
     m_pColliderMain->Set_Collider_GameObject(this);
     
     return S_OK;

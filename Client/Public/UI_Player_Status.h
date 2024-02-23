@@ -5,7 +5,6 @@ BEGIN(Engine)
 class CTexture;
 END
 
-
 BEGIN(Client)
 
 class CUI_Player_Status : public CUI

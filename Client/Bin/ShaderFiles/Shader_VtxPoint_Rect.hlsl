@@ -5,6 +5,8 @@ texture2D   g_Texture;
 float2      vSize;
 float       g_fRatio = 1.f;
 vector      g_vColor;
+float       g_fAlpha;
+
 
 
 struct VS_IN
@@ -189,6 +191,21 @@ PS_OUT PS_WORLD_HP(PS_IN In)
    
     return Out;
 }
+PS_OUT PS_SYSTEM(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vColor = g_Texture.Sample(g_LinearSampler, In.vTexcoord);
+	
+    if (vColor.a < 0.1f)
+        discard;
+    
+    vColor.a = g_fAlpha;
+  
+    Out.vColor = vColor;
+   
+    return Out;
+}
 
 /* EffectFramework */
 
@@ -240,6 +257,18 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_HP();
         PixelShader = compile ps_5_0 PS_WORLD_HP();
+    }
+
+    pass Static_System
+    {
+		/* RenderState¼³Á¤. */
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        PixelShader = compile ps_5_0 PS_SYSTEM();
     }
 }
 

@@ -143,7 +143,7 @@ void CWood_Hand::State_Control(_float fTimeDelta)
 			if(m_fDurTime < 0.52f)
 				m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
 
-			m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");
+			m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");
 		}
 
 	}
@@ -174,7 +174,7 @@ void CWood_Hand::Set_Next_State()
 	{
 		m_pColliderMain->Set_Radius(0.f);
 		m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
-		m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");
+		m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");
 		m_fDurTime = 0;
 		m_bTargeting = false;
 	}
@@ -193,18 +193,18 @@ void CWood_Hand::Set_Targeting(_vector Target_Pos)
 
 HRESULT CWood_Hand::Add_Components()
 {
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	CModel* m_pModel_L;
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Skill_WoodHand_L"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Skill_WoodHand_L"),
 		TEXT("Com_Model_L"), reinterpret_cast<CComponent**>(&m_pModel_L))))
 		return E_FAIL;
 	m_vModels.push_back(m_pModel_L);
 	
 	CModel* m_pModel_R;
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Skill_WoodHand_R"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Skill_WoodHand_R"),
 		TEXT("Com_Model_R"), reinterpret_cast<CComponent**>(&m_pModel_R))))
 		return E_FAIL;
 	m_vModels.push_back(m_pModel_R);
@@ -212,11 +212,11 @@ HRESULT CWood_Hand::Add_Components()
 	CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
 	BoundingDesc.fRadius = 0.f;
 	BoundingDesc.vCenter = _float3(0.f, 4.f, 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
 		return E_FAIL;
 
-	m_pGameInstance->Add_Collider(TEXT("Wood_Hand_Collider"), m_pColliderMain);
+	m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Wood_Hand_Collider"), m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 
 	return S_OK;

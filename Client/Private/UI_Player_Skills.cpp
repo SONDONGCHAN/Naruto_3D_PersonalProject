@@ -124,7 +124,7 @@ HRESULT CUI_Player_Skills::Render()
 
 HRESULT CUI_Player_Skills::Add_Component()
 {
-	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Skill_Base"),
+	if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Skill_Base"),
 		TEXT("Com_Texture_Base"), reinterpret_cast<CComponent**>(&m_pTextureBase))))
 		return E_FAIL;
 
@@ -134,7 +134,7 @@ HRESULT CUI_Player_Skills::Add_Component()
 		pUI_Desc_1.vPos = { 1180.f, 650.f };
 		pUI_Desc_1.vSize = { 55.f, 55.f };
 		m_UI_Descs.push_back(pUI_Desc_1);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Rasengun"),
 			TEXT("Com_Texture_Icon_Rasengun"), reinterpret_cast<CComponent**>(&m_pTextureIcon_1))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon_1);
@@ -143,7 +143,7 @@ HRESULT CUI_Player_Skills::Add_Component()
 		pUI_Desc_2.vPos = { 1100.f, 650.f };
 		pUI_Desc_2.vSize = { 55.f, 55.f };
 		m_UI_Descs.push_back(pUI_Desc_2);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_RasenShuriken"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_RasenShuriken"),
 			TEXT("Com_Texture_Icon_RasenShuriken"), reinterpret_cast<CComponent**>(&m_pTextureIcon_2))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon_2);
@@ -152,7 +152,7 @@ HRESULT CUI_Player_Skills::Add_Component()
 		pUI_Desc_3.vPos = { 1020.f, 655.f };
 		pUI_Desc_3.vSize = { 40.f, 40.f };
 		m_UI_Descs.push_back(pUI_Desc_3);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
 			TEXT("Com_Texture_Icon_WoodSwap"), reinterpret_cast<CComponent**>(&m_pTextureIcon_3))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon_3);
@@ -163,7 +163,7 @@ HRESULT CUI_Player_Skills::Add_Component()
 		pUI_Desc_1.vPos = { 1180.f, 650.f };
 		pUI_Desc_1.vSize = { 55.f, 55.f };
 		m_UI_Descs.push_back(pUI_Desc_1);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_FireBall"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_FireBall"),
 			TEXT("Com_Texture_Icon_FireBall"), reinterpret_cast<CComponent**>(&m_pTextureIcon_1))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon_1);
@@ -172,7 +172,7 @@ HRESULT CUI_Player_Skills::Add_Component()
 		pUI_Desc_2.vPos = { 1100.f, 650.f };
 		pUI_Desc_2.vSize = { 55.f, 55.f };
 		m_UI_Descs.push_back(pUI_Desc_2);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Chidori"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Chidori"),
 			TEXT("Com_Texture_Icon_Chidori"), reinterpret_cast<CComponent**>(&m_pTextureIcon_2))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon_2);
@@ -181,7 +181,7 @@ HRESULT CUI_Player_Skills::Add_Component()
 		pUI_Desc_3.vPos = { 1020.f, 650.f };
 		pUI_Desc_3.vSize = { 55.f, 55.f };
 		m_UI_Descs.push_back(pUI_Desc_3);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodHand"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_WoodHand"),
 			TEXT("Com_Texture_Icon_WoodHand"), reinterpret_cast<CComponent**>(&m_pTextureIcon_3))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon_3);
@@ -190,7 +190,7 @@ HRESULT CUI_Player_Skills::Add_Component()
 		pUI_Desc_4.vPos = { 940.f, 655.f };
 		pUI_Desc_4.vSize = { 40.f, 40.f };
 		m_UI_Descs.push_back(pUI_Desc_4);
-		if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
 			TEXT("Com_Texture_Icon_WoodSwap"), reinterpret_cast<CComponent**>(&m_pTextureIcon_4))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon_4);

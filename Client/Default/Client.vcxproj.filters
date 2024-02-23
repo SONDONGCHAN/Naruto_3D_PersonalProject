@@ -40,10 +40,10 @@
       <Filter>00.MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\03. GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>01.Levels\00.Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Free.cpp">
       <Filter>02.GameObjects\Cameras</Filter>
@@ -64,7 +64,7 @@
       <Filter>02.GameObjects\Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01.Levels\Loading\Loader</Filter>
+      <Filter>01.Levels\00.Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Body_Monster_LeafNinja.cpp">
       <Filter>02.GameObjects\LandObject\Monster\Monster_LeafNinja\Body</Filter>
@@ -100,7 +100,7 @@
       <Filter>02.GameObjects\Skill\Wood_Dragon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Logo.cpp">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>01.Levels\01. Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BackGround.cpp">
       <Filter>02.GameObjects\BackGround</Filter>
@@ -133,7 +133,7 @@
       <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Upper</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_CustomRoom.cpp">
-      <Filter>01.Levels\CustomRoom</Filter>
+      <Filter>01.Levels\02. CustomRoom</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kamui.cpp">
       <Filter>02.GameObjects\Skill\Kamui</Filter>
@@ -177,6 +177,15 @@
     <ClCompile Include="..\Private\Player_Custom.cpp">
       <Filter>02.GameObjects\LandObject\Player\Player_Custom</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Level_BossStage.cpp">
+      <Filter>01.Levels\04. BossStage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_System.cpp">
+      <Filter>02.GameObjects\UI\UI_System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Boss_Status.cpp">
+      <Filter>02.GameObjects\UI\UI_Boss_Status</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -185,20 +194,17 @@
     <ClInclude Include="targetver.h">
       <Filter>98.Default</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Client_Defines.h">
-      <Filter>99.Defines</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\MainApp.h">
       <Filter>00.MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>01.Levels\03. GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>01.Levels\00.Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
-      <Filter>01.Levels\Loading\Loader</Filter>
+      <Filter>01.Levels\00.Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Free.h">
       <Filter>02.GameObjects\Cameras</Filter>
@@ -261,7 +267,7 @@
       <Filter>02.GameObjects\Skill\Wood_Dragon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Logo.h">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>01.Levels\01. Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BackGround.h">
       <Filter>02.GameObjects\BackGround</Filter>
@@ -292,9 +298,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Body_Player_Custom_Upper.h">
       <Filter>02.GameObjects\LandObject\Player\Player_Custom\Body\Body_Upper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Level_CustomRoom.h">
-      <Filter>01.Levels\CustomRoom</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kamui.h">
       <Filter>02.GameObjects\Skill\Kamui</Filter>
@@ -335,6 +338,21 @@
     <ClInclude Include="..\Public\UI_Monster_Status.h">
       <Filter>02.GameObjects\UI\UI_Monster_Status</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_CustomRoom.h">
+      <Filter>01.Levels\02. CustomRoom</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_BossStage.h">
+      <Filter>01.Levels\04. BossStage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_System.h">
+      <Filter>02.GameObjects\UI\UI_System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Boss_Status.h">
+      <Filter>02.GameObjects\UI\UI_Boss_Status</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Client_Defines.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -362,12 +380,6 @@
     </Filter>
     <Filter Include="00.MainApp">
       <UniqueIdentifier>{f2fd7e81-fdde-4fd3-a712-0ea245633714}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{5a42f547-e667-4d88-8df1-1a7fdfe27c94}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Loading">
-      <UniqueIdentifier>{a4d4b5a0-b54b-4697-9b86-12bc978301da}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\BackGround">
       <UniqueIdentifier>{94f4d0ca-521b-4303-b7ca-e3ef123cb486}</UniqueIdentifier>
@@ -429,9 +441,6 @@
     <Filter Include="02.GameObjects\Skill\Wood_Dragon">
       <UniqueIdentifier>{90cca1ad-2ab4-4b55-82d8-75b69e83bc02}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Logo">
-      <UniqueIdentifier>{d64ee3bc-e128-48fd-9887-570e3dee100d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Skill\Wood_Swap">
       <UniqueIdentifier>{8830bc0d-0776-4230-b68a-4b1cc2ab2eb4}</UniqueIdentifier>
     </Filter>
@@ -461,9 +470,6 @@
     </Filter>
     <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Parts">
       <UniqueIdentifier>{5bada7d6-1f36-4ac2-b1ee-9cf228e65a21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\CustomRoom">
-      <UniqueIdentifier>{59023e12-ed37-46bd-8016-32b6acceff0f}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Skill\Kamui">
       <UniqueIdentifier>{3d5308d8-5ec0-4e9e-a7f2-3a12e394e791}</UniqueIdentifier>
@@ -513,9 +519,6 @@
     <Filter Include="02.GameObjects\UI\UI_Monster_Status">
       <UniqueIdentifier>{158dfe3f-0f0f-402a-aa49-41e4ec2b8008}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels\Loading\Loader">
-      <UniqueIdentifier>{7d2604b7-8417-4e6e-b875-ef3010ce76c5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Body">
       <UniqueIdentifier>{f4506234-43b0-4279-9e24-c47d67bdf1e0}</UniqueIdentifier>
     </Filter>
@@ -530,6 +533,30 @@
     </Filter>
     <Filter Include="02.GameObjects\LandObject\Player\Player_Custom\Body\Body_HeadGear">
       <UniqueIdentifier>{12a8d1dc-f05c-4faa-84ae-c05d675d757b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\UI_System">
+      <UniqueIdentifier>{9e84eeaf-b262-40ef-bb87-97cb963a0d4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\00.Loading">
+      <UniqueIdentifier>{a4d4b5a0-b54b-4697-9b86-12bc978301da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\00.Loading\Loader">
+      <UniqueIdentifier>{7d2604b7-8417-4e6e-b875-ef3010ce76c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\01. Logo">
+      <UniqueIdentifier>{d64ee3bc-e128-48fd-9887-570e3dee100d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\02. CustomRoom">
+      <UniqueIdentifier>{59023e12-ed37-46bd-8016-32b6acceff0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\03. GamePlay">
+      <UniqueIdentifier>{5a42f547-e667-4d88-8df1-1a7fdfe27c94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\04. BossStage">
+      <UniqueIdentifier>{2517414b-42ec-4488-ac3e-1323ed09a022}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\UI_Boss_Status">
+      <UniqueIdentifier>{dc3dd233-6de8-4f26-9a34-15c8ff17d397}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

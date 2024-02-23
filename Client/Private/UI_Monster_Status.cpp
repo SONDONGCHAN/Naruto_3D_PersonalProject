@@ -139,7 +139,7 @@ HRESULT CUI_Monster_Status::Add_Component()
 	UI_Monster_Status_DESC pUI_Desc_1;
 	pUI_Desc_1.vSize = { 30.f, 6.5f };
 	m_UI_Descs.push_back(pUI_Desc_1);
-	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp_Base"),
+	if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Monster_Hp_Base"),
 		TEXT("Com_Texture_Base"), reinterpret_cast<CComponent**>(&m_pTextureBase))))
 		return E_FAIL;
 	m_Textures.push_back(m_pTextureBase);
@@ -147,7 +147,7 @@ HRESULT CUI_Monster_Status::Add_Component()
 	UI_Monster_Status_DESC pUI_Desc_2;
 	pUI_Desc_2.vSize = { 30.f, 6.5f };
 	m_UI_Descs.push_back(pUI_Desc_2);
-	if (FAILED(CGameObject::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp"),
+	if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Monster_Hp"),
 		TEXT("Com_Texture_Hp"), reinterpret_cast<CComponent**>(&m_pTextureHp))))
 		return E_FAIL;
 	m_Textures.push_back(m_pTextureHp);

@@ -41,16 +41,23 @@ HRESULT CMonster_LeafNinja::Initialize(void* pArg)
 	if (FAILED(Add_Skills()))
 		return E_FAIL;
 
-	m_MaxHp		= 100.f;
-	m_CurrentHp = 100.f;
+	m_MaxHp		= 10.f;
+	m_CurrentHp = 10.f;
 
 	if (FAILED(Add_UIs()))
 		return E_FAIL;
 
 	m_CurrentState = MONSTER_STATE_IDLE;
+
 	_vector vStart_Pos = { 7.f, 0.f, 10.f, 1.f };
+
+	if (m_Current_Level == LEVEL_GAMEPLAY)
+		vStart_Pos = { 7.f, 0.f, 10.f, 1.f };
+	else if (m_Current_Level == LEVEL_BOSS)
+		vStart_Pos = { -102.73f, 6.93f, 60.47f, 1.f };
+
 	m_pTransformCom->Set_Pos(vStart_Pos);
-	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bisLand);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	
 
 
@@ -88,8 +95,8 @@ void CMonster_LeafNinja::Tick(_float fTimeDelta)
 void CMonster_LeafNinja::Late_Tick(_float fTimeDelta)
 {
 	//Collision_ToPlayer();
-	m_pGameInstance->Check_Collision_For_MyEvent(m_pColliderMain, L"Player_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level,m_pColliderMain, L"Player_Main_Collider");
+	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
 
 
 	for (auto& Pair : m_MonsterParts)
@@ -140,8 +147,8 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 		if (!m_bDeadCheck)
 		{
 			m_bDeadCheck = true;
-			m_pGameInstance->Kill_Dead_Collider(m_pColliderMain);
-			m_pGameInstance->Kill_Dead_Collider(m_pColliderAttack);
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderMain);
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderAttack);
 			m_pColliderMain->Delete_All_IsCollider();
 			m_pColliderAttack->Delete_All_IsCollider();
 			m_iState = MONSTER_DEAD;
@@ -191,7 +198,7 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 
 
 	if (m_iState & MONSTER_RUN)
-		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bisLand);
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 	if (!(m_iState & MONSTER_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
@@ -455,7 +462,7 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 
 void CMonster_LeafNinja::Set_Direction()
 {
-	_vector Pos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+	_vector Pos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 	_vector Dir = Pos - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	Dir.m128_f32[3] = 0.f;
 
@@ -499,7 +506,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 	else if (strColliderLayerTag == L"Player_Attack_Collider")
@@ -631,7 +638,7 @@ void CMonster_LeafNinja::Collider_Event_Stay(const wstring& strColliderLayerTag,
 
 			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
 
-			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bisLand);
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
 
@@ -749,14 +756,13 @@ void CMonster_LeafNinja::Off_Attack_Collider()
 	m_pColliderAttack->Set_Radius(0.f);
 	m_pColliderAttack->Set_Center(_float3{ 0.f, -9999.f, 0.f });
 	//m_pColliderAttack->Set_HitType(HIT_NORMAL);
-
 }
 
 
 void CMonster_LeafNinja::Dash_Move(_float ratio, _float fTimeDelta)
 {
 	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
-	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bisLand);
+	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 }
 
 void CMonster_LeafNinja::Use_Skill(const wstring& strSkillName)
@@ -811,7 +817,7 @@ void CMonster_LeafNinja::Skill_Tick(_float fTimeDelta)
 				Pos.m128_f32[1] += 1.f;
 				pFlameBomb->Get_TranformCom()->Set_Pos(Pos);
 				pFlameBomb->Get_TranformCom()->Set_Look(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 				TargetPos.m128_f32[1] += 0.7f;
 				pFlameBomb->Set_Targeting(TargetPos);
 				pFlameBomb->Set_Next_State();
@@ -844,20 +850,28 @@ HRESULT CMonster_LeafNinja::Add_Components()
 	/* Com_Navigation */
 	CNavigation::NAVI_DESC		NaviDesc{};
 	NaviDesc.iStartCellIndex = 30;
-	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navi_Map_Stadium"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
-		return E_FAIL;
-	
+	if (m_Current_Level == LEVEL_GAMEPLAY)
+	{
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Stadium"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
+	else if (m_Current_Level == LEVEL_BOSS)
+	{
+		NaviDesc.iStartCellIndex = 64;
+		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+			return E_FAIL;
+	}
 	/* Com_Collider */
 	CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
 	BoundingDesc.fRadius = 0.7f;
 	BoundingDesc.vCenter = _float3(0.f, BoundingDesc.fRadius, 0.f);
 	
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(TEXT("Monster_Main_Collider"), m_pColliderMain);
+	m_pGameInstance->Add_Collider(m_Current_Level,TEXT("Monster_Main_Collider"), m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 
 
@@ -865,10 +879,10 @@ HRESULT CMonster_LeafNinja::Add_Components()
 	AttackBoundingDesc.fRadius = 0.f;
 	AttackBoundingDesc.vCenter = _float3(0.f, AttackBoundingDesc.fRadius, AttackBoundingDesc.fRadius);
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Attack"), reinterpret_cast<CComponent**>(&m_pColliderAttack), &AttackBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(L"Monster_Attack_Collider", m_pColliderAttack);
+	m_pGameInstance->Add_Collider(m_Current_Level,L"Monster_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
 	return S_OK;                           
 } 
@@ -897,6 +911,7 @@ HRESULT CMonster_LeafNinja::Add_Skills()
 	Skill_desc.pParentTransform = m_pTransformCom;
 	Skill_desc.User_Type		= CSkill::USER_MONSTER;
 	Skill_desc.pCamera			= m_pCamera;
+	Skill_desc.Current_Level = m_Current_Level;
 
 	 CSkill* pFlameBomb = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_FlameBomb"), &Skill_desc));
 	 if (nullptr == pFlameBomb)

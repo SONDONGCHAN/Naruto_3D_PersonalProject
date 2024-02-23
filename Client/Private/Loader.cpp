@@ -39,6 +39,10 @@
 #include "UI_Player_Skills.h"
 #include "UI_Player_Custom.h"
 #include "UI_Monster_Status.h"
+#include "UI_System.h"
+#include "UI_Boss_Status.h"
+
+
 
 
 
@@ -94,6 +98,9 @@ HRESULT CLoader::Loading_Selector()
 		break;
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlayLevel();
+		break;
+	case LEVEL_BOSS:
+		hr = Loading_For_BossStageLevel();
 		break;
 	}
 
@@ -275,79 +282,115 @@ HRESULT CLoader::Loading_For_CustomRoomLevel()
 	return S_OK;
 }
 
-
 HRESULT CLoader::Loading_For_GamePlayLevel()
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
 	/* For.Prototype_Component_Texture_Snow */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Snow"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Snow"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
 		return E_FAIL;
+	/* For.Prototype_Component_Texture_Battle_Start */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Battle_Start"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Announce_BattleStart_BC_LOCL.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Battle_Victory */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Battle_Victory"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Announce_Win_BC_LOCL.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_HIT */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HIT"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Announce_Hit_Text_LOCL_0.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_HITS*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HITS"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Announce_Hit_Small_LOCL.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_KO*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_KO"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Announce_KO_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Number*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Number"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/Number/T_UI_Announce_Hit_Digit_%d.png"), 10))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Boss_Base_Hp*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Base_Hp"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/Boss/T_UI_Boss_Gauge1.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Boss_Face_Naruto*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Face_Naruto"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/Boss/T_UI_Dialog_Character_D34_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Boss_Hp*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Hp"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/Boss/T_UI_Boss_Gauge2_M.png"), 1))))
+		return E_FAIL;
+
 
 	// 플레이어 상태 UI
 	/* For.Prototype_Component_Texture_Status */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Status"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_SP_Gauge_Base_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Status_Hp */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Status_Hp"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Status_Hp"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_Base2.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_Rasengun_Super */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Rasengun_Super"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_Rasengan_Super_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_Kamui */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Kamui"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Kamui"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_SP_KamuiKakashi_BC.png"), 1))))
 		return E_FAIL;
 
 	// 몬스터 UI
 	/* For.Prototype_Component_Texture_Monster_Hp_Base */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp_Base"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Monster_Hp_Base"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_frame_M.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Monster_Hp */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Hp"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Monster_Hp"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_LifeGauge_Base_BC.png"), 1))))
 		return E_FAIL;
 
 	// 스킬 UI
 	/* For.Prototype_Component_Texture_Icon_Skill_Base */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Skill_Base"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Skill_Base"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Skill_Gauge_Base_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_Rasengun */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Rasengun"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Rasengun"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_Rasengan_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_RasenShuriken */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_RasenShuriken"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_RasenShuriken"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_TrueRasenShuriken_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_FireBall */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_FireBall"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_FireBall"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_FireBall_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_Chidori */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_Chidori"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_Chidori"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_Chidori_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Icon_WoodHand */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodHand"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_WoodHand"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Skill_LaughingMonk_BC.png"), 1))))
 		return E_FAIL;
 
 
 	/* For.Prototype_Component_Texture_Icon_WoodSwap */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Icon_WoodSwap"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Icon/T_UI_Clone_BC.png"), 1))))
 		return E_FAIL;
 	
 	m_strLoadingText = TEXT("컴포넌트를(을) 로딩 중 입니다.");
 	/* For.Prototype_Component_Calculator*/
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Calculator"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Calculator"),
 		CCalculator::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
@@ -356,60 +399,51 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 
 	//////////Player//////////
 	///* For.Prototype_Component_Player_Naruto */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Player_Naruto"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Player_Naruto"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, L"../Bin/Resources/Models/Anim/Player/Naruto/Naruto.dat"))))
 		return E_FAIL;
 
 
 	//////////Monster//////////
 	///* For.Prototype_Component_Body_Monster_LeafNinja */
- 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Body_Monster_LeafNinja"),
+ 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Body_Monster_LeafNinja"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, L"../Bin/Resources/Models/Anim/Monster/Monster_LeafNinja/Monster_LeafNinja.dat"))))
 		return E_FAIL;
 	///* For.Prototype_Component_Body_Monster_Samurai */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Body_Monster_Samurai"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Body_Monster_Samurai"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, L"../Bin/Resources/Models/Anim/Monster/Monster_Samurai/Monster_Samurai.dat"))))
 		return E_FAIL;
 
 	//////////Skill///////////
 	///* For.Prototype_Component_Body_Monster_Samurai */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Skill_Wood_Dragon"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Skill_Wood_Dragon"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, L"../Bin/Resources/Models/Anim/Skill/Wood_Dragon/Wood_Dragon.dat"))))
 		return E_FAIL;
 	///* For.Prototype_Component_Skill_WoodHand_L */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Skill_WoodHand_L"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Skill_WoodHand_L"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, L"../Bin/Resources/Models/Anim/Skill/WoodHand_L/WoodHand_L.dat"))))
 		return E_FAIL;
 	///* For.Prototype_Component_Skill_WoodHand_R */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Skill_WoodHand_R"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Skill_WoodHand_R"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, L"../Bin/Resources/Models/Anim/Skill/WoodHand_R/WoodHand_R.dat"))))
 		return E_FAIL;
 	///////////Weapon/////////////
 
 
 	////////////Map//////////////
-	///* For.Prototype_Component_Map_KonohaVillage_Robby */
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_KonohaVillage_Robby"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/KonohaVillage_Robby.dat"))))
-	//	return E_FAIL;
 
-	/* For.Prototype_Component_Map_Stadium */
+	///* For.Prototype_Component_Map_Stadium */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Stadium"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Map_Stadium.dat"))))
 		return E_FAIL;
-	///* For.Prototype_Component_Map_Konoha_Village */
-	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Konoha_Village"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Konaha_Village_N.dat"))))
-	//	return E_FAIL;
-
 
 	///////////Particle///////////
 	/* For.Prototype_Component_VIBuffer_Particle_Rect */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Particle_Rect"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Particle_Rect"),
 		CVIBuffer_Particle_Rect::Create(m_pDevice, m_pContext, 300))))
 		return E_FAIL;
 	/* For.Prototype_Component_VIBuffer_Particle_Point */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Particle_Point"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Particle_Point"),
 		CVIBuffer_Particle_Point::Create(m_pDevice, m_pContext, 2000))))
 		return E_FAIL;
 
@@ -421,20 +455,21 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		return E_FAIL;
 
 
+
 	m_strLoadingText = TEXT("충돌체를(을) 로딩 중 입니다.");
 
 	/* For.Prototype_Component_Collider_AABB */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"),
 		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Collider_OBB */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Collider_Sphere */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_Sphere"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
 		return E_FAIL;
 
@@ -442,32 +477,22 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	m_strLoadingText = TEXT("셰이더를(을) 로딩 중 입니다.");
 
 	/* For.Prototype_Component_Shader_VtxNorTex*/
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNorTex"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"),VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_VtxMesh*/
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
-		return E_FAIL;
-
-	/* For.Prototype_Component_Shader_VtxAnimMesh*/
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
-		return E_FAIL;
-
 	/* For.Prototype_Component_Shader_VtxRectInstance */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxRectInstance"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxRectInstance"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxRectInstance.hlsl"), VTX_RECT_INSTANCE::Elements, VTX_RECT_INSTANCE::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxPointInstance */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxPointInstance"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPointInstance"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPointInstance.hlsl"), VTX_POINT_INSTANCE::Elements, VTX_POINT_INSTANCE::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_VtxLine */
-	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxPoint_Trail"),
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPoint_Trail"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPoint_Trail.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements))))
 		return E_FAIL;
 
@@ -557,6 +582,14 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_Monster_Hp"),
 		CUI_Monster_Status::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	/* For.Prototype_GameObject_UI_System*/
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_System"),
+		CUI_System::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_CUI_Boss_Status*/
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CUI_Boss_Status"),
+		CUI_Boss_Status::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	m_strLoadingText = TEXT("스킬를(을) 로딩 중 입니다.");
@@ -604,6 +637,32 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	/* For.Prototype_GameObject_Skill_Wood_Hand*/
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_Wood_Hand"),
 		CWood_Hand::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
+
+	m_isFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_BossStageLevel()
+{
+	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
+	m_strLoadingText = TEXT("모델를(을) 로딩 중 입니다.");
+	////////////Map//////////////
+	///* For.Prototype_Component_Map_Stadium */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_BOSS, TEXT("Prototype_Component_Map_Konaha_Village"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Konaha_Village_N.dat"))))
+		return E_FAIL;
+
+
+	m_strLoadingText = TEXT("네비게이션를(을) 로딩 중 입니다.");
+	////////////Map//////////////
+	/* For.Prototype_Component_Navi_Map_Stadium */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_BOSS, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/Navi_Map_Konoha_Village.dat")))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");

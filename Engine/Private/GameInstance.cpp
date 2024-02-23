@@ -57,7 +57,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
-	m_pCollider_Manager = CCollider_Manager::Create();
+	m_pCollider_Manager = CCollider_Manager::Create(iNumLevels);
 	if (nullptr == m_pCollider_Manager)
 		return E_FAIL;
 
@@ -75,26 +75,25 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 		nullptr == m_pObject_Manager)
 		return;
 
-	m_pKey_Manager->Tick();
 
+	m_pKey_Manager->Tick();
 	m_pObject_Manager->Priority_Tick(fTimeDelta);
 	m_pPipeLine->Tick();
 	m_pObject_Manager->Tick(fTimeDelta);
-	m_pObject_Manager->Late_Tick(fTimeDelta);
-
 	m_pLevel_Manager->Tick(fTimeDelta);
 
+	m_pObject_Manager->Late_Tick(fTimeDelta);
 }
 
 HRESULT CGameInstance::Draw(const _float4& vClearColor)
 {
 	if (nullptr == m_pGraphic_Device)
 		return E_FAIL;
-
+	
 	m_pGraphic_Device->Clear_BackBuffer_View(vClearColor);
 	m_pGraphic_Device->Clear_DepthStencil_View();
-
-	m_pRenderer->Render();
+	
+	m_pRenderer->Render();	
 	m_pLevel_Manager->Render();
 
 	return S_OK;
@@ -113,10 +112,10 @@ void CGameInstance::Clear(_uint iNumLevels)
 	if (nullptr == m_pObject_Manager || nullptr == m_pComponent_Manager)
 		return;
 
-	m_pObject_Manager->Clear(iNumLevels);
-	m_pComponent_Manager->Clear(iNumLevels);
+	m_pObject_Manager		->Clear(iNumLevels);
+	m_pComponent_Manager	->Clear(iNumLevels);
+	m_pCollider_Manager		->Collider_Clear(iNumLevels);
 }
-
 /* For.Key_Manager */
 
 bool CGameInstance::Key_Pressing(_ubyte byKeyID, _float fTimeDelta, _float* pPressingTime)
@@ -322,38 +321,38 @@ HRESULT CGameInstance::Render_Light(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 	return m_pLight_Manager->Render(pShader, pVIBuffer);
 }
 
-HRESULT CGameInstance::Add_Collider(const wstring& strLayerTag, CCollider* pCollider, void* pArg)
+HRESULT CGameInstance::Add_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* pCollider, void* pArg)
 {
 	if (nullptr == m_pCollider_Manager)
 		return E_FAIL;
 
-	return m_pCollider_Manager->Add_Collider(strLayerTag, pCollider, pArg);
+	return m_pCollider_Manager->Add_Collider(iLevelIndex, strLayerTag, pCollider, pArg);
 }
 
-void CGameInstance::Check_Collision_For_MyEvent(CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag)
+void CGameInstance::Check_Collision_For_MyEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag)
 {
 	if (nullptr == m_pCollider_Manager)
 		return;
 
-	return m_pCollider_Manager->Check_Collision_For_MyEvent(MyColliderCom, strTargetColliderLayerTag);
+	return m_pCollider_Manager->Check_Collision_For_MyEvent(iLevelIndex, MyColliderCom, strTargetColliderLayerTag);
 }
 
-void CGameInstance::Check_Collision_For_TargetEvent(CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag)
+void CGameInstance::Check_Collision_For_TargetEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag)
 {
 	if (nullptr == m_pCollider_Manager)
 		return;
 
-	return m_pCollider_Manager->Check_Collision_For_TargetEvent(MyColliderCom, strTargetColliderLayerTag, strMyColliderLayerTag);
+	return m_pCollider_Manager->Check_Collision_For_TargetEvent(iLevelIndex, MyColliderCom, strTargetColliderLayerTag, strMyColliderLayerTag);
 }
 
-_bool CGameInstance::Is_Collision(CCollider* MyColliderCom, const wstring& strColliderLayerTag)
+_bool CGameInstance::Is_Collision(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strColliderLayerTag)
 {
-	return m_pCollider_Manager->Is_Collision(MyColliderCom, strColliderLayerTag);
+	return m_pCollider_Manager->Is_Collision(iLevelIndex, MyColliderCom, strColliderLayerTag);
 }
 
-void CGameInstance::Kill_Dead_Collider(CCollider* DeadColliderCom)
+void CGameInstance::Kill_Dead_Collider(_uint iLevelIndex, CCollider* DeadColliderCom)
 {
-	return m_pCollider_Manager->Kill_Dead_Collider(DeadColliderCom);
+	return m_pCollider_Manager->Kill_Dead_Collider(iLevelIndex, DeadColliderCom);
 }
 
 HRESULT CGameInstance::Add_Font(const wstring& strFontTag, const wstring& strFontFilePath)

@@ -28,8 +28,19 @@ private:
 	HRESULT Ready_Layer_Monster(const wstring& strLayerTag, CLandObject::LANDOBJ_DESC& GameObjDesc);
 	HRESULT Ready_Layer_Item(const wstring& strLayerTag);
 	HRESULT Ready_Layer_Effect(const wstring& strLayerTag);
+	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
 
+	void	Add_Run_Time_Object();
+	_bool	Check_Can_NextLevel();
 
+private:
+	_float	m_fRun_Time = 0.f;
+	_float	m_fEnd_Time = 0.f;
+
+	_bool	m_bCreated[2] = {false, };
+
+	vector<CGameObject*>  pMonsters;
+	_uint	m_iNumEnemy = { 0 };
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
