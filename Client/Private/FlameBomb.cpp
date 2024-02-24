@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FlameBomb.h"
-#include "GameInstance.h"
 
 CFlameBomb::CFlameBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CSkill(pDevice, pContext)

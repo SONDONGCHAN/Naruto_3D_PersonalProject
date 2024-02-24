@@ -36,14 +36,22 @@ HRESULT CTrail_Line::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 	m_OriginalMat = m_pTransformCom->Get_WorldMatrix();
 
-	if (m_eMyCharacter == PLAYER_CUSTOM)
-		m_vColor = { 113.f / 255.f, 199.f / 255.f, 236.f / 255.f , 1.f};
-	
-	else if (m_eMyCharacter == PLAYER_NARUTO)
+	if (m_eMyCharacter == PLAYER_CUSTOM) {
+		m_vColor = { 113.f / 255.f, 199.f / 255.f, 236.f / 255.f , 1.f };
+		m_vThickness = 0.025f;
+	}
+	else if (m_eMyCharacter == PLAYER_NARUTO) {
 		m_vColor = { 252.f / 255.f, 220.f / 255.f, 77.f / 255.f , 1.f };
-
-	else if (m_eMyCharacter == MONSTER_NARUTO)
+		m_vThickness = 0.025f;
+	}
+	else if (m_eMyCharacter == MONSTER_NARUTO) {
 		m_vColor = { 255.f / 255.f, 100.f / 255.f, 100.f / 255.f , 1.f };
+		m_vThickness = 0.025f;
+	}
+	else if (m_eMyCharacter == BOSS_KURAMA) {
+		m_vColor = { 0.f, 0.f, 0.f , 1.f };
+		m_vThickness = 0.05f;
+	}
 
 	return S_OK;
 }
@@ -82,6 +90,10 @@ HRESULT CTrail_Line::Render()
 	{
 		m_vColor.m128_f32[3] = 1.f - (1.f / 60.f) * i;
 
+		m_vThick.y = m_vThick.x;
+		m_vThick.x = (1.f - (1.f / 60.f) * i)  * m_vThickness;
+
+
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix_Old[i])))
 			return E_FAIL;
 
@@ -95,6 +107,8 @@ HRESULT CTrail_Line::Render()
 			return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(_float4))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vfThickness", &m_vThick, sizeof(_float2))))
 			return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Begin(0)))

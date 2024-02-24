@@ -1,0 +1,846 @@
+#include "Boss_Kurama.h"
+#include "Body_Boss_Kurama.h"
+#include "Skill.h"
+#include "Trail_Line.h"
+#include "Player.h"
+#include "UI_Boss_Status.h"
+
+CBoss_Kurama::CBoss_Kurama(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	: CLandObject(pDevice, pContext)
+{
+}
+
+CBoss_Kurama::CBoss_Kurama(const CBoss_Kurama& rhs)
+	: CLandObject(rhs)
+{
+}
+
+HRESULT CBoss_Kurama::Initialize_Prototype()
+{
+	return S_OK;
+}
+
+HRESULT CBoss_Kurama::Initialize(void* pArg)
+{
+	LANDOBJ_DESC* pGameObjectDesc = (LANDOBJ_DESC*)pArg;
+	
+	pGameObjectDesc->fSpeedPerSec = 5.f;
+	pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+	
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+	
+	if (FAILED(Add_Components()))
+		return E_FAIL;
+	
+	if (FAILED(Add_PartObjects()))
+		return E_FAIL;
+	
+	if (FAILED(Add_Skills()))
+		return E_FAIL;
+	
+	if (FAILED(Add_Trails()))
+		return E_FAIL;
+	
+	m_MaxHp = 300.f;
+	m_CurrentHp = 300.f;
+	
+	if (FAILED(Add_UIs()))
+		return E_FAIL;
+	
+	m_CurrentState = BOSS_STATE_IDLE;
+	_vector vStart_Pos = { 77.f, 28.f, -67.f, 1.f };
+	m_pTransformCom->Set_Pos(vStart_Pos);
+	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	
+	return S_OK;
+}
+
+void CBoss_Kurama::Priority_Tick(_float fTimeDelta)
+{
+	Cal_Direction();
+	RootAnimation();
+	Set_Gravity(m_pTransformCom, fTimeDelta);
+	State_Control(fTimeDelta);
+
+	for (auto& Pair : m_MonsterParts)
+		(Pair.second)->Priority_Tick(fTimeDelta);
+}
+
+void CBoss_Kurama::Tick(_float fTimeDelta)
+{
+	Skill_Tick(fTimeDelta);
+
+	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+
+	for (auto& Pair : m_MonsterParts)
+		(Pair.second)->Tick(fTimeDelta);
+}
+
+void CBoss_Kurama::Late_Tick(_float fTimeDelta)
+{
+	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
+	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
+
+	for (auto& Pair : m_MonsterParts)
+		(Pair.second)->Late_Tick(fTimeDelta);
+
+	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
+		return;
+
+
+	for (auto& Pair : m_MonsterTrails)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+
+	for (auto& Pair : m_MonsterUIs)
+		Pair.second->Late_Tick(fTimeDelta);
+
+#ifdef _DEBUG
+	m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
+	m_pGameInstance->Add_DebugComponent(m_pColliderMain);
+	m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
+#endif
+}
+
+HRESULT CBoss_Kurama::Render()
+{
+	return S_OK;
+}
+
+void CBoss_Kurama::RootAnimation()
+{
+	// 움직임을 World이동으로치환
+	_float3 fmovevalue = m_pBodyModelCom->Get_FramePos();
+	_float3 fInversemovevalue;
+	fInversemovevalue.x = -fmovevalue.x;
+	fInversemovevalue.y = 0.f;
+	fInversemovevalue.z = -fmovevalue.y;
+	m_pTransformCom->SetAnimationMove(XMLoadFloat3(&fInversemovevalue));
+}
+
+void CBoss_Kurama::State_Control(_float fTimeDelta)
+{	
+	CoolTimeTick(fTimeDelta);
+
+	if (m_CurrentHp <= 0)
+	{
+		if (!m_bDeadCheck)
+		{
+			m_bDeadCheck = true;
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderMain);
+			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderAttack);
+			m_pColliderMain->Delete_All_IsCollider();
+			m_pColliderAttack->Delete_All_IsCollider();
+			m_iState = BOSS_DEAD;
+			return;
+		}
+	}
+
+	if (m_iState & BOSS_RUSH_ATTACK)
+	{
+		m_ColliderDelay += fTimeDelta;
+
+		if (m_ColliderDelay > 1.f)
+			Off_Attack_Collider();
+		else if (m_ColliderDelay > 0.8f)
+			On_Attack_Collider(4.f, 3.f, HIT_BEATEN);
+
+		Dash_Move(DIR_FRONT, 0.96f, fTimeDelta);
+	}
+	else if (m_iState & BOSS_ATTACK_SCRATCH)
+	{
+		m_ColliderDelay += fTimeDelta;
+
+		if (m_ColliderDelay > 0.35f)
+			Off_Attack_Collider();
+		else if (m_ColliderDelay > 0.2f)
+			On_Attack_Collider(2.5f, 2.5f);
+	}
+
+	else if (m_iState & BOSS_ATTACK_KICK)
+	{
+		m_ColliderDelay += fTimeDelta;
+
+		if (m_ColliderDelay > 0.75f)
+			Off_Attack_Collider();
+		else if (m_ColliderDelay > 0.6f)
+			On_Attack_Collider(2.5f, 2.5f);
+		else if (m_ColliderDelay > 0.25f)
+			Off_Attack_Collider();
+		else if (m_ColliderDelay > 0.15f)
+			On_Attack_Collider(2.5f, 2.5f);
+	}
+
+	else if (m_iState & BOSS_DASH) {
+			Dash_Move(m_Dash_Dir, 0.96f, fTimeDelta);
+	}
+	else
+	{
+		Off_Attack_Collider();
+		m_ColliderDelay = 0.f;
+	}
+
+	if (m_iState & BOSS_RUN)
+		m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+
+	if (!(m_iState & BOSS_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
+		return;
+
+	if ((m_iState & BOSS_DEAD) || m_iState & BOSS_DEAD_LOOP)
+	{
+		m_iState = BOSS_DEAD_LOOP;
+		return;
+	}
+
+	Set_Direction_Lerf(0.01f);
+
+	m_iState = 0x00000000;
+
+	if (m_fWaitingTime < 1.5f)
+	{
+		m_CurrentState = BOSS_STATE_IDLE;
+		m_iState |= BOSS_IDLE;
+		return;
+	}
+
+	//if (m_fNinjutsu < 0.f)
+	//{
+	//	if ((!InNormalAttackRange()) && CheckPlayer()) {
+	//		Use_Skill(L"Skill_FlameBomb");
+	//		m_CurrentState = MONSTER_STATE_NINJUTSU;
+	//		//m_iState |= MONSTER_HANDSEAL;
+	//		m_fNinjutsu = 12.f;
+	//		m_iNinjutsuCount = 0;
+	//		return;
+	//	}
+	//}
+
+	//if (Skill_State(fTimeDelta))
+	//	return;
+
+	switch (m_CurrentState)
+	{
+	case BOSS_STATE_IDLE:
+
+		if (InNormalAttackRange()) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			_uint iRandom = (rand() % 2) + 1;
+			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			break;
+		}
+		else if (InRushAttackRange() && (m_CoolTime_Rush <=0.f)) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			m_iState |= BOSS_RUSH_ATTACK;
+			m_fDashSpeed = 20.f;
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			m_CoolTime_Rush = 10.f;
+			break;
+		}
+		else if (CheckPlayer()) {
+			m_CurrentState = BOSS_STATE_MOVE;
+
+			if (m_CoolTime_SideDash <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= BOSS_RUN;
+				else if (iRandom == 1) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 20.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 20.f;
+				}
+				m_CoolTime_SideDash = 7.f;
+			}
+			else
+				m_iState |= BOSS_RUN;
+
+			break;
+		}
+		else {
+			m_CurrentState = BOSS_STATE_IDLE;
+			m_iState |= BOSS_IDLE;
+			break;
+		}
+		
+		break;
+
+
+	case BOSS_STATE_MOVE:
+
+		if (InNormalAttackRange()) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			_uint iRandom = (rand() % 2) + 1;
+			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			break;
+		}
+		else if (InRushAttackRange() && (m_CoolTime_Rush <= 0.f)) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			m_iState |= BOSS_RUSH_ATTACK;
+			m_fDashSpeed = 20.f;
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			m_CoolTime_Rush = 10.f;
+			break;
+		}
+		else if (CheckPlayer()) {
+			m_CurrentState = BOSS_STATE_MOVE;
+
+			if (m_CoolTime_SideDash <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= BOSS_RUN;
+				else if (iRandom == 1) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 20.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 20.f;
+				}
+				m_CoolTime_SideDash = 7.f;
+			}
+			else
+				m_iState |= BOSS_RUN;
+
+			break;	
+		}
+		else {
+			m_CurrentState = BOSS_STATE_IDLE;
+			m_iState |= BOSS_IDLE;
+			break;
+		}
+
+		break;
+
+
+	case BOSS_STATE_ATTACK:
+
+		if (InNormalAttackRange()) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			_uint iRandom = (rand() % 2) + 1;
+			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			break;
+		}
+		else if (InRushAttackRange() && (m_CoolTime_Rush <= 0.f)) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			m_iState |= BOSS_RUSH_ATTACK;
+			m_fDashSpeed = 20.f;
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			m_CoolTime_Rush = 10.f;
+			break;
+		}
+		else if (CheckPlayer()) {
+			m_CurrentState = BOSS_STATE_MOVE;
+
+			if (m_CoolTime_SideDash <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= BOSS_RUN;
+				else if (iRandom == 1) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 20.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 20.f;
+				}
+				m_CoolTime_SideDash = 7.f;
+			}
+			else
+				m_iState |= BOSS_RUN;
+
+			break;	
+		}
+		else {
+			m_CurrentState = BOSS_STATE_IDLE;
+			m_iState |= BOSS_IDLE;
+			break;
+		}
+		
+		break;
+	}
+}
+
+void CBoss_Kurama::Set_Direction_Lerf(_float ratio)
+{
+	_vector MyDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+	_vector Lerf_Dir;
+
+	if (0 > XMVectorGetX(XMVector4Dot(MyDir, m_vDirection)))
+		Lerf_Dir = XMVectorLerp(MyDir, m_vDirection, ratio * 2);
+
+	else
+		Lerf_Dir = XMVectorLerp(MyDir, m_vDirection, ratio);
+
+	m_pTransformCom->Set_Look(Lerf_Dir);
+}
+
+void CBoss_Kurama::Cal_Direction()
+{
+	_vector Pos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+	_vector Dir = Pos - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	Dir.m128_f32[3] = 0.f;	
+	m_vDirection = Dir;
+}
+
+_bool CBoss_Kurama::CheckPlayer()
+{
+	if (XMVectorGetX(XMVector3Length(m_vDirection)) < 30.f)
+		return true;
+
+	return false;
+}
+
+_bool CBoss_Kurama::InRushAttackRange()
+{
+	if (XMVectorGetX(XMVector3Length(m_vDirection)) < 15.f)
+		return true;
+
+	return false;
+}
+
+_bool CBoss_Kurama::InNormalAttackRange()
+{
+	if (XMVectorGetX(XMVector3Length(m_vDirection)) < 5.f)
+		return true;
+
+	return false;
+}
+
+void CBoss_Kurama::Collider_Event_Enter(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider)
+{
+	if (m_bInvincible)
+		return;
+
+	if (strColliderLayerTag == L"Player_Main_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+		{
+			_float3		MyCenter = m_pColliderMain->Get_Center();
+			_float3		TargetCenter = pTargetCollider->Get_Center();
+			_float		Length = m_pColliderMain->Get_Radius() + pTargetCollider->Get_Radius();
+		
+			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
+		
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+		}
+	}
+	else if (strColliderLayerTag == L"Player_Attack_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+		{		
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 2.f, 0.05f);
+		
+			if (pTargetCollider->Get_HitType() == HIT_THROW)
+				m_CurrentHp -= 20;
+			
+			else if (pTargetCollider->Get_HitType() == HIT_STRONG)
+				m_CurrentHp -= 15;
+			
+			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
+				m_CurrentHp -= 25;
+			
+			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
+				m_CurrentHp -= 10;	
+		}
+	}
+	else if (strColliderLayerTag == L"Rasengun_Collider" || strColliderLayerTag == L"FlameBomb_Collider" || strColliderLayerTag == L"Wood_Hand_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+			m_CurrentHp -= 30;		
+	}
+	else if (strColliderLayerTag == L"RasenShuriken_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+			m_fGetAttack_FrameCount = 0;
+	}
+	else if (strColliderLayerTag == L"Rasengun_Super_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+			m_fGetAttack_FrameCount = 0;		
+	}
+	else if (strColliderLayerTag == L"Kamui_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+			m_fGetAttack_FrameCount = 0;		
+	}
+	else if (strColliderLayerTag == L"Chidori_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+			m_CurrentHp -= 40;		
+	}
+}
+
+void CBoss_Kurama::Collider_Event_Stay(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider)
+{
+	if (m_bInvincible)
+		return;
+
+	if (strColliderLayerTag == L"Player_Main_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+		{
+			_float3		MyCenter = m_pColliderMain->Get_Center();
+			_float3		TargetCenter = pTargetCollider->Get_Center();
+			_float		Length = m_pColliderMain->Get_Radius() + pTargetCollider->Get_Radius();
+
+			_vector		Dir = XMVector3Normalize((XMLoadFloat3(&MyCenter) - XMLoadFloat3(&TargetCenter)));
+
+			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+		}
+	}
+
+	else if (strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+		{
+			if (m_fGetAttack_FrameCount == 0)
+			{
+				m_fGetAttack_FrameCount = 10;
+				m_CurrentHp -= 10;
+			}
+			m_fGetAttack_FrameCount--;
+		}
+	}
+
+	else if (strColliderLayerTag == L"Kamui_Collider")
+	{
+		if (pMyCollider == m_pColliderMain)
+		{
+			if (m_fGetAttack_FrameCount == 0)
+			{
+				m_fGetAttack_FrameCount = 7;
+				m_CurrentHp -= 10;
+			}
+			m_fGetAttack_FrameCount--;
+		}
+	}
+}
+
+void CBoss_Kurama::Collider_Event_Exit(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider)
+{
+	if (m_bInvincible)
+		return;
+
+	 if (strColliderLayerTag == L"Kamui_Collider" || strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
+	 {
+	 	if (pMyCollider == m_pColliderMain)
+	 	{
+	 		m_fGetAttack_FrameCount = 0;
+	 		m_CurrentHp -= 20;
+	 	}
+	 }
+}
+
+void CBoss_Kurama::On_Attack_Collider(_float radius, _float distance, HIT_TYPE HitType)
+{
+	m_pColliderAttack->Set_Radius(radius);
+	m_pColliderAttack->Set_Center(_float3{ 0.f, radius, distance });
+	m_pColliderAttack->Set_HitType(HitType);
+}
+
+void CBoss_Kurama::Off_Attack_Collider()
+{
+	m_pColliderAttack->Set_Radius(0.f);
+	m_pColliderAttack->Set_Center(_float3{ 0.f, -9999.f, 0.f });
+}
+
+void CBoss_Kurama::Dash_Move(DASH_DIR dir, _float ratio, _float fTimeDelta)
+{
+	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
+
+	if(dir == DIR_FRONT)
+		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_BACK)
+		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_LEFT)
+		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_RIGHT)
+		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+}
+
+void CBoss_Kurama::Use_Skill(const wstring& strSkillName)
+{
+}
+
+_bool CBoss_Kurama::Skill_State(_float fTimeDelta)
+{
+	return _bool();
+}
+
+void CBoss_Kurama::Skill_Tick(_float fTimeDelta)
+{
+}
+
+void CBoss_Kurama::Skill_Cancle()
+{
+}
+
+_bool CBoss_Kurama::Using_Skill()
+{
+	for (_uint i = 0; i < SKILL_END; i++)
+	{
+		if (m_bSkillOn[i])
+			return true;
+	}
+	return false;
+}
+
+void CBoss_Kurama::CoolTimeTick(_float fTimeDelta)
+{
+	m_fWaitingTime += fTimeDelta;
+
+	m_CoolTime_Rush -= fTimeDelta;
+	m_CoolTime_SideDash -= fTimeDelta;
+}
+
+HRESULT CBoss_Kurama::Add_Components()
+{
+	/* Com_Navigation */
+	CNavigation::NAVI_DESC		NaviDesc{};
+	NaviDesc.iStartCellIndex = 29;
+	if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
+		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+		return E_FAIL;
+	
+
+	/* Com_Collider */
+	CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
+	BoundingDesc.fRadius = 2.5f;
+	BoundingDesc.vCenter = _float3(0.f, BoundingDesc.fRadius, 0.f);
+	
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
+		return E_FAIL;
+	m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Monster_Main_Collider"), m_pColliderMain);
+	m_pColliderMain->Set_Collider_GameObject(this);
+	
+	
+	CBounding_Sphere::SPHERE_DESC		AttackBoundingDesc{};
+	AttackBoundingDesc.fRadius = 0.f;
+	AttackBoundingDesc.vCenter = _float3(0.f, AttackBoundingDesc.fRadius, AttackBoundingDesc.fRadius);
+	
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		TEXT("Com_Collider_Attack"), reinterpret_cast<CComponent**>(&m_pColliderAttack), &AttackBoundingDesc)))
+		return E_FAIL;
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Monster_Attack_Collider", m_pColliderAttack);
+	m_pColliderAttack->Set_Collider_GameObject(this);
+	
+	return S_OK;
+}
+
+HRESULT CBoss_Kurama::Add_PartObjects()
+{
+	CBody_Boss_Kurama::BODY_MONSTER_DESC BodyBossDesc{};
+	BodyBossDesc.pParentTransform = m_pTransformCom;
+	BodyBossDesc.pState = &m_iState;
+
+	CPartObject* pBody_Boss = dynamic_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Body_Boss_Kurama"), &BodyBossDesc));
+	if (nullptr == pBody_Boss)
+		return E_FAIL;
+	m_MonsterParts.emplace(TEXT("Part_Body"), pBody_Boss);
+
+	m_pBodyModelCom = dynamic_cast<CModel*>(pBody_Boss->Get_Component(TEXT("Com_Model")));
+
+	return S_OK;
+}
+
+HRESULT CBoss_Kurama::Add_Skills()
+{
+	CSkill::SKILL_DESC Skill_desc{};
+	Skill_desc.pParentTransform = m_pTransformCom;
+	Skill_desc.User_Type		= CSkill::USER_MONSTER;
+	Skill_desc.pCamera			= m_pCamera;
+	Skill_desc.Current_Level	= m_Current_Level;
+	
+	CSkill* pScratch = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Scratch"), &Skill_desc));
+	if (nullptr == pScratch)
+		return E_FAIL;
+	m_MonsterSkills.emplace(TEXT("Skill_Scratch"), pScratch);
+	
+	return S_OK;
+}
+
+HRESULT CBoss_Kurama::Add_Trails()
+{
+	CTrail_Line::Trail_Line_DESC Trail_Line_LH_Desc{};
+	Trail_Line_LH_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_LH_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("LeftHandMiddle1");
+	Trail_Line_LH_Desc.eMyCharacter = CTrail_Line::BOSS_KURAMA;
+	CTrail_Line* pTrail_Hand_L = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_LH_Desc));
+	if (nullptr == pTrail_Hand_L)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Hand_L"), pTrail_Hand_L);
+	
+	CTrail_Line::Trail_Line_DESC Trail_Line_RH_Desc{};
+	Trail_Line_RH_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_RH_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("RightHandMiddle1");
+	Trail_Line_RH_Desc.eMyCharacter = CTrail_Line::BOSS_KURAMA;
+	CTrail_Line* pTrail_Hand_R = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_RH_Desc));
+	if (nullptr == pTrail_Hand_R)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Hand_R"), pTrail_Hand_R);
+
+	CTrail_Line::Trail_Line_DESC Trail_Line_LF_Desc{};
+	Trail_Line_LF_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_LF_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("LeftFootMiddle1");
+	Trail_Line_LF_Desc.eMyCharacter = CTrail_Line::BOSS_KURAMA;
+	CTrail_Line* pTrail_Foot_L = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_LF_Desc));
+	if (nullptr == pTrail_Foot_L)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Foot_L"), pTrail_Foot_L);
+
+	CTrail_Line::Trail_Line_DESC Trail_Line_RF_Desc{};
+	Trail_Line_RF_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_RF_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("RightFootMiddle1");
+	Trail_Line_RF_Desc.eMyCharacter = CTrail_Line::BOSS_KURAMA;
+	CTrail_Line* pTrail_Foot_R = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_RF_Desc));
+	if (nullptr == pTrail_Foot_R)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Foot_R"), pTrail_Foot_R);
+
+	CTrail_Line::Trail_Line_DESC Trail_Line_Tail_Desc{};
+	Trail_Line_Tail_Desc.pParentTransform = m_pTransformCom;
+	Trail_Line_Tail_Desc.eMyCharacter = CTrail_Line::BOSS_KURAMA;
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailRight04Bone06");
+	CTrail_Line* pTrail_Tail_1 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_1)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_1"), pTrail_Tail_1);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailRight03Bone06");
+	CTrail_Line* pTrail_Tail_2 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_2)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_2"), pTrail_Tail_2);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailRight02Bone06");
+	CTrail_Line* pTrail_Tail_3 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_3)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_3"), pTrail_Tail_3);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailRight01Bone06");
+	CTrail_Line* pTrail_Tail_4 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_4)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_4"), pTrail_Tail_4);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailCenterBone06");
+	CTrail_Line* pTrail_Tail_5 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_5)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_5"), pTrail_Tail_5);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailLeft01Bone06");
+	CTrail_Line* pTrail_Tail_6 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_6)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_6"), pTrail_Tail_6);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailLeft02Bone06");
+	CTrail_Line* pTrail_Tail_7 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_7)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_7"), pTrail_Tail_7);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailLeft03Bone06");
+	CTrail_Line* pTrail_Tail_8 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_8)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_8"), pTrail_Tail_8);
+
+	Trail_Line_Tail_Desc.pSocketMatrix = m_pBodyModelCom->Get_CombinedBoneMatrixPtr("TailLeft04Bone06");
+	CTrail_Line* pTrail_Tail_9 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
+	if (nullptr == pTrail_Tail_9)
+		return E_FAIL;
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_9"), pTrail_Tail_9);
+	
+	return S_OK;
+}
+
+HRESULT CBoss_Kurama::Add_UIs()
+{
+	CUI_Boss_Status::UI_Boss_Hp_DESC Hp_Desc{};
+	Hp_Desc.pCurrentHp = &m_CurrentHp;
+	Hp_Desc.pMaxHp = &m_MaxHp;
+	Hp_Desc.eMyCharacter = CUI_Boss_Status::BOSS_KURAMA;
+	
+	CUI_Boss_Status* pUIStatus = dynamic_cast<CUI_Boss_Status*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_CUI_Boss_Status"), &Hp_Desc));
+	if (nullptr == pUIStatus)
+		return E_FAIL;
+	m_MonsterUIs.emplace(TEXT("UI_Boss_Status"), pUIStatus);
+	
+	return S_OK;
+}
+
+CBoss_Kurama* CBoss_Kurama::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	CBoss_Kurama* pInstance = new CBoss_Kurama(pDevice, pContext);
+	
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CBoss_Kurama");
+		Safe_Release(pInstance);
+	}
+	
+	return pInstance;
+}
+
+CGameObject* CBoss_Kurama::Clone(void* pArg)
+{
+	CBoss_Kurama* pInstance = new CBoss_Kurama(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : CBoss_Kurama");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CBoss_Kurama::Free()
+{
+	for (auto& Pair : m_MonsterParts)
+		Safe_Release(Pair.second);
+	m_MonsterParts.clear();
+	
+	for (auto& Pair : m_MonsterSkills)
+		Safe_Release(Pair.second);
+	m_MonsterSkills.clear();
+	
+	for (auto& Pair : m_MonsterTrails)
+		Safe_Release(Pair.second);
+	m_MonsterTrails.clear();
+	
+	for (auto& Pair : m_MonsterUIs)
+		Safe_Release(Pair.second);
+	m_MonsterUIs.clear();
+	
+	Safe_Release(m_pNavigationCom);
+	Safe_Release(m_pBodyModelCom);
+	Safe_Release(m_pColliderMain);
+	Safe_Release(m_pColliderAttack);
+	
+	__super::Free();
+}

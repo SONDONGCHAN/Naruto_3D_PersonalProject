@@ -130,13 +130,13 @@ HRESULT CUI_Boss_Status::Add_Component()
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon);
 	}
-	else if (m_eMyCharacter == BOSS_FINAL)
+	else if (m_eMyCharacter == BOSS_KURAMA)
 	{
 		UI_Boss_UI_DESC pUI_Desc_3;
-		pUI_Desc_3.vPos = { 300.f, 100.f };
-		pUI_Desc_3.vSize = { 150.f, 100.f };
+		pUI_Desc_3.vPos = { 435.f, 50.f };
+		pUI_Desc_3.vSize = { 120.f, 120.f };
 		m_UI_Descs.push_back(pUI_Desc_3);
-		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Face_Naruto"),
+		if (FAILED(CGameObject::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Face_Kurama"),
 			TEXT("Com_Texture_Face_Icon"), reinterpret_cast<CComponent**>(&m_pTextureIcon))))
 			return E_FAIL;
 		m_Textures.push_back(m_pTextureIcon);

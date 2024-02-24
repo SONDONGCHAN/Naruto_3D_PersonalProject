@@ -1,4 +1,5 @@
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\BackGround.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\BackGround.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_Boss_Kurama.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Body_Boss_Kurama.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_Boss_Naruto.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Body_Boss_Naruto.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_Monster_LeafNinja.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Body_Monster_LeafNinja.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_Monster_Samurai.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Body_Monster_Samurai.obj
@@ -7,6 +8,7 @@ C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_Player_Custom_Lower.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Body_Player_Custom_Lower.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_Player_Custom_Upper.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Body_Player_Custom_Upper.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Body_Player_Naruto.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Body_Player_Naruto.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Boss_Kurama.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Boss_Kurama.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Boss_Naruto.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Boss_Naruto.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Camera_Free.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Camera_Free.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Chidori.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Chidori.obj
@@ -14,6 +16,7 @@ C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Deco.
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\FlameBomb.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\FlameBomb.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Item.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Item.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Kamui.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Kamui.obj
+C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Kurama_Scratch.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Kurama_Scratch.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\LandObject.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\LandObject.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Level_BossStage.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Level_BossStage.obj
 C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Private\Level_CustomRoom.cpp;C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Default\x64\Private\Level_CustomRoom.obj

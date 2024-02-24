@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\BackGround.h" />
+    <ClInclude Include="..\Public\Body_Boss_Kurama.h" />
     <ClInclude Include="..\Public\Body_Boss_Naruto.h" />
     <ClInclude Include="..\Public\Body_Monster_LeafNinja.h" />
     <ClInclude Include="..\Public\Body_Monster_Samurai.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="..\Public\Body_Player_Custom_Lower.h" />
     <ClInclude Include="..\Public\Body_Player_Custom_Upper.h" />
     <ClInclude Include="..\Public\Body_Player_Naruto.h" />
+    <ClInclude Include="..\Public\Boss_Kurama.h" />
     <ClInclude Include="..\Public\Boss_Naruto.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Chidori.h" />
@@ -165,6 +167,7 @@
     <ClInclude Include="..\Public\FlameBomb.h" />
     <ClInclude Include="..\Public\Item.h" />
     <ClInclude Include="..\Public\Kamui.h" />
+    <ClInclude Include="..\Public\Kurama_Scratch.h" />
     <ClInclude Include="..\Public\LandObject.h" />
     <ClInclude Include="..\Public\Level_BossStage.h" />
     <ClInclude Include="..\Public\Level_CustomRoom.h" />
@@ -206,6 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Body_Boss_Kurama.cpp" />
     <ClCompile Include="..\Private\Body_Boss_Naruto.cpp" />
     <ClCompile Include="..\Private\Body_Monster_LeafNinja.cpp" />
     <ClCompile Include="..\Private\Body_Monster_Samurai.cpp" />
@@ -214,6 +218,7 @@
     <ClCompile Include="..\Private\Body_Player_Custom_Lower.cpp" />
     <ClCompile Include="..\Private\Body_Player_Custom_Upper.cpp" />
     <ClCompile Include="..\Private\Body_Player_Naruto.cpp" />
+    <ClCompile Include="..\Private\Boss_Kurama.cpp" />
     <ClCompile Include="..\Private\Boss_Naruto.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Chidori.cpp" />
@@ -221,6 +226,7 @@
     <ClCompile Include="..\Private\FlameBomb.cpp" />
     <ClCompile Include="..\Private\Item.cpp" />
     <ClCompile Include="..\Private\Kamui.cpp" />
+    <ClCompile Include="..\Private\Kurama_Scratch.cpp" />
     <ClCompile Include="..\Private\LandObject.cpp" />
     <ClCompile Include="..\Private\Level_BossStage.cpp" />
     <ClCompile Include="..\Private\Level_CustomRoom.cpp" />
@@ -283,6 +289,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_OutLine.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Client</EntryPointName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

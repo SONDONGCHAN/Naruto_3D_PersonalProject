@@ -197,6 +197,46 @@ namespace Client
 		MONSTER_STATE_NINJUTSU_3,
 		MONSTER_STATE_STRUCK,
 		MONSTER_STATE_END };
+
+
+	const _uint BOSS_IDLE	= 0x00000001; // 21
+	const _uint BOSS_RUN	= 0x00000002; // 31
+
+	const _uint BOSS_MOVE	= 0x00000003; // 
+
+
+	const _uint BOSS_DASH_LEFT	= 0x00000004; // 22 ¾È¾¸
+	const _uint BOSS_DASH		= 0x00000008; // 7
+
+
+	const _uint BOSS_APPEAR		= 0x00000010; // 12
+	const _uint BOSS_APPEAR2	= 0x00000020; // 18
+
+	const _uint BOSS_DEAD		= 0x00000040; // 10
+	const _uint BOSS_DEAD_LOOP  = 0x00000080; // 11
+
+	const _uint BOSS_ATTACK_SCRATCH		= 0x00000100; // 0
+	const _uint BOSS_ATTACK_KICK		= 0x00000200; // 1
+	const _uint BOSS_ATTACK_BITE		= 0x00000400; // 3
+	const _uint BOSS_RUSH_ATTACK		= 0x00000800; // 4
+
+	const _uint BOSS_ATTACK_SCRATCH_FAR = 0x00001000; // 6
+	const _uint BOSS_ATTACK_LASER		= 0x00002000; // 29
+	const _uint BOSS_ATTACK_LASER_AERIAL= 0x00004000; // 26
+	const _uint BOSS_ATTACK_FIREBALL	= 0x00008000; // 27
+
+	const _uint BOSS_ATTACK				= 0x0000FF00;
+
+	const _uint BOSS_PHASECHANGE		= 0x00010000; // 28
+
+	enum BOSS_STATE {
+		BOSS_STATE_APPEAR,
+		BOSS_STATE_IDLE,
+		BOSS_STATE_MOVE,
+		BOSS_STATE_ATTACK,
+		BOSS_STATE_DEAD,
+		BOSS_STATE_END
+	};
 }
 
 extern _int				g_iPartsIndex[4];

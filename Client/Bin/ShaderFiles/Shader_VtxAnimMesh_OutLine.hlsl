@@ -45,7 +45,7 @@ VS_OUT VS_MAIN(VS_IN In)
     vector vPosition = mul(vector(In.vPosition, 1.f), BoneMatrix);
 	vector	vNormal = mul(vector(In.vNormal, 0.f), BoneMatrix);
     vNormal = normalize(mul(vNormal, g_WorldMatrix));
-    vPosition = mul(vPosition, g_WorldMatrix) + (vNormal * 0.005f);
+    vPosition = mul(vPosition, g_WorldMatrix) + (vNormal * 0.003f);
     
     Out.vPosition = mul(vPosition, matVP);
     Out.vTexcoord = In.vTexcoord;

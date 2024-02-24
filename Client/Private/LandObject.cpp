@@ -22,7 +22,7 @@ HRESULT CLandObject::Initialize(void* pArg)
 	{
 		LANDOBJ_DESC* pGameObjectDesc = (LANDOBJ_DESC*)pArg;
 
-		if (pGameObjectDesc->fSpeedPerSec != 5.f)
+		if (pGameObjectDesc->fSpeedPerSec != 1.2345f)
 		{
 			m_pMapTransform = pGameObjectDesc->pMapTransform;
 			m_pCamera = pGameObjectDesc->pCamera;

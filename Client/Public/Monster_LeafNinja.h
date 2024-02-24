@@ -27,6 +27,7 @@ private:
 
 	// 상태 제어
 	void		State_Control(_float fTimeDelta);
+
 	// 패턴 계산 함수
 	void		Set_Direction();
 	_bool		CheckPlayer();
@@ -48,7 +49,6 @@ private:
 
 	// 스킬 사용
 	void		Use_Skill(const wstring& strSkillName);
-	//_bool		Skill_State(_float fTimeDelta);
 	void		Skill_Tick(_float fTimeDelta);
 	void		Skill_Cancle();
 

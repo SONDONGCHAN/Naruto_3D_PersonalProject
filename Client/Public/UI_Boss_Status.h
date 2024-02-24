@@ -10,7 +10,7 @@ BEGIN(Client)
 class CUI_Boss_Status : public CUI
 {
 public:
-	enum BOSS_CHARACTER { BOSS_NARUTO, BOSS_FINAL, BOSS_END};
+	enum BOSS_CHARACTER { BOSS_NARUTO, BOSS_KURAMA, BOSS_END};
 
 	struct UI_Boss_Hp_DESC : public CGameObject::GAMEOBJECT_DESC
 	{

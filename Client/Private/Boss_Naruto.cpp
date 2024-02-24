@@ -787,14 +787,6 @@ void CBoss_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 			m_pTransformCom->Go_Custom_Direction(0.016f, 4, Dir, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
-
-	else if (strColliderLayerTag == L"Player_Attack_Collider")
-	{
-		if (pMyCollider == m_pColliderMain)
-		{
-
-		}
-	}
 	else if (strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
 	{
 		if (pMyCollider == m_pColliderMain)
@@ -845,13 +837,6 @@ void CBoss_Naruto::Collider_Event_Exit(const wstring& strColliderLayerTag, CColl
 	{
 		if (pMyCollider == m_pColliderMain)
 		{
-		}
-	}
-	else if (strColliderLayerTag == L"Player_Attack_Collider")
-	{
-		if (pMyCollider == m_pColliderMain)
-		{
-
 		}
 	}
 	else if (strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")

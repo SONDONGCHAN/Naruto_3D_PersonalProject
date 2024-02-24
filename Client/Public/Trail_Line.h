@@ -13,7 +13,7 @@ class CTrail_Line : public CGameObject
 {
 
 public:
-	enum PLAYER_CHARACTER { PLAYER_CUSTOM, PLAYER_NARUTO, MONSTER_NARUTO, PLAYER_END };
+	enum PLAYER_CHARACTER { PLAYER_CUSTOM, PLAYER_NARUTO, MONSTER_NARUTO, BOSS_KURAMA, PLAYER_END };
 
 	struct Trail_Line_DESC 
 	{
@@ -45,6 +45,10 @@ private:
 	_matrix  			m_OriginalMat = {};
 	PLAYER_CHARACTER	m_eMyCharacter = { PLAYER_END };
 	_vector				m_vColor;
+	_float2				m_vThick;
+	_float				m_vThickness;
+
+
 
 private:
 	HRESULT Add_Component(); 

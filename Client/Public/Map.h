@@ -29,6 +29,8 @@ public:
 
 private:
 	CShader*		m_pShaderCom = { nullptr };
+	CShader*		m_pShaderOutLine = { nullptr };
+
 	CModel*			m_pModelCom = { nullptr };
 	CNavigation*	m_pNavigationCom = { nullptr };
 

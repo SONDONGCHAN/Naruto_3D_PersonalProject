@@ -64,15 +64,30 @@ HRESULT CMap::Render()
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
 
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 1, "g_DiffuseTexture")))
+		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
 			return E_FAIL;
 	
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderOutLine->Begin(0)))
 			return E_FAIL;
 		
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
+
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+
+		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 1, "g_DiffuseTexture")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(0)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+
 	return S_OK;
 }
 
@@ -107,9 +122,12 @@ HRESULT CMap::Add_Model_Component()
 
 HRESULT CMap::Add_Component()
 {
-
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh_OutLine"),
+		TEXT("Com_Shader_OutLine"), reinterpret_cast<CComponent**>(&m_pShaderOutLine))))
 		return E_FAIL;
 
 	Add_Model_Component();
@@ -122,6 +140,8 @@ HRESULT CMap::Bind_ShaderResources()
 	_float4x4		ViewMatrix = m_pGameInstance->Get_ViewMatrix_Float();
 	_float4x4		ProjMatrix = m_pGameInstance->Get_ProjMatrix_Float();
 	_float4			CameraPos = m_pGameInstance->Get_CameraPos_Float();
+
+	_float			fAlphaDiscard = 0.f;
 
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
@@ -136,10 +156,26 @@ HRESULT CMap::Bind_ShaderResources()
 	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &CameraPos, sizeof(_float4))))
 	//	return E_FAIL;
 
-
-	_float fAlphaDiscard = 0.f;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlphaDiscard", &fAlphaDiscard, sizeof(_float))))
 		return E_FAIL;
+
+	///////////////
+
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderOutLine, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderOutLine->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderOutLine->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
+
+	//if (FAILED(m_pShaderOutLine->Bind_RawValue("g_vCamPosition", &CameraPos, sizeof(_float4))))
+	//	return E_FAIL;
+
+	if (FAILED(m_pShaderOutLine->Bind_RawValue("g_fAlphaDiscard", &fAlphaDiscard, sizeof(_float))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -175,6 +211,7 @@ void CMap::Free()
 	__super::Free();
 
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pShaderOutLine);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pNavigationCom);
 }

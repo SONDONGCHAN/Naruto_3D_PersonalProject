@@ -151,14 +151,17 @@ HRESULT CLevel_BossStage::Ready_Layer_Monster(const wstring& strLayerTag, CLandO
 	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_Monster_Samurai"), &GameObjDesc)))
 		return E_FAIL;
 
-	//if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_Boss_Naruto"), &GameObjDesc)))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_Boss_Kurama"), &GameObjDesc)))
+		return E_FAIL;
 
 	CGameObject* pMonster_LeafNinja = m_pGameInstance->Get_GameObject(LEVEL_BOSS, TEXT("Layer_Monster"), 0);
 	pMonsters.push_back(pMonster_LeafNinja);
 	m_iNumEnemy++;
 	CGameObject* pMonster_Samurai = m_pGameInstance->Get_GameObject(LEVEL_BOSS, TEXT("Layer_Monster"), 1);
 	pMonsters.push_back(pMonster_Samurai);
+	m_iNumEnemy++;
+	CGameObject* pMonster_Kurama = m_pGameInstance->Get_GameObject(LEVEL_BOSS, TEXT("Layer_Monster"), 2);
+	pMonsters.push_back(pMonster_Kurama);
 	m_iNumEnemy++;
 
 	return S_OK;

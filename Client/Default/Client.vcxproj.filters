@@ -28,6 +28,9 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint_Rect.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_OutLine.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -185,6 +188,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_Boss_Status.cpp">
       <Filter>02.GameObjects\UI\UI_Boss_Status</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_Kurama.cpp">
+      <Filter>02.GameObjects\LandObject\Monster\Boss_Kurama</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Body_Boss_Kurama.cpp">
+      <Filter>02.GameObjects\LandObject\Monster\Boss_Kurama\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kurama_Scratch.cpp">
+      <Filter>02.GameObjects\Skill\Kurama_Scratch</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -353,6 +365,15 @@
     <ClInclude Include="..\Public\Client_Defines.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Boss_Kurama.h">
+      <Filter>02.GameObjects\LandObject\Monster\Boss_Kurama</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Body_Boss_Kurama.h">
+      <Filter>02.GameObjects\LandObject\Monster\Boss_Kurama\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kurama_Scratch.h">
+      <Filter>02.GameObjects\Skill\Kurama_Scratch</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -480,9 +501,6 @@
     <Filter Include="02.GameObjects\Skill\Wood_Hand">
       <UniqueIdentifier>{fb37e6e3-28f4-4613-88ab-2bc0250d08af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Skill\Wood_Drop">
-      <UniqueIdentifier>{b8a3d1bd-da5e-4ab6-8ab7-ee1017cd0c07}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\LandObject\Monster\Boss_Naruto">
       <UniqueIdentifier>{b4c60a42-a624-4448-b398-e4524730f07a}</UniqueIdentifier>
     </Filter>
@@ -557,6 +575,15 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\UI_Boss_Status">
       <UniqueIdentifier>{dc3dd233-6de8-4f26-9a34-15c8ff17d397}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LandObject\Monster\Boss_Kurama">
+      <UniqueIdentifier>{1a84befb-8ff0-46d7-969d-7afb10a2a200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LandObject\Monster\Boss_Kurama\Body">
+      <UniqueIdentifier>{7b5b1436-7524-4203-b262-3c95da838210}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Skill\Kurama_Scratch">
+      <UniqueIdentifier>{63b7c23a-d58e-4453-89d0-5513d3b6c670}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

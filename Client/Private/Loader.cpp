@@ -8,6 +8,7 @@
 #include "Body_Monster_LeafNinja.h"
 #include "Body_Monster_Samurai.h"
 #include "Body_Boss_Naruto.h"
+#include "Body_Boss_Kurama.h"
 #include "Body_Player_Naruto.h"
 #include "Body_Player_Custom_Face.h"
 #include "Body_Player_Custom_HeadGear.h"
@@ -23,6 +24,7 @@
 #include "Monster_LeafNinja.h"
 #include "Monster_Samurai.h"
 #include "Boss_Naruto.h"
+#include "Boss_Kurama.h"
 #include "Item.h"
 #include "Deco.h"
 #include "Rasengun.h"
@@ -34,6 +36,7 @@
 #include "Kamui.h"
 #include "Chidori.h"
 #include "Wood_Hand.h"
+#include "Kurama_Scratch.h"
 #include "Weapon.h"
 #include "UI_Player_Status.h"
 #include "UI_Player_Skills.h"
@@ -228,6 +231,10 @@ HRESULT CLoader::Loading_For_CustomRoomLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
+	/* For.Prototype_Component_Shader_VtxMesh_OutLine*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh_OutLine"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh_OutLine.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
 	/* For.Prototype_Component_Shader_VtxPoint_Rect*/
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPoint_Rect"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPoint_Rect.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements))))
@@ -321,6 +328,10 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	/* For.Prototype_Component_Texture_Boss_Face_Naruto*/
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Face_Naruto"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/Boss/T_UI_Dialog_Character_D34_BC.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Boss_Face_Kurama*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Face_Kurama"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/Boss/T_UI_Boss_Kurama_BC.png"), 1))))
 		return E_FAIL;
 	/* For.Prototype_Component_Texture_Boss_Hp*/
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Hp"),
@@ -657,12 +668,33 @@ HRESULT CLoader::Loading_For_BossStageLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Konaha_Village_N.dat"))))
 		return E_FAIL;
 
+	///////////Boss///////////
+	///* For.Prototype_Component_Boss_Kurama*/
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_BOSS, TEXT("Prototype_Component_Boss_Kurama"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, L"../Bin/Resources/Models/Anim/Monster/Boss_Kurama/Boss_Kurama.dat"))))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("네비게이션를(을) 로딩 중 입니다.");
 	////////////Map//////////////
 	/* For.Prototype_Component_Navi_Map_Stadium */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_BOSS, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../Bin/DataFiles/Navi_Map_Konoha_Village.dat")))))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("객체원형를(을) 로딩 중 입니다.");
+	// /* For.Prototype_GameObject_Boss_Kurama */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Boss_Kurama"),
+		CBoss_Kurama::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Boss_Kurama"),
+		CBody_Boss_Kurama::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	m_strLoadingText = TEXT("스킬를(을) 로딩 중 입니다.");
+	/* For.Prototype_GameObject_Skill_Kurama_Scratch */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_Scratch"),
+		CKurama_Scratch::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("로딩이 완료되었습니다.");
