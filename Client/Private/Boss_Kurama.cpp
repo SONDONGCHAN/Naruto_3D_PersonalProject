@@ -4,6 +4,10 @@
 #include "Trail_Line.h"
 #include "Player.h"
 #include "UI_Boss_Status.h"
+#include "Kurama_Scratch.h"
+#include "FlameBomb.h"
+
+
 
 CBoss_Kurama::CBoss_Kurama(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLandObject(pDevice, pContext)
@@ -24,7 +28,7 @@ HRESULT CBoss_Kurama::Initialize(void* pArg)
 {
 	LANDOBJ_DESC* pGameObjectDesc = (LANDOBJ_DESC*)pArg;
 	
-	pGameObjectDesc->fSpeedPerSec = 5.f;
+	pGameObjectDesc->fSpeedPerSec = 6.f;
 	pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 	
 	if (FAILED(__super::Initialize(pArg)))
@@ -48,7 +52,7 @@ HRESULT CBoss_Kurama::Initialize(void* pArg)
 	if (FAILED(Add_UIs()))
 		return E_FAIL;
 	
-	m_CurrentState = BOSS_STATE_IDLE;
+	m_CurrentState = BOSS_STATE_APPEAR;
 	_vector vStart_Pos = { 77.f, 28.f, -67.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
@@ -58,53 +62,78 @@ HRESULT CBoss_Kurama::Initialize(void* pArg)
 
 void CBoss_Kurama::Priority_Tick(_float fTimeDelta)
 {
-	Cal_Direction();
-	RootAnimation();
-	Set_Gravity(m_pTransformCom, fTimeDelta);
-	State_Control(fTimeDelta);
+	if (m_bAppear)
+	{
+		Cal_Direction();
+		RootAnimation();
+		Set_Gravity(m_pTransformCom, fTimeDelta);
+		State_Control(fTimeDelta);
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Priority_Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Priority_Tick(fTimeDelta);
+
+		Skills_Priority_Tick(fTimeDelta);
+	}
 }
 
 void CBoss_Kurama::Tick(_float fTimeDelta)
 {
-	Skill_Tick(fTimeDelta);
+	if (m_bAppear)
+	{
+		Skill_Tick(fTimeDelta);
 
-	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
-	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+		m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+		m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Tick(fTimeDelta);
+
+		Skills_Tick(fTimeDelta);
+	}
 }
 
 void CBoss_Kurama::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
+	__super::Late_Tick(fTimeDelta);
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Late_Tick(fTimeDelta);
+	if (m_bAppear)
+	{
+		m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
+		m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
 
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
-		return;
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Late_Tick(fTimeDelta);
 
+		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
+			return;
 
-	for (auto& Pair : m_MonsterTrails)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+		for (auto& Pair : m_MonsterTrails)
+			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
 
-	for (auto& Pair : m_MonsterUIs)
-		Pair.second->Late_Tick(fTimeDelta);
+		if (m_bAppear_End)
+		{
+			for (auto& Pair : m_MonsterUIs)
+				Pair.second->Late_Tick(fTimeDelta);
+		}
+
+		Skills_Late_Tick(fTimeDelta);
+
 
 #ifdef _DEBUG
-	m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
-	m_pGameInstance->Add_DebugComponent(m_pColliderMain);
-	m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
+		m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
+		m_pGameInstance->Add_DebugComponent(m_pColliderMain);
+		m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
 #endif
+	}
 }
 
 HRESULT CBoss_Kurama::Render()
 {
+	if (m_bAppear)
+	{
+		Skills_Render();
+	}
+
 	return S_OK;
 }
 
@@ -121,7 +150,44 @@ void CBoss_Kurama::RootAnimation()
 
 void CBoss_Kurama::State_Control(_float fTimeDelta)
 {	
-	CoolTimeTick(fTimeDelta);
+	if (m_iState == BOSS_APPEAR)
+	{
+		m_fAppearDurTime += fTimeDelta;
+
+		if (m_fAppearDurTime > 0.4f && m_fAppearDurTime < 0.5f)
+		{
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.2f);
+			m_fAppearDurTime += 0.1f;
+		}		
+	}
+	else if (m_iState == BOSS_APPEAR2)
+	{
+		m_fAppearDurTime2 += fTimeDelta;
+
+		if (m_fAppearDurTime2 > 0.7f && m_fAppearDurTime2 < 0.8f)
+		{
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+			m_fAppearDurTime2 += 0.1f;
+		}	
+		else if (m_fAppearDurTime2 > 1.4f && m_fAppearDurTime2 < 1.5f)
+		{
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+			m_fAppearDurTime2 += 0.1f;
+		}
+		else if (m_fAppearDurTime2 > 2.4f && m_fAppearDurTime2 < 2.5f)
+		{
+			Set_Appear_Camera();
+			m_fAppearDurTime2 += 0.1f;
+		}
+		else if (m_fAppearDurTime2 > 2.8f && m_fAppearDurTime2 < 2.9f)
+		{
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 4.f, 2.3f);
+			m_fAppearDurTime2 += 0.1f;
+		}
+	}
+	else 
+		CoolTimeTick(fTimeDelta);
+
 
 	if (m_CurrentHp <= 0)
 	{
@@ -187,6 +253,13 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 	if (!(m_iState & BOSS_MOVE) && !(m_pBodyModelCom->Get_Current_Animation()->Get_CanStop()))
 		return;
 
+	if (m_iState & BOSS_APPEAR)
+	{
+		m_CurrentState = BOSS_STATE_APPEAR;
+		m_iState = BOSS_APPEAR2;
+		return;
+	}
+
 	if ((m_iState & BOSS_DEAD) || m_iState & BOSS_DEAD_LOOP)
 	{
 		m_iState = BOSS_DEAD_LOOP;
@@ -204,24 +277,33 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 		return;
 	}
 
-	//if (m_fNinjutsu < 0.f)
-	//{
-	//	if ((!InNormalAttackRange()) && CheckPlayer()) {
-	//		Use_Skill(L"Skill_FlameBomb");
-	//		m_CurrentState = MONSTER_STATE_NINJUTSU;
-	//		//m_iState |= MONSTER_HANDSEAL;
-	//		m_fNinjutsu = 12.f;
-	//		m_iNinjutsuCount = 0;
-	//		return;
-	//	}
-	//}
-
+	if ((!Using_Skill()) && (!InNormalAttackRange()) && CheckPlayer() )
+	{
+		if (m_fCoolTime_Scratch_Current < 0.f) {
+			m_pTransformCom->Set_Look(m_vDirection);
+			Use_Skill(L"Skill_Scratch");
+			m_CurrentState = BOSS_STATE_ATTACK;
+			m_fCoolTime_Scratch_Current = m_fCoolTime_Scratch;
+			return;
+		}		
+		else if (m_fCoolTime_FireBall_Current < 0.f) {
+			m_pTransformCom->Set_Look(m_vDirection);
+			Use_Skill(L"Skill_FlameBomb_1");
+			m_CurrentState = BOSS_STATE_ATTACK;
+			m_fCoolTime_FireBall_Current = m_fCoolTime_FireBall;
+			return;
+		}
+	}
 	//if (Skill_State(fTimeDelta))
 	//	return;
 
 	switch (m_CurrentState)
 	{
-	case BOSS_STATE_IDLE:
+	case BOSS_STATE_APPEAR:
+
+		m_bAppear_End = true;
+		m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
+		m_pCamera->Set_Camera_radius();
 
 		if (InNormalAttackRange()) {
 			m_CurrentState = BOSS_STATE_ATTACK;
@@ -231,19 +313,19 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange() && (m_CoolTime_Rush <=0.f)) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = BOSS_STATE_ATTACK;
 			m_iState |= BOSS_RUSH_ATTACK;
 			m_fDashSpeed = 20.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
-			m_CoolTime_Rush = 10.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = BOSS_STATE_MOVE;
 
-			if (m_CoolTime_SideDash <= 0.f) {
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
 				_uint iRandom = (rand() % 3);
 				if (iRandom == 0)
 					m_iState |= BOSS_RUN;
@@ -257,7 +339,59 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 					m_Dash_Dir = DIR_RIGHT;
 					m_fDashSpeed = 20.f;
 				}
-				m_CoolTime_SideDash = 7.f;
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= BOSS_RUN;
+
+			break;
+		}
+		else {
+			m_CurrentState = BOSS_STATE_IDLE;
+			m_iState |= BOSS_IDLE;
+			break;
+		}
+
+		break;
+
+
+	case BOSS_STATE_IDLE:
+
+		if (InNormalAttackRange()) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			_uint iRandom = (rand() % 2) + 1;
+			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			break;
+		}
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <=0.f)) {
+			m_CurrentState = BOSS_STATE_ATTACK;
+			m_iState |= BOSS_RUSH_ATTACK;
+			m_fDashSpeed = 20.f;
+			m_fWaitingTime = 0.f;
+			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
+			break;
+		}
+		else if (CheckPlayer()) {
+			m_CurrentState = BOSS_STATE_MOVE;
+
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= BOSS_RUN;
+				else if (iRandom == 1) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 20.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= BOSS_DASH;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 20.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
 			}
 			else
 				m_iState |= BOSS_RUN;
@@ -283,19 +417,19 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange() && (m_CoolTime_Rush <= 0.f)) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = BOSS_STATE_ATTACK;
 			m_iState |= BOSS_RUSH_ATTACK;
 			m_fDashSpeed = 20.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
-			m_CoolTime_Rush = 10.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = BOSS_STATE_MOVE;
 
-			if (m_CoolTime_SideDash <= 0.f) {
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
 				_uint iRandom = (rand() % 3);
 				if (iRandom == 0)
 					m_iState |= BOSS_RUN;
@@ -309,7 +443,7 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 					m_Dash_Dir = DIR_RIGHT;
 					m_fDashSpeed = 20.f;
 				}
-				m_CoolTime_SideDash = 7.f;
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
 			}
 			else
 				m_iState |= BOSS_RUN;
@@ -335,19 +469,19 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange() && (m_CoolTime_Rush <= 0.f)) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = BOSS_STATE_ATTACK;
 			m_iState |= BOSS_RUSH_ATTACK;
 			m_fDashSpeed = 20.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
-			m_CoolTime_Rush = 10.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = BOSS_STATE_MOVE;
 
-			if (m_CoolTime_SideDash <= 0.f) {
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
 				_uint iRandom = (rand() % 3);
 				if (iRandom == 0)
 					m_iState |= BOSS_RUN;
@@ -361,7 +495,7 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 					m_Dash_Dir = DIR_RIGHT;
 					m_fDashSpeed = 20.f;
 				}
-				m_CoolTime_SideDash = 7.f;
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
 			}
 			else
 				m_iState |= BOSS_RUN;
@@ -553,7 +687,7 @@ void CBoss_Kurama::Collider_Event_Exit(const wstring& strColliderLayerTag, CColl
 void CBoss_Kurama::On_Attack_Collider(_float radius, _float distance, HIT_TYPE HitType)
 {
 	m_pColliderAttack->Set_Radius(radius);
-	m_pColliderAttack->Set_Center(_float3{ 0.f, radius, distance });
+	m_pColliderAttack->Set_Center(_float3{ 0.f, radius -1.f, distance });
 	m_pColliderAttack->Set_HitType(HitType);
 }
 
@@ -579,6 +713,35 @@ void CBoss_Kurama::Dash_Move(DASH_DIR dir, _float ratio, _float fTimeDelta)
 
 void CBoss_Kurama::Use_Skill(const wstring& strSkillName)
 {
+	if (strSkillName == L"Skill_Scratch")
+	{
+		dynamic_cast<CKurama_Scratch*>(m_MonsterSkills.find(L"Skill_Scratch")->second)->Set_State();
+	
+		m_iState |= BOSS_ATTACK_SCRATCH_FAR;
+	
+		m_bSkillOn[SKILL_SCRATCH] = true;
+	}
+
+	else if (strSkillName == L"Skill_FlameBomb_1")
+	{
+		dynamic_cast<CFlameBomb*>(m_MonsterSkills.find(L"Skill_FlameBomb_1")->second)->Set_State();
+
+		m_iState |= BOSS_ATTACK_FIREBALL;
+
+		m_bSkillOn[SKILL_FLAMEBOMB_1] = true;
+	}
+	else if (strSkillName == L"Skill_FlameBomb_2")
+	{
+		dynamic_cast<CFlameBomb*>(m_MonsterSkills.find(L"Skill_FlameBomb_2")->second)->Set_State();
+
+		m_bSkillOn[SKILL_FLAMEBOMB_2] = true;
+	}
+	else if (strSkillName == L"Skill_FlameBomb_3")
+	{
+		dynamic_cast<CFlameBomb*>(m_MonsterSkills.find(L"Skill_FlameBomb_3")->second)->Set_State();
+
+		m_bSkillOn[SKILL_FLAMEBOMB_3] = true;
+	}
 }
 
 _bool CBoss_Kurama::Skill_State(_float fTimeDelta)
@@ -588,10 +751,130 @@ _bool CBoss_Kurama::Skill_State(_float fTimeDelta)
 
 void CBoss_Kurama::Skill_Tick(_float fTimeDelta)
 {
-}
+	if (m_bSkillOn[SKILL_SCRATCH])
+	{
+		CKurama_Scratch* pScratch = dynamic_cast<CKurama_Scratch*>(m_MonsterSkills.find(L"Skill_Scratch")->second);
 
-void CBoss_Kurama::Skill_Cancle()
-{
+		if (pScratch->Get_State() == CKurama_Scratch::STATE_MAKING)
+		{
+			m_fScratchDurTime += fTimeDelta;
+
+			if (m_fScratchDurTime > 0.8f)
+			{
+				_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				Pos.m128_f32[1] += 2.5f;
+				pScratch->Get_TranformCom()->Set_Pos(Pos);
+				pScratch->Get_TranformCom()->Set_Look(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+				TargetPos.m128_f32[1] += 0.7f;
+				pScratch->Set_Targeting(TargetPos);
+				pScratch->Set_Next_State();
+
+			}
+		}
+		else if (pScratch->Get_State() == CKurama_Scratch::STATE_FINISH)
+		{
+			m_bSkillOn[SKILL_SCRATCH] = false;
+			m_fScratchDurTime = 0.f;
+		}
+
+	}
+
+	if (m_bSkillOn[SKILL_FLAMEBOMB_1])
+	{
+		m_pTransformCom->Set_Look(m_vDirection);
+
+		CFlameBomb* pFlameBomb_1 = dynamic_cast<CFlameBomb*>(m_MonsterSkills.find(L"Skill_FlameBomb_1")->second);
+
+		if (pFlameBomb_1->Get_State() == CFlameBomb::STATE_MAKING)
+		{
+			m_fFireBallDurTime_1 += fTimeDelta;
+
+			if (m_fFireBallDurTime_1 > 0.7f)
+			{
+				if (!m_bSkillOn[SKILL_FLAMEBOMB_2])
+					Use_Skill(L"Skill_FlameBomb_2");
+
+				_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				Pos.m128_f32[1] += 2.5f;
+				pFlameBomb_1->Get_TranformCom()->Set_Pos(Pos);
+				pFlameBomb_1->Get_TranformCom()->Set_Look(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+				TargetPos.m128_f32[1] += 0.7f;
+				pFlameBomb_1->Set_Targeting(TargetPos);
+				pFlameBomb_1->Set_Next_State();
+
+			}
+		}
+		else if (pFlameBomb_1->Get_State() == CFlameBomb::STATE_FINISH)
+		{
+			m_bSkillOn[SKILL_FLAMEBOMB_1] = false;
+			m_fFireBallDurTime_1 = 0.f;
+		}
+	}
+
+	if (m_bSkillOn[SKILL_FLAMEBOMB_2])
+	{
+		m_pTransformCom->Set_Look(m_vDirection);
+
+		CFlameBomb* pFlameBomb_2 = dynamic_cast<CFlameBomb*>(m_MonsterSkills.find(L"Skill_FlameBomb_2")->second);
+
+		if (pFlameBomb_2->Get_State() == CFlameBomb::STATE_MAKING)
+		{
+			m_fFireBallDurTime_2 += fTimeDelta;
+
+			if (m_fFireBallDurTime_2 > 0.5f)
+			{
+				if (!m_bSkillOn[SKILL_FLAMEBOMB_3])
+					Use_Skill(L"Skill_FlameBomb_3");
+
+				_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				Pos.m128_f32[1] += 2.5f;
+				pFlameBomb_2->Get_TranformCom()->Set_Pos(Pos);
+				pFlameBomb_2->Get_TranformCom()->Set_Look(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+				TargetPos.m128_f32[1] += 0.7f;
+				pFlameBomb_2->Set_Targeting(TargetPos);
+				pFlameBomb_2->Set_Next_State();
+
+			}
+		}
+		else if (pFlameBomb_2->Get_State() == CFlameBomb::STATE_FINISH)
+		{
+			m_bSkillOn[SKILL_FLAMEBOMB_2] = false;
+			m_fFireBallDurTime_2 = 0.f;
+		}
+	}
+
+	if (m_bSkillOn[SKILL_FLAMEBOMB_3])
+	{
+		m_pTransformCom->Set_Look(m_vDirection);
+
+		CFlameBomb* pFlameBomb_3 = dynamic_cast<CFlameBomb*>(m_MonsterSkills.find(L"Skill_FlameBomb_3")->second);
+
+		if (pFlameBomb_3->Get_State() == CFlameBomb::STATE_MAKING)
+		{
+			m_fFireBallDurTime_3 += fTimeDelta;
+
+			if (m_fFireBallDurTime_3 > 0.5f)
+			{
+				_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				Pos.m128_f32[1] += 2.5f;
+				pFlameBomb_3->Get_TranformCom()->Set_Pos(Pos);
+				pFlameBomb_3->Get_TranformCom()->Set_Look(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector TargetPos = dynamic_cast<CPlayer*>(m_pGameInstance->Get_GameObject(m_Current_Level, TEXT("Layer_Player")))->Get_CurrentCharacter()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+				TargetPos.m128_f32[1] += 0.7f;
+				pFlameBomb_3->Set_Targeting(TargetPos);
+				pFlameBomb_3->Set_Next_State();
+
+			}
+		}
+		else if (pFlameBomb_3->Get_State() == CFlameBomb::STATE_FINISH)
+		{
+			m_bSkillOn[SKILL_FLAMEBOMB_3] = false;
+			m_fFireBallDurTime_3 = 0.f;
+		}
+	}
 }
 
 _bool CBoss_Kurama::Using_Skill()
@@ -608,8 +891,80 @@ void CBoss_Kurama::CoolTimeTick(_float fTimeDelta)
 {
 	m_fWaitingTime += fTimeDelta;
 
-	m_CoolTime_Rush -= fTimeDelta;
-	m_CoolTime_SideDash -= fTimeDelta;
+	m_fCoolTime_Rush_Current		-= fTimeDelta;
+	m_fCoolTime_SideDash_Current	-= fTimeDelta;
+	m_fCoolTime_Scratch_Current		-= fTimeDelta;
+	m_fCoolTime_FireBall_Current	-= fTimeDelta;
+}
+
+void CBoss_Kurama::Skills_Priority_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_SCRATCH])
+		m_MonsterSkills.find(L"Skill_Scratch")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_1])
+		m_MonsterSkills.find(L"Skill_FlameBomb_1")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_2])
+		m_MonsterSkills.find(L"Skill_FlameBomb_2")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_3])
+		m_MonsterSkills.find(L"Skill_FlameBomb_3")->second->Priority_Tick(fTimeDelta);
+}
+
+void CBoss_Kurama::Skills_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_SCRATCH])
+		m_MonsterSkills.find(L"Skill_Scratch")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_1])
+		m_MonsterSkills.find(L"Skill_FlameBomb_1")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_2])
+		m_MonsterSkills.find(L"Skill_FlameBomb_2")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_3])
+		m_MonsterSkills.find(L"Skill_FlameBomb_3")->second->Tick(fTimeDelta);
+}
+
+void CBoss_Kurama::Skills_Late_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_SCRATCH])
+		m_MonsterSkills.find(L"Skill_Scratch")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_1])
+		m_MonsterSkills.find(L"Skill_FlameBomb_1")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_2])
+		m_MonsterSkills.find(L"Skill_FlameBomb_2")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB_3])
+		m_MonsterSkills.find(L"Skill_FlameBomb_3")->second->Late_Tick(fTimeDelta);
+}
+
+void CBoss_Kurama::Skills_Render()
+{
+	if (m_bSkillOn[SKILL_SCRATCH])
+		m_MonsterSkills.find(L"Skill_Scratch")->second->Render();
+	if (m_bSkillOn[SKILL_FLAMEBOMB_1])
+		m_MonsterSkills.find(L"Skill_FlameBomb_1")->second->Render();
+	if (m_bSkillOn[SKILL_FLAMEBOMB_2])
+		m_MonsterSkills.find(L"Skill_FlameBomb_2")->second->Render();
+	if (m_bSkillOn[SKILL_FLAMEBOMB_3])
+		m_MonsterSkills.find(L"Skill_FlameBomb_3")->second->Render();
+}
+
+void CBoss_Kurama::Set_Appear_Camera()
+{
+	if (m_iState == BOSS_APPEAR)
+	{
+		m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
+		m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
+		m_pCamera->Set_Camera_radius(7.f, 0.07f);
+	}
+
+	else if (m_iState == BOSS_APPEAR2)
+	{
+		m_pCamera->Set_Camera_radius(10.f, 0.15f);
+	}
+}
+
+void CBoss_Kurama::Set_Appear()
+{
+	Set_Appear_Camera();
+	m_bAppear = true;
+
 }
 
 HRESULT CBoss_Kurama::Add_Components()
@@ -669,13 +1024,30 @@ HRESULT CBoss_Kurama::Add_Skills()
 	Skill_desc.pParentTransform = m_pTransformCom;
 	Skill_desc.User_Type		= CSkill::USER_MONSTER;
 	Skill_desc.pCamera			= m_pCamera;
-	Skill_desc.Current_Level	= m_Current_Level;
-	
+	Skill_desc.Current_Level	= m_Current_Level;	
+
 	CSkill* pScratch = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Scratch"), &Skill_desc));
 	if (nullptr == pScratch)
 		return E_FAIL;
 	m_MonsterSkills.emplace(TEXT("Skill_Scratch"), pScratch);
+
+
+	CSkill* pFlameBomb_1 = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_FlameBomb"), &Skill_desc));
+	if (nullptr == pFlameBomb_1)
+		return E_FAIL;
+	m_MonsterSkills.emplace(TEXT("Skill_FlameBomb_1"), pFlameBomb_1);
+
+	CSkill* pFlameBomb_2 = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_FlameBomb"), &Skill_desc));
+	if (nullptr == pFlameBomb_2)
+		return E_FAIL;
+	m_MonsterSkills.emplace(TEXT("Skill_FlameBomb_2"), pFlameBomb_2);
+
+	CSkill* pFlameBomb_3 = dynamic_cast<CSkill*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_FlameBomb"), &Skill_desc));
+	if (nullptr == pFlameBomb_3)
+		return E_FAIL;
+	m_MonsterSkills.emplace(TEXT("Skill_FlameBomb_3"), pFlameBomb_3);
 	
+
 	return S_OK;
 }
 
@@ -717,7 +1089,7 @@ HRESULT CBoss_Kurama::Add_Trails()
 		return E_FAIL;
 	m_MonsterTrails.emplace(TEXT("Trail_Line_Foot_R"), pTrail_Foot_R);
 
-	CTrail_Line::Trail_Line_DESC Trail_Line_Tail_Desc{};
+	/*CTrail_Line::Trail_Line_DESC Trail_Line_Tail_Desc{};
 	Trail_Line_Tail_Desc.pParentTransform = m_pTransformCom;
 	Trail_Line_Tail_Desc.eMyCharacter = CTrail_Line::BOSS_KURAMA;
 
@@ -773,7 +1145,7 @@ HRESULT CBoss_Kurama::Add_Trails()
 	CTrail_Line* pTrail_Tail_9 = dynamic_cast<CTrail_Line*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Line"), &Trail_Line_Tail_Desc));
 	if (nullptr == pTrail_Tail_9)
 		return E_FAIL;
-	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_9"), pTrail_Tail_9);
+	m_MonsterTrails.emplace(TEXT("Trail_Line_Tail_9"), pTrail_Tail_9);*/
 	
 	return S_OK;
 }

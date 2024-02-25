@@ -92,10 +92,18 @@ HRESULT CBody_Player_Custom_Upper::Render()
 
 		if (FAILED(m_pCurrentModel->Render(i)))
 			return E_FAIL;
+	}
 
-
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		_uint Index = { 0 };
 		if (FAILED(m_pCurrentModel->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
 			return E_FAIL;
+
+		if (FAILED(m_pCurrentModel->Bind_Material_ShaderResource(m_pShaderCom, i, 6, "g_NormalTexture")))
+			Index = 0;
+		else
+			Index = 1;
 
 		if (FAILED(m_pCurrentModel->Bind_BoneMatrices(m_pShaderOutLine, "g_BoneMatrices", i)))
 			return E_FAIL;

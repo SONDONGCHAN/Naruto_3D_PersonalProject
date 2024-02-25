@@ -59,10 +59,32 @@ HRESULT CBody_Boss_Naruto::Render()
 
     _uint	iNumMeshes = m_pModelCom->Get_NumMeshes();
 
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
+			return E_FAIL;
+	
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderOutLine, "g_BoneMatrices", i)))
+			return E_FAIL;
+	
+		if (FAILED(m_pShaderOutLine->Begin(0)))
+			return E_FAIL;
+	
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
     for (_uint i = 0; i < iNumMeshes; i++)
     {
+		_uint Index = { 0 };
+
         if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 1, "g_DiffuseTexture")))
             return E_FAIL;
+
+		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 6, "g_NormalTexture")))
+			Index = 0;
+		else
+			Index = 1;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
@@ -231,6 +253,10 @@ HRESULT CBody_Boss_Naruto::Add_Component()
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh_OutLine"),
+		TEXT("Com_Shader_OutLine"), reinterpret_cast<CComponent**>(&m_pShaderOutLine))))
+		return E_FAIL;
+
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Player_Naruto"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
@@ -255,6 +281,15 @@ HRESULT CBody_Boss_Naruto::Bind_ShaderResources()
 
 	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &CameraPos, sizeof(_float4))))
 	//	return E_FAIL;
+
+	if (FAILED(m_pShaderOutLine->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderOutLine->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderOutLine->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -289,6 +324,8 @@ void CBody_Boss_Naruto::Free()
 {
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pShaderOutLine);
+
 
 	__super::Free();
 }

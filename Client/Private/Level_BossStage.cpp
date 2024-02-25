@@ -5,6 +5,8 @@
 #include "LandObject.h"
 #include "Player_Custom.h"
 #include "UI_System.h"
+#include "EventTrigger.h"
+
 
 
 CLevel_BossStage::CLevel_BossStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -32,6 +34,9 @@ HRESULT CLevel_BossStage::Initialize()
 	if (FAILED(Ready_LandObjects()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_EventTrigger(TEXT("Layer_EventTrigger"))))
+		return E_FAIL;
+	
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_System_UI"))))
 		return E_FAIL;
 
@@ -74,7 +79,7 @@ HRESULT CLevel_BossStage::Ready_Lights()
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 0.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
@@ -184,6 +189,19 @@ HRESULT CLevel_BossStage::Ready_Layer_UI(const wstring& strLayerTag)
 	return S_OK;
 }
 
+HRESULT CLevel_BossStage::Ready_Layer_EventTrigger(const wstring& strLayerTag)
+{
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc{};
+
+	TriggerDesc.Current_Level = LEVEL_BOSS;
+	TriggerDesc.vPos = {89.f, 28.f, -17.7f , 1.f};
+
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 void CLevel_BossStage::Add_Run_Time_Object()
 {
 	if (m_fRun_Time > 1.f && !m_bCreated[0])
@@ -201,7 +219,7 @@ void CLevel_BossStage::Add_Run_Time_Object()
 		m_pGameInstance->Add_CloneObject(LEVEL_BOSS, TEXT("Layer_System_UI"), TEXT("Prototype_GameObject_UI_System"), &desc);
 	}
 
-	if (m_fEnd_Time > 2.f && !m_bCreated[1])
+	if (m_fEnd_Time > 7.f && !m_bCreated[1])
 	{
 		m_bCreated[1] = true;
 

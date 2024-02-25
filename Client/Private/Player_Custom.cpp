@@ -69,9 +69,9 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		if(m_Current_Level == LEVEL_GAMEPLAY)
 			 vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
 		else if (m_Current_Level == LEVEL_BOSS)
-			 vStart_Pos = { 92.f, 28.f, -18.f, 1.f };
-		/*else if (m_Current_Level == LEVEL_BOSS)
-			vStart_Pos = { -114.5f, 23.f, 82.5f, 1.f };*/
+			 vStart_Pos = { 91.f, 26.f, -8.f, 1.f };
+		//else if (m_Current_Level == LEVEL_BOSS)
+			//vStart_Pos = { -114.5f, 23.f, 82.5f, 1.f };
 
 
 		// m_bOnAir = true;a
@@ -1638,7 +1638,7 @@ HRESULT CPlayer_Custom::Add_Components()
 	else if (m_Current_Level == LEVEL_BOSS)
 	{
 		//NaviDesc.iStartCellIndex = 114;
-		NaviDesc.iStartCellIndex = 39;
+		NaviDesc.iStartCellIndex = 22;
 
 		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
 			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))

@@ -27,6 +27,8 @@ private:
 	HRESULT Ready_Layer_Item(const wstring& strLayerTag);
 	HRESULT Ready_Layer_Effect(const wstring& strLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& strLayerTag);
+	HRESULT Ready_Layer_EventTrigger(const wstring& strLayerTag);
+
 
 	void	Add_Run_Time_Object();
 	_bool	Check_Can_NextLevel();

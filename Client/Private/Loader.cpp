@@ -44,6 +44,8 @@
 #include "UI_Monster_Status.h"
 #include "UI_System.h"
 #include "UI_Boss_Status.h"
+#include "EventTrigger.h"
+
 
 
 
@@ -444,8 +446,11 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	////////////Map//////////////
 
 	///* For.Prototype_Component_Map_Stadium */
+	//if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Stadium"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Map_Stadium.dat"))))
+	//	return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Map_Stadium"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Map_Stadium.dat"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Map/All_Maps/Map_Stadium_N.dat"))))
 		return E_FAIL;
 
 	///////////Particle///////////
@@ -690,7 +695,12 @@ HRESULT CLoader::Loading_For_BossStageLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Body_Boss_Kurama"),
 		CBody_Boss_Kurama::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EventTrigger"),
+		CEventTrigger::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
+
+	
 	m_strLoadingText = TEXT("스킬를(을) 로딩 중 입니다.");
 	/* For.Prototype_GameObject_Skill_Kurama_Scratch */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_Scratch"),

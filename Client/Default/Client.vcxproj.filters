@@ -198,6 +198,9 @@
     <ClCompile Include="..\Private\Kurama_Scratch.cpp">
       <Filter>02.GameObjects\Skill\Kurama_Scratch</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\EventTrigger.cpp">
+      <Filter>02.GameObjects\EventTrigger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -373,6 +376,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kurama_Scratch.h">
       <Filter>02.GameObjects\Skill\Kurama_Scratch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EventTrigger.h">
+      <Filter>02.GameObjects\EventTrigger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -584,6 +590,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Skill\Kurama_Scratch">
       <UniqueIdentifier>{63b7c23a-d58e-4453-89d0-5513d3b6c670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\EventTrigger">
+      <UniqueIdentifier>{85317011-e715-4a1b-8fa8-92a6a78ccc34}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

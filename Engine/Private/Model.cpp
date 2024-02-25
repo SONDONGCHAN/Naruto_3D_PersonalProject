@@ -206,6 +206,9 @@ HRESULT CModel::Bind_Material_ShaderResource(CShader* pShader, _uint iMeshIndex,
 
 	if (nullptr == m_vecMaterials[iMaterialIndex].pMtrlTextures[MaterialTextureType])
 	{
+		if (MaterialTextureType == 6)
+			return E_FAIL;
+
 		return S_OK;
 	}
 

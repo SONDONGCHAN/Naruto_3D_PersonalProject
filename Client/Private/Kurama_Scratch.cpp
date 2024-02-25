@@ -152,7 +152,7 @@ void CKurama_Scratch::Set_Next_State()
 
     else if (myState == STATE_HIT)
     {
-        m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+       // m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
         m_pColliderMain->Set_Radius(3.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_fDurTime = 0;

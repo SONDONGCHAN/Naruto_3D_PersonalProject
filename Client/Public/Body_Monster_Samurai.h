@@ -35,6 +35,8 @@ public:
 
 private:
 	CShader*	m_pShaderCom = { nullptr };
+	CShader*	m_pShaderOutLine = { nullptr };
+
 	CModel*		m_pModelCom = { nullptr };
 
 private:

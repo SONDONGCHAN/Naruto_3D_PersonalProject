@@ -7,7 +7,7 @@ BEGIN(Client)
 
 class CBoss_Kurama : public CLandObject
 {
-	enum SKILL_TYPE { SKILL_SCRATCH, SKILL_END };
+	enum SKILL_TYPE { SKILL_SCRATCH, SKILL_FLAMEBOMB_1, SKILL_FLAMEBOMB_2, SKILL_FLAMEBOMB_3, SKILL_END };
 	enum DASH_DIR { DIR_FRONT, DIR_BACK, DIR_LEFT, DIR_RIGHT, DIR_END};
 
 
@@ -54,10 +54,21 @@ private:
 	void		Use_Skill(const wstring& strSkillName);
 	_bool		Skill_State(_float fTimeDelta);
 	void		Skill_Tick(_float fTimeDelta);
-	void		Skill_Cancle();
 	_bool		Using_Skill();
 
 	void		CoolTimeTick(_float fTimeDelta);
+	void		Skills_Priority_Tick(_float fTimeDelta);
+	void		Skills_Tick(_float fTimeDelta);
+	void		Skills_Late_Tick(_float fTimeDelta);
+	void		Skills_Render();
+
+
+public:
+	// 카메라 연출
+	void		Set_Appear_Camera();
+
+public:
+	void		Set_Appear();
 
 private:
 	CModel* m_pBodyModelCom = { nullptr };
@@ -67,32 +78,51 @@ private:
 
 
 private:
+	// 등장 트리거		
+	_bool				m_bAppear = { false };
+	_bool				m_bAppear_End = { false };
+	_float				m_fAppearDurTime2 = { 0.f };
+	_float				m_fAppearDurTime = { 0.f };
+
+
 	// 상태
-	_ulonglong				m_iState = { 0x00000001 };
-	BOSS_STATE			m_CurrentState = { BOSS_STATE_IDLE };
+	_ulonglong				m_iState = { 0x00000010 };
+	BOSS_STATE			m_CurrentState = { BOSS_STATE_APPEAR };
 
 	// 움직임
 	_vector				m_vDirection = {};
 	_float				m_fDashSpeed = { 0.f };
 	_uint				m_iComboCount = { 0 };
-	_float				m_fWaitingTime = { 0.f };
-	_float				m_CoolTime_SideDash = { 0.f };
+	_float				m_fWaitingTime = { 1.5f };
 	DASH_DIR			m_Dash_Dir = { DIR_END };
+	_float				m_fCoolTime_SideDash_Current = { 10.f };
+	_float				m_fCoolTime_SideDash = { 20.f };
 
 	// 피격
 	_uint				m_fGetAttack_FrameCount = 0;
 
 	//공격
-	_float				m_ColliderDelay = 0.f;
-	_float				m_CoolTime_Rush = 0.f;
+	_float				m_ColliderDelay		= 0.f;
+	_float				m_fCoolTime_Rush_Current = { 10.f };
+	_float				m_fCoolTime_Rush = { 10.f };
 
 	// 스킬
-	SKILL_TYPE			m_Skill_Animation_State = { SKILL_END };
 	_bool				m_bSkillOn[SKILL_END] = { false, };
-	_float				m_fSkillDurTime = { 0.f };
+
+	_float				m_fCoolTime_Scratch_Current = { 15.f };
+	_float				m_fCoolTime_Scratch = { 15.f };
+	_float				m_fScratchDurTime = { 0.f };
+
+	_float				m_fCoolTime_FireBall_Current = { 20.f };
+	_float				m_fCoolTime_FireBall = { 20.f };
+	_float				m_fFireBallDurTime_1 = { 0.f };
+	_float				m_fFireBallDurTime_2 = { 0.f };
+	_float				m_fFireBallDurTime_3 = { 0.f };
 
 	// 무적
 	_bool				m_bInvincible = false;
+
+	
 
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;

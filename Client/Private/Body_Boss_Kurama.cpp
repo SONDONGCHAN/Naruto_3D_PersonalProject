@@ -61,8 +61,30 @@ HRESULT CBody_Boss_Kurama::Render()
 
     for (_uint i = 0; i < iNumMeshes; i++)
     {
+        if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
+            return E_FAIL;
+    
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderOutLine, "g_BoneMatrices", i)))
+            return E_FAIL;
+    
+        if (FAILED(m_pShaderOutLine->Begin(0)))
+            return E_FAIL;
+    
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
+    }
+
+    for (_uint i = 0; i < iNumMeshes; i++)
+    {
+        _uint Index = { 0 };
+
         if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 1, "g_DiffuseTexture")))
             return E_FAIL;
+
+        if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderCom, i, 6, "g_NormalTexture")))
+            Index = 0;
+        else
+            Index = 1;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
@@ -84,7 +106,7 @@ void CBody_Boss_Kurama::Set_Animation_State(_float fTimeDelta)
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_RUN) {
-        m_pModelCom->Set_Animation(31, 0.1f, true, 1.5f, false, false);
+        m_pModelCom->Set_Animation(31, 0.1f, true, 1.f, false, false);
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_DASH_LEFT) {
@@ -96,7 +118,7 @@ void CBody_Boss_Kurama::Set_Animation_State(_float fTimeDelta)
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_APPEAR) {
-        m_pModelCom->Set_Animation(12, 0.1f, false, 1.5f, false, false);
+        m_pModelCom->Set_Animation(12, 0.1f, false, 1.f, false, false);
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_APPEAR2) {
@@ -128,7 +150,7 @@ void CBody_Boss_Kurama::Set_Animation_State(_float fTimeDelta)
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_ATTACK_SCRATCH_FAR) {
-        m_pModelCom->Set_Animation(6, 0.1f, false, 1.5f, false, false);
+        m_pModelCom->Set_Animation(6, 0.1f, false, 3.f, false, false);
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_ATTACK_LASER) {
@@ -140,7 +162,7 @@ void CBody_Boss_Kurama::Set_Animation_State(_float fTimeDelta)
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_ATTACK_FIREBALL) {
-        m_pModelCom->Set_Animation(27, 0.1f, false, 1.5f, false, false);
+        m_pModelCom->Set_Animation(27, 0.1f, false, 1.f, false, false);
         m_fAnimationPlayRatio = 1.f;
     }
     else if (*m_iMonsterState & BOSS_PHASECHANGE) {
@@ -154,6 +176,10 @@ HRESULT CBody_Boss_Kurama::Add_Component()
 {
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+        return E_FAIL;
+
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh_OutLine"),
+        TEXT("Com_Shader_OutLine"), reinterpret_cast<CComponent**>(&m_pShaderOutLine))))
         return E_FAIL;
     
     if (FAILED(__super::Add_Component(LEVEL_BOSS, TEXT("Prototype_Component_Boss_Kurama"),
@@ -176,6 +202,16 @@ HRESULT CBody_Boss_Kurama::Bind_ShaderResources()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderOutLine->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+        return E_FAIL;
+    
+    if (FAILED(m_pShaderOutLine->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+        return E_FAIL;
+    
+    if (FAILED(m_pShaderOutLine->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
+    
         return E_FAIL;
 
 	return S_OK;
@@ -211,6 +247,7 @@ void CBody_Boss_Kurama::Free()
 {
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
+    Safe_Release(m_pShaderOutLine);
 
     __super::Free();
 }

@@ -164,6 +164,7 @@
     <ClInclude Include="..\Public\Chidori.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Deco.h" />
+    <ClInclude Include="..\Public\EventTrigger.h" />
     <ClInclude Include="..\Public\FlameBomb.h" />
     <ClInclude Include="..\Public\Item.h" />
     <ClInclude Include="..\Public\Kamui.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Chidori.cpp" />
     <ClCompile Include="..\Private\Deco.cpp" />
+    <ClCompile Include="..\Private\EventTrigger.cpp" />
     <ClCompile Include="..\Private\FlameBomb.cpp" />
     <ClCompile Include="..\Private\Item.cpp" />
     <ClCompile Include="..\Private\Kamui.cpp" />
