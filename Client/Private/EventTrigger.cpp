@@ -32,6 +32,8 @@ HRESULT CEventTrigger::Initialize(void* pArg)
 
     m_pTransformCom->Set_Pos(m_MyDesc.vPos);
     m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+
+    return S_OK;
 }
 
 void CEventTrigger::Priority_Tick(_float fTimeDelta)

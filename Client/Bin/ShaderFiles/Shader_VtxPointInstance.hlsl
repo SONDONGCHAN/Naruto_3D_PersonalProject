@@ -1,6 +1,8 @@
 #include "Shader_Defines.hlsli"
 
 matrix      g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+matrix      g_RotateMatrix;
+
 texture2D   g_Texture;
 vector      g_vCamPosition;
 
@@ -64,7 +66,7 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> DataStream)
     float3 vLook = (g_vCamPosition - In[0].vPosition).xyz;
     float3 vRight = normalize(cross(float3(0.f, 1.f, 0.f), vLook)) * In[0].vPSize.x * 0.5f;
     float3 vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
-	matrix matVP = mul(g_ViewMatrix, g_ProjMatrix);
+    matrix matVP = mul(g_ViewMatrix, g_ProjMatrix);
     
     Out[0].vPosition = In[0].vPosition + float4(vRight, 0.f) + float4(vUp, 0.f);
     Out[0].vPosition = mul(Out[0].vPosition, matVP);
@@ -117,14 +119,30 @@ PS_OUT PS_MAIN(PS_IN In)
     if (In.vColor.a == 0.f)
         discard;
     
-    Out.vColor = g_Texture.Sample(g_LinearSampler, In.vTexcoord) * In.vColor;
-
-    if (Out.vColor.a < 0.3f)
+    float4 vColor = g_Texture.Sample(g_LinearSampler, In.vTexcoord) * In.vColor;
+    
+    if (vColor.a < 0.3f)
         discard;
-
-	Out.vColor = In.vColor;
+        
+    vColor = In.vColor;
+    
+    Out.vColor = vColor;
   
     return Out;
+    
+ //   PS_OUT Out = (PS_OUT) 0;
+
+ //   if (In.vColor.a == 0.f)
+ //       discard;
+    
+ //   Out.vColor = g_Texture.Sample(g_LinearSampler, In.vTexcoord) * In.vColor;
+
+ //   if (Out.vColor.a < 0.3f)
+ //       discard;
+
+	//Out.vColor = In.vColor;
+  
+ //   return Out;
 }
 
 /* EffectFramework */
@@ -136,7 +154,7 @@ technique11 DefaultTechnique
 		/* RenderState¼³Á¤. */
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_MAIN();

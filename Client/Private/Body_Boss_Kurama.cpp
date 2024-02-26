@@ -238,6 +238,7 @@ CGameObject* CBody_Boss_Kurama::Clone(void* pArg)
     {
         MSG_BOX("Failed to Cloned : CBody_Boss_Kurama");
         Safe_Release(pInstance);
+        
     }
 
     return pInstance;

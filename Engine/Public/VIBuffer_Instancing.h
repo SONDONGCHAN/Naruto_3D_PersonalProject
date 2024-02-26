@@ -7,8 +7,11 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instancing abstract : public CVIBuffer
 {
 public:
+	enum  PARTICLE_OPTION {OPTION_DROP, OPTION_SPREAD, OPTION_END};
+
 	struct INSTANCE_DESC
 	{
+		_uint			iNumInstance;
 		_float3			vPivot;
 		_float3			vCenter;
 		_float3			vRange;
@@ -18,7 +21,10 @@ public:
 		_bool			isLoop;
 		_float4			vColor;
 		_float			fDuration;
+		PARTICLE_OPTION	MyOption;
+		wstring			strTextureTag;
 	};
+
 protected:
 	CVIBuffer_Instancing(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CVIBuffer_Instancing(const CVIBuffer_Instancing& rhs);
@@ -31,8 +37,14 @@ public:
 	virtual HRESULT Bind_Buffers();
 
 public:
+	void	Trigger(_vector vCenterPos);
+	void	Tick_Particle(_float fTimeDelta);
+
+private:
 	void Tick_Drop(_float fTimeDelta);
+	void Tick_Spread_Loop(_float fTimeDelta);
 	void Tick_Spread(_float fTimeDelta);
+
 
 protected:
 	ID3D11Buffer*				m_pVBInstance = { nullptr };
@@ -46,10 +58,14 @@ protected:
 
 	_float*						m_pSpeed = { nullptr };
 	_float*						m_pLifeTime = { nullptr };
+	_float*						m_pMaxLifeTime = { nullptr };
+
 
 	_float						m_fTimeAcc = { 0.f };
-	_bool						m_isFinished = { false };
+	_bool						m_isFinished = { true };
 
+private:
+	D3D11_MAPPED_SUBRESOURCE			m_SubResource{};
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

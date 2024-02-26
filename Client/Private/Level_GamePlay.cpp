@@ -197,11 +197,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Item(const wstring& strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring& strLayerTag)
 {
- 	//if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Particle_Rect"))))
-		//return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, strLayerTag, TEXT("Prototype_GameObject_Particle_Point"))))
-		return E_FAIL;
 	return S_OK;
 }
 

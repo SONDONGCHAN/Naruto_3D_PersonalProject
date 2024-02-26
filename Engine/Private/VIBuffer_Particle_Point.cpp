@@ -10,16 +10,23 @@ CVIBuffer_Particle_Point::CVIBuffer_Particle_Point(const CVIBuffer_Particle_Poin
 {
 }
 
-HRESULT CVIBuffer_Particle_Point::Initialize_Prototype(_uint iNumInstance)
+HRESULT CVIBuffer_Particle_Point::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CVIBuffer_Particle_Point::Initialize(void* pArg)
+{
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	m_iNumVertexBuffers = 2;
 	m_iVertexStride = sizeof(VTXPOINT);
 	m_iNumVertices = 1;
 
-	m_iNumInstance = iNumInstance;
 	m_iIndexCountPerInstance = 1;
 	m_iIndexStride = 2;
 	m_eIndexFormat = m_iIndexStride == 2 ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
@@ -71,15 +78,9 @@ HRESULT CVIBuffer_Particle_Point::Initialize_Prototype(_uint iNumInstance)
 
 #pragma endregion
 
-	return S_OK;
-}
 
-HRESULT CVIBuffer_Particle_Point::Initialize(void* pArg)
-{
+
 #pragma region INSTANCE_BUFFER
-
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
 
 	m_iInstanceStride = sizeof(VTXINSTANCE);
 
@@ -91,15 +92,13 @@ HRESULT CVIBuffer_Particle_Point::Initialize(void* pArg)
 	m_BufferDesc.MiscFlags = 0;
 	m_BufferDesc.StructureByteStride = m_iVertexStride;
 
-	VTXINSTANCE* pVertices = new VTXINSTANCE[m_iNumInstance];
-	ZeroMemory(pVertices, sizeof(VTXINSTANCE) * m_iNumInstance);
+	VTXINSTANCE* pInsVertices = new VTXINSTANCE[m_iNumInstance];
+	ZeroMemory(pInsVertices, sizeof(VTXINSTANCE) * m_iNumInstance);
 
 	uniform_real_distribution<float>	WidthRange(m_InstanceData.vRange.x * -0.5f, m_InstanceData.vRange.x * 0.5f);
 	uniform_real_distribution<float>	HeightRange(m_InstanceData.vRange.y * -0.5f, m_InstanceData.vRange.y * 0.5f);
 	uniform_real_distribution<float>	DepthRange(m_InstanceData.vRange.z * -0.5f, m_InstanceData.vRange.z * 0.5f);
 	uniform_real_distribution<float>	SizeRange(m_InstanceData.vSize.x, m_InstanceData.vSize.y);
-
-
 
 	/*uniform_real_distribution<float>	RandomRange(0.1f, m_InstancingDesc.fRange);
 	uniform_real_distribution<float>	RandomRotation(0.0f, XMConvertToRadians(360.0f));
@@ -112,24 +111,25 @@ HRESULT CVIBuffer_Particle_Point::Initialize(void* pArg)
 	{
 		_float		fSize = SizeRange(m_RandomNumber);
 
-		pVertices[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
-		pVertices[i].vUp = _float4(0.f, fSize, 0.f, 0.f);
-		pVertices[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
-		pVertices[i].vTranslation = _float4(
+		pInsVertices[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
+		pInsVertices[i].vUp = _float4(0.f, fSize, 0.f, 0.f);
+		pInsVertices[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
+		pInsVertices[i].vTranslation = _float4(
 			m_InstanceData.vCenter.x + WidthRange(m_RandomNumber),
 			m_InstanceData.vCenter.y + HeightRange(m_RandomNumber),
 			m_InstanceData.vCenter.z + DepthRange(m_RandomNumber),
 			1.f);
 
-		pVertices[i].vColor = m_InstanceData.vColor;
+		pInsVertices[i].vColor = m_InstanceData.vColor;
+		pInsVertices[i].vColor.w = 0.f;
 	}
 
-	m_InitialData.pSysMem = pVertices;
+	m_InitialData.pSysMem = pInsVertices;
 
 	if (FAILED(__super::Create_Buffer(&m_pVBInstance)))
 		return E_FAIL;
 
-	Safe_Delete_Array(pVertices);
+	Safe_Delete_Array(pInsVertices);
 
 
 #pragma endregion
@@ -137,11 +137,11 @@ HRESULT CVIBuffer_Particle_Point::Initialize(void* pArg)
 	return S_OK;
 }
 
-CVIBuffer_Particle_Point* CVIBuffer_Particle_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iNumInstance)
+CVIBuffer_Particle_Point* CVIBuffer_Particle_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CVIBuffer_Particle_Point* pInstance = new CVIBuffer_Particle_Point(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(iNumInstance)))
+	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CVIBuffer_Particle_Point");
 		Safe_Release(pInstance);

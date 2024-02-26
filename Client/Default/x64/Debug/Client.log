@@ -1,2 +1,4 @@
-﻿  Map.cpp
-  Client.vcxproj -> C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Client.exe
+﻿FXC : warning X4717: Effects deprecated for D3DCompiler_47
+  
+  compilation object save succeeded; see C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Client\Bin\Shader_VtxPointInstance.cso
+  Client.vcxproj -> C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Client\Bin\Client.exe

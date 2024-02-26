@@ -28,8 +28,11 @@ HRESULT CVIBuffer_Instancing::Initialize(void* pArg)
 {
 	m_InstanceData = *(INSTANCE_DESC*)pArg;
 
+	m_iNumInstance = m_InstanceData.iNumInstance;
+
 	m_pSpeed	= new _float[m_iNumInstance];
 	m_pLifeTime = new _float[m_iNumInstance];
+	m_pMaxLifeTime = new _float[m_iNumInstance];
 
 	uniform_real_distribution<float>	SpeedRange(m_InstanceData.vSpeed.x, m_InstanceData.vSpeed.y);
 	uniform_real_distribution<float>	TimeRange(m_InstanceData.vLifeTime.x, m_InstanceData.vLifeTime.y);
@@ -38,6 +41,8 @@ HRESULT CVIBuffer_Instancing::Initialize(void* pArg)
 	{
 		m_pSpeed[i]		= SpeedRange(m_RandomNumber);
 		m_pLifeTime[i]	= TimeRange(m_RandomNumber);
+		m_pMaxLifeTime[i] = TimeRange(m_RandomNumber);
+
 	}
 
 	return S_OK;
@@ -72,6 +77,61 @@ HRESULT CVIBuffer_Instancing::Bind_Buffers()
 	m_pContext->IASetPrimitiveTopology(m_ePrimitiveTopology);
 
 	return S_OK;
+}
+
+void CVIBuffer_Instancing::Trigger(_vector vCenterPos)
+{
+	m_isFinished = false;
+	m_fTimeAcc = 0.f;
+	XMStoreFloat3(&m_InstanceData.vCenter, vCenterPos);
+	m_InstanceData.vPivot = m_InstanceData.vCenter;
+
+	uniform_real_distribution<float>	TimeRange(m_InstanceData.vLifeTime.x, m_InstanceData.vLifeTime.y);
+	uniform_real_distribution<float>	WidthRange(m_InstanceData.vRange.x * -0.5f, m_InstanceData.vRange.x * 0.5f);
+	uniform_real_distribution<float>	HeightRange(m_InstanceData.vRange.y * -0.5f, m_InstanceData.vRange.y * 0.5f);
+	uniform_real_distribution<float>	DepthRange(m_InstanceData.vRange.z * -0.5f, m_InstanceData.vRange.z * 0.5f);
+	uniform_real_distribution<float>	SizeRange(m_InstanceData.vSize.x, m_InstanceData.vSize.y);
+
+
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &m_SubResource);
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{	
+		m_pLifeTime[i] = TimeRange(m_RandomNumber);
+		m_pMaxLifeTime[i] = m_pLifeTime[i];
+
+		((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation = _float4(
+			m_InstanceData.vCenter.x + WidthRange(m_RandomNumber),
+			m_InstanceData.vCenter.y + HeightRange(m_RandomNumber),
+			m_InstanceData.vCenter.z + DepthRange(m_RandomNumber),
+			1.f);
+
+		((VTXINSTANCE*)m_SubResource.pData)[i].vColor.w = 1.f;
+
+		_float		fSize = SizeRange(m_RandomNumber);
+
+		((VTXINSTANCE*)m_SubResource.pData)[i].vRight	= _float4(fSize, 0.f, 0.f, 0.f);
+		((VTXINSTANCE*)m_SubResource.pData)[i].vUp		= _float4(0.f, fSize*10.f, 0.f, 0.f);
+		((VTXINSTANCE*)m_SubResource.pData)[i].vLook	= _float4(0.f, 0.f, fSize, 0.f);
+	}
+}
+
+void CVIBuffer_Instancing::Tick_Particle(_float fTimeDelta)
+{
+	if (m_InstanceData.MyOption == OPTION_DROP)
+	{
+		if(m_InstanceData.isLoop == true)
+			Tick_Drop(fTimeDelta);
+		else if (m_InstanceData.isLoop == false)
+			Tick_Drop(fTimeDelta);
+	}
+	else if (m_InstanceData.MyOption == OPTION_SPREAD)
+	{
+		if (m_InstanceData.isLoop == true)
+			Tick_Spread_Loop(fTimeDelta);
+		else if (m_InstanceData.isLoop == false)
+			Tick_Spread(fTimeDelta);
+	}
 }
 
 void CVIBuffer_Instancing::Tick_Drop(_float fTimeDelta)
@@ -113,13 +173,14 @@ void CVIBuffer_Instancing::Tick_Drop(_float fTimeDelta)
 				((VTXINSTANCE*)SubResource.pData)[i].vColor.w = 0.f;
 			}
 		}
+
 	
 	}
 	
 	m_pContext->Unmap(m_pVBInstance, 0);
 }
 
-void CVIBuffer_Instancing::Tick_Spread(_float fTimeDelta)
+void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 {
 	m_fTimeAcc += fTimeDelta;
 
@@ -145,25 +206,62 @@ void CVIBuffer_Instancing::Tick_Spread(_float fTimeDelta)
 		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + XMVector3Normalize(vDir) * m_pSpeed[i] * fTimeDelta);
 
 		m_pLifeTime[i] -= fTimeDelta;
+
 		if (0.0f >= m_pLifeTime[i])
 		{
-			if (true == m_InstanceData.isLoop)
+			((VTXINSTANCE*)SubResource.pData)[i].vColor.w = 0.f;
+
+			if ((true == m_InstanceData.isLoop) && (m_isFinished))
 			{
+				((VTXINSTANCE*)SubResource.pData)[i].vColor.w = 1.f;
+
 				m_pLifeTime[i] = TimeRange(m_RandomNumber);
 				((VTXINSTANCE*)SubResource.pData)[i].vTranslation = _float4(
 					m_InstanceData.vCenter.x + WidthRange(m_RandomNumber),
 					m_InstanceData.vCenter.y + HeightRange(m_RandomNumber),
 					m_InstanceData.vCenter.z + DepthRange(m_RandomNumber),
 					1.f);
-			}
-			else
-			{
-				((VTXINSTANCE*)SubResource.pData)[i].vColor.w = 0.f;
+
+				if (m_iNumInstance <= i + 1)
+				{
+					m_isFinished = false;
+					m_fTimeAcc = 0.f;
+				}
 			}
 		}
 	}
-
 	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
+void CVIBuffer_Instancing::Tick_Spread(_float fTimeDelta)
+{
+	if (!m_isFinished)
+	{
+		m_fTimeAcc += fTimeDelta;
+
+		if (m_InstanceData.fDuration <= m_fTimeAcc)
+			m_isFinished = true;
+
+		for (_uint i = 0; i < m_iNumInstance; ++i)
+		{
+			VTXINSTANCE* pVertices = ((VTXINSTANCE*)m_SubResource.pData);
+
+			_vector		vDir = XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
+			vDir = XMVectorSetW(vDir, 0.f);
+
+			XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + XMVector3Normalize(vDir) * m_pSpeed[i] * fTimeDelta);
+
+			m_pLifeTime[i] -= fTimeDelta;
+
+			if (0.0f >= m_pLifeTime[i])
+			{
+				((VTXINSTANCE*)m_SubResource.pData)[i].vColor.w = 0.f;
+			}
+			else
+				((VTXINSTANCE*)m_SubResource.pData)[i].vColor.w = m_pLifeTime[i] / m_pMaxLifeTime[i];
+		}
+		m_pContext->Unmap(m_pVBInstance, 0);
+	}
 }
 
 
@@ -171,6 +269,7 @@ void CVIBuffer_Instancing::Free()
 {
 	__super::Free();
 
+	Safe_Delete_Array(m_pMaxLifeTime);
 	Safe_Delete_Array(m_pLifeTime);
 	Safe_Delete_Array(m_pSpeed);
 

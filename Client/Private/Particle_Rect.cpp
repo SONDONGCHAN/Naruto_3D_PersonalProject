@@ -38,7 +38,7 @@ void CParticle_Rect::Priority_Tick(_float fTimeDelta)
 
 void CParticle_Rect::Tick(_float fTimeDelta)
 {
-    m_pVIBufferCom->Tick_Spread(fTimeDelta);
+   // m_pVIBufferCom->Tick_Spread(fTimeDelta);
    // m_pVIBufferCom->Tick_Drop(fTimeDelta);
 }
 
@@ -90,7 +90,7 @@ HRESULT CParticle_Rect::Add_Component()
 
     CVIBuffer_Instancing::INSTANCE_DESC			InstanceDesc{};
     InstanceDesc.vPivot = _float3(0.f, 10.f, 0.f);
-    InstanceDesc.vCenter = _float3(0.0f, 10.f, 0.f);
+    //InstanceDesc.Center = _float3(0.0f, 10.f, 0.f);
     InstanceDesc.vRange = _float3(10.0f, 2.f, 10.f);
     InstanceDesc.vSize = _float2(0.2f, 0.7f);
     InstanceDesc.vSpeed = _float2(2.f, 5.f);

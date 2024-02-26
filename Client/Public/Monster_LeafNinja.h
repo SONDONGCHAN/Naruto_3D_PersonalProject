@@ -71,6 +71,9 @@ private:
 	_uint				m_iComboCount = { 0 };	
 	_float				m_fWaitingTime= { 0.f };
 
+	_float				m_fCoolTime_SideDash_Current = { 5.f };
+	_float				m_fCoolTime_SideDash = { 10.f };
+
 	// 인술
 	_uint				m_iNinjutsuCount = { 0 };
 	_float				m_fNinjutsu = 7.f;
@@ -81,6 +84,8 @@ private:
 
 	//공격
 	_float				m_ColliderDelay = 0.f;
+	_float				m_fCoolTime_Rush_Current = { 10.f };
+	_float				m_fCoolTime_Rush = { 10.f };
 
 	// 스킬
 	SKILL_TYPE			m_Skill_Animation_State = { SKILL_END };

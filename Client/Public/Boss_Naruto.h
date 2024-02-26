@@ -8,6 +8,7 @@ BEGIN(Client)
 class CBoss_Naruto : public CLandObject
 {
 	enum SKILL_TYPE { SKILL_RASENGUN, SKILL_RASENSHURIKEN, SKILL_RASENGUN_SUPER, SKILL_WOOD_SWAP, SKILL_END };
+	enum DASH_DIR { DIR_FRONT, DIR_BACK, DIR_LEFT, DIR_RIGHT, DIR_END };
 
 private:
 	CBoss_Naruto(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -44,7 +45,7 @@ private:
 
 private:
 	// 이동 관련 
-	void		Dash_Move(_float ratio, _float fTimeDelta);
+	void		Dash_Move(DASH_DIR dir, _float ratio, _float fTimeDelta);
 
 	// 스킬 사용
 	void		Use_Skill(const wstring& strSkillName);
@@ -71,6 +72,9 @@ private:
 	_float				m_fDashSpeed = { 0.f };
 	_uint				m_iComboCount = { 0 };
 	_float				m_fWaitingTime = { 0.f };
+	_float				m_fCoolTime_SideDash_Current = { 10.f };
+	_float				m_fCoolTime_SideDash = { 20.f };
+	DASH_DIR			m_Dash_Dir = { DIR_END };
 
 	// 인술
 	_uint				m_iCountRasengun = { 0 };
@@ -90,6 +94,8 @@ private:
 
 	//공격
 	_float				m_ColliderDelay = 0.f;
+	_float				m_fCoolTime_Rush_Current = { 10.f };
+	_float				m_fCoolTime_Rush = { 10.f };
 
 	// 스킬
 	SKILL_TYPE			m_Skill_Animation_State = { SKILL_END };

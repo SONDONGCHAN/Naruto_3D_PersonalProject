@@ -53,7 +53,7 @@ HRESULT CBoss_Naruto::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_CurrentState = MONSTER_STATE_IDLE;
-	_vector vStart_Pos = { 0.f, 0.f, 7.f, 1.f };
+	_vector vStart_Pos = { 0.f, 0.f, 13.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	
@@ -164,7 +164,8 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 	m_fCoolRasenshuriken	-= fTimeDelta;
 	m_fCoolRasengun_Super	-= fTimeDelta;
 	m_fWaitingTime += fTimeDelta;
-
+	m_fCoolTime_Rush_Current -= fTimeDelta;
+	m_fCoolTime_SideDash_Current -= fTimeDelta;
 	if (m_CurrentHp <= 0)
 	{
 		if (!m_bDeadCheck)
@@ -188,7 +189,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 		else if (m_ColliderDelay > 0.2f)
 			On_Attack_Collider(0.7f, HIT_THROW);
 
-		Dash_Move(0.95f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.95f, fTimeDelta);
 	}
 	else if (m_iState & PLAYER_STATE_COMBO_ATTACK)
 	{
@@ -205,7 +206,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			else if (m_ColliderDelay > 0.10f)
 				On_Attack_Collider(0.7f);
 
-			Dash_Move(0.9f, fTimeDelta);
+			Dash_Move(DIR_FRONT, 0.9f, fTimeDelta);
 
 		}
 		else if (m_iState & PLAYER_STATE_COMBO_4)
@@ -215,7 +216,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			else if (m_ColliderDelay > 0.2f)
 				On_Attack_Collider(0.7f, HIT_THROW);
 
-			Dash_Move(0.9f, fTimeDelta);
+			Dash_Move(DIR_FRONT, 0.9f, fTimeDelta);
 		}
 		else
 		{
@@ -224,9 +225,12 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			else if (m_ColliderDelay > 0.15f)
 				On_Attack_Collider(0.7f);
 
-			Dash_Move(0.9f, fTimeDelta);
+			Dash_Move(DIR_FRONT, 0.9f, fTimeDelta);
 		}
 	}
+	else if (m_iState & PLAYER_STATE_DASH)
+		Dash_Move(m_Dash_Dir, 0.96f, fTimeDelta);
+
 	else
 	{
 		Off_Attack_Collider();
@@ -234,16 +238,16 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 	}
 
 	if (m_iState & PLAYER_STATE_STRUCK)
-		Dash_Move(0.75f, fTimeDelta);
+		Dash_Move(DIR_FRONT,0.75f, fTimeDelta);
 
 	if (m_iState & PLAYER_STRUCK_STRONG)
-		Dash_Move(0.85f, fTimeDelta);
+		Dash_Move(DIR_FRONT,0.85f, fTimeDelta);
 
 	if (m_iState & PLAYER_THROW)
-		Dash_Move(0.96f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.96f, fTimeDelta);
 
 	if (m_iState & PLAYER_BEATEN)
-		Dash_Move(0.96f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.96f, fTimeDelta);
 
 
 	if (m_iState & PLAYER_STATE_RUN)
@@ -332,17 +336,36 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			m_iState |= PLAYER_STATE_COMBO_STRONG_3;
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -364,17 +387,35 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			m_iState |= (PLAYER_STATE_COMBO_STRONG_3);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -398,12 +439,46 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 		}
 		else if (InRushAttackRange()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -450,17 +525,35 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			m_iState |= (PLAYER_STATE_COMBO_STRONG_3);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -481,17 +574,35 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			m_iState |= (PLAYER_STATE_COMBO_STRONG_3);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -514,17 +625,35 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			m_iState |= (PLAYER_STATE_COMBO_STRONG_3);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -548,17 +677,35 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			m_iState |= (PLAYER_STATE_COMBO_STRONG_3);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -580,17 +727,35 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			m_iState |= (PLAYER_STATE_COMBO_STRONG_3);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= PLAYER_STATE_RUN;
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= PLAYER_STATE_RUN;
+				else if (iRandom == 1) {
+					m_iState |= PLAYER_STATE_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= PLAYER_STATE_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= PLAYER_STATE_RUN;
 			break;
 		}
 		else {
@@ -890,10 +1055,18 @@ void CBoss_Naruto::Off_Attack_Collider()
 	m_pColliderAttack->Set_Center(_float3{ 0.f, -9999.f, 0.f });
 }
 
-void CBoss_Naruto::Dash_Move(_float ratio, _float fTimeDelta)
+void CBoss_Naruto::Dash_Move(DASH_DIR dir, _float ratio, _float fTimeDelta)
 {
 	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
-	m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+
+	if (dir == DIR_FRONT)
+		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_BACK)
+		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_LEFT)
+		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_RIGHT)
+		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 }
 
 void CBoss_Naruto::Use_Skill(const wstring& strSkillName)

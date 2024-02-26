@@ -12,11 +12,11 @@ private:
 	virtual ~CVIBuffer_Particle_Point() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(_uint iNumInstance);
+	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	static CVIBuffer_Particle_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iNumInstance);
+	static CVIBuffer_Particle_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

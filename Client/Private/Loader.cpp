@@ -295,10 +295,19 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 {
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
 
+	/* For.Prototype_Component_Texture_Circle */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Circle"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Particle/Circle.png"), 1))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_Circle_Noise */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Circle_Noise"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Particle/Circle_Noise.png"), 1))))
+		return E_FAIL;
 	/* For.Prototype_Component_Texture_Snow */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Snow"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Particle/Snow.png"), 1))))
 		return E_FAIL;
+
 	/* For.Prototype_Component_Texture_Battle_Start */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Battle_Start"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/T_UI_Announce_BattleStart_BC_LOCL.png"), 1))))
@@ -460,7 +469,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		return E_FAIL;
 	/* For.Prototype_Component_VIBuffer_Particle_Point */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Particle_Point"),
-		CVIBuffer_Particle_Point::Create(m_pDevice, m_pContext, 2000))))
+		CVIBuffer_Particle_Point::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	m_strLoadingText = TEXT("네비게이션를(을) 로딩 중 입니다.");
@@ -576,7 +585,7 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Rect"),
 	 CParticle_Rect::Create(m_pDevice, m_pContext))))
 	 return E_FAIL;
-	/* For.Prototype_GameObject_Particle_Rect */
+	/* For.Prototype_GameObject_Particle_Point */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Particle_Point"),
 		CParticle_Point::Create(m_pDevice, m_pContext))))
 		return E_FAIL;

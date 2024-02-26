@@ -66,9 +66,6 @@
     <ClCompile Include="..\Private\Map.cpp">
       <Filter>02.GameObjects\Map</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01.Levels\00.Loading\Loader</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Body_Monster_LeafNinja.cpp">
       <Filter>02.GameObjects\LandObject\Monster\Monster_LeafNinja\Body</Filter>
     </ClCompile>
@@ -200,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\EventTrigger.cpp">
       <Filter>02.GameObjects\EventTrigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
+      <Filter>01.Levels\00.Loading\Loader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

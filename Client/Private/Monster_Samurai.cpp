@@ -140,6 +140,8 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 {
 	m_fNinjutsu -= fTimeDelta;
 	m_fWaitingTime += fTimeDelta;
+	m_fCoolTime_Rush_Current -= fTimeDelta;
+	m_fCoolTime_SideDash_Current -= fTimeDelta;
 
 	if (m_CurrentHp <= 0)
 	{
@@ -164,7 +166,7 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 		else if (m_ColliderDelay > 0.2f)
 			On_Attack_Collider(0.7f, HIT_THROW);
 
-		Dash_Move(0.95f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.95f, fTimeDelta);
 	}
 	else if (m_iState & MONSTER_COMBO_ATTACK)
 	{
@@ -175,8 +177,11 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 		else if (m_ColliderDelay > 0.15f)
 			On_Attack_Collider(0.7f);
 
-		Dash_Move(0.85f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.85f, fTimeDelta);
 	}
+	else if (m_iState & MONSTER_DASH)
+		Dash_Move(m_Dash_Dir, 0.96f, fTimeDelta);
+
 	else
 	{
 		Off_Attack_Collider();
@@ -184,16 +189,16 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 	}
 
 	if (m_iState & MONSTER_STRUCK)
-		Dash_Move(0.75f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.75f, fTimeDelta);
 
 	if (m_iState & MONSTER_STRUCK_STRONG)
-		Dash_Move(0.85f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.85f, fTimeDelta);
 
 	if (m_iState & MONSTER_THROW)
-		Dash_Move(0.96f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.96f, fTimeDelta);
 
 	if (m_iState & MONSTER_BEATEN)
-		Dash_Move(0.96f, fTimeDelta);
+		Dash_Move(DIR_FRONT, 0.96f, fTimeDelta);
 
 
 	if (m_iState & MONSTER_RUN)
@@ -258,13 +263,14 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
@@ -291,18 +297,37 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= MONSTER_RUN;
+
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= MONSTER_RUN;
+				else if (iRandom == 1) {
+					m_iState |= MONSTER_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= MONSTER_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= MONSTER_RUN;
 			break;
 		}
 		else {
@@ -326,7 +351,25 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 		}
 		else if (InRushAttackRange()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= MONSTER_RUN;
+
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= MONSTER_RUN;
+				else if (iRandom == 1) {
+					m_iState |= MONSTER_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= MONSTER_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= MONSTER_RUN;
 			break;
 		}
 		else if (CheckPlayer()){
@@ -362,18 +405,37 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= MONSTER_RUN;
+
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= MONSTER_RUN;
+				else if (iRandom == 1) {
+					m_iState |= MONSTER_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= MONSTER_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= MONSTER_RUN;
 			break;
 		}
 		else {
@@ -402,18 +464,37 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= MONSTER_RUN;
+
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= MONSTER_RUN;
+				else if (iRandom == 1) {
+					m_iState |= MONSTER_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= MONSTER_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= MONSTER_RUN;
 			break;
 		}
 		else {
@@ -434,18 +515,37 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
 			m_CurrentState = MONSTER_STATE_MOVE;
-			m_iState |= MONSTER_RUN;
+
+			if (m_fCoolTime_SideDash_Current <= 0.f) {
+				_uint iRandom = (rand() % 3);
+				if (iRandom == 0)
+					m_iState |= MONSTER_RUN;
+				else if (iRandom == 1) {
+					m_iState |= MONSTER_DASH_LEFT;
+					m_Dash_Dir = DIR_LEFT;
+					m_fDashSpeed = 15.f;
+				}
+				else if (iRandom == 2) {
+					m_iState |= MONSTER_DASH_RIGHT;
+					m_Dash_Dir = DIR_RIGHT;
+					m_fDashSpeed = 15.f;
+				}
+				m_fCoolTime_SideDash_Current = m_fCoolTime_SideDash;
+			}
+			else
+				m_iState |= MONSTER_RUN;
 			break;
 		}
 		else {
@@ -757,10 +857,18 @@ void CMonster_Samurai::Off_Attack_Collider()
 }
 
 
-void CMonster_Samurai::Dash_Move(_float ratio, _float fTimeDelta)
+void CMonster_Samurai::Dash_Move(DASH_DIR dir, _float ratio, _float fTimeDelta)
 {
 	m_fDashSpeed = Lerp(0, m_fDashSpeed, ratio);
+
+	if (dir == DIR_FRONT)
 		m_pTransformCom->Go_Straight_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_BACK)
+		m_pTransformCom->Go_Backward_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_LEFT)
+		m_pTransformCom->Go_Left_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
+	else if (dir == DIR_RIGHT)
+		m_pTransformCom->Go_Right_Custom(fTimeDelta, m_fDashSpeed, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 }
 
 void CMonster_Samurai::Use_Skill(const wstring& strSkillName)

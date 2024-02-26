@@ -184,6 +184,14 @@ namespace Client
 
 	const _uint MONSTER_DEAD			= 0x00020000; // LeafNinja : 49 / Samurai : 72
 
+	const _uint MONSTER_DASH_LEFT	= 0x00040000; // LeafNinja :  / Samurai : 95
+	const _uint MONSTER_DASH_RIGHT	= 0x00080000; // LeafNinja :  / Samurai : 96
+
+	const _uint MONSTER_DASH		= 0x000C0000; //
+
+
+
+
 
 
 	enum MONSTER_STATE{ 

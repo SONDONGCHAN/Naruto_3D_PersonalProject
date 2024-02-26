@@ -141,6 +141,8 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 {
 	m_fNinjutsu -= fTimeDelta;
 	m_fWaitingTime += fTimeDelta;
+	m_fCoolTime_Rush_Current -= fTimeDelta;
+	//m_fCoolTime_SideDash_Current -= fTimeDelta;
 
 	if (m_CurrentHp <= 0)
 	{
@@ -259,13 +261,14 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
@@ -292,13 +295,14 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
@@ -363,13 +367,14 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
@@ -403,13 +408,14 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
@@ -435,13 +441,14 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 			m_ColliderDelay = 0.f;
 			break;
 		}
-		else if (InRushAttackRange()) {
+		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
 			m_CurrentState = MONSTER_STATE_RUSH_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
 			m_iState |= (MONSTER_RUSH_ATTACK_PUNCH * iRandom);
 			m_fDashSpeed = 15.f;
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			m_fCoolTime_Rush_Current = m_fCoolTime_Rush;
 			break;
 		}
 		else if (CheckPlayer()) {
@@ -521,6 +528,8 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 			vDir.m128_f32[1] = 0.f;
 			m_pTransformCom->Set_Look(vDir);
 			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 2.f, 0.05f);
+
+
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{

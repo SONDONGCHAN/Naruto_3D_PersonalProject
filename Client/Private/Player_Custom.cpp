@@ -16,8 +16,7 @@
 #include "UI_Player_Status.h"
 #include "UI_Player_Skills.h"
 #include "UI_Player_Custom.h"
-
-
+#include "Particle_Point.h"
 
 CPlayer_Custom::CPlayer_Custom(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLandObject(pDevice, pContext)
@@ -62,6 +61,9 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 			 return E_FAIL;
 
 		 if (FAILED(Add_UIs()))
+			 return E_FAIL;
+
+		 if (FAILED(Add_Particles()))
 			 return E_FAIL;
 
 		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
@@ -135,6 +137,11 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 			m_fSkillCurrentCoolTime[i] = 0.f;
 	}
 
+	if (m_pGameInstance->Key_Down(DIK_L))
+	{
+		m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Trigger(m_MyPos);
+	}
+
 	m_LockOnTargetLength = 99999.f;
 
 	for (auto& Pair : m_PlayerParts)
@@ -156,16 +163,8 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 		int a = 0;
 	}
 
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Priority_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Priority_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_KAMUI])
-		m_PlayerSkills.find(L"Skill_Kamui")->second->Priority_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_CHIDORI])
-		m_PlayerSkills.find(L"Skill_Chidori")->second->Priority_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_WOODHAND])
-		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Priority_Tick(fTimeDelta);
+	Skills_Priority_Tick(fTimeDelta);
+	Particles_Priority_Tick(fTimeDelta);
 
 	if (m_bOnAir && (m_fGravity < -0.017f) && m_bCellisLand)
 	{
@@ -203,17 +202,8 @@ void CPlayer_Custom::Tick(_float fTimeDelta)
 	for (auto& Pair : m_PlayerWeapon)
 		(Pair.second)->Tick(fTimeDelta);
 	
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_KAMUI])
-		m_PlayerSkills.find(L"Skill_Kamui")->second->Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_CHIDORI])
-		m_PlayerSkills.find(L"Skill_Chidori")->second->Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_WOODHAND])
-		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Tick(fTimeDelta);
-
+	Skills_Tick(fTimeDelta);
+	Particles_Tick(fTimeDelta);
 
 	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -242,16 +232,8 @@ void CPlayer_Custom::Late_Tick(_float fTimeDelta)
 	for (auto& Pair : m_PlayerWeapon)
 		(Pair.second)->Late_Tick(fTimeDelta);
 
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Late_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Late_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_KAMUI])
-		m_PlayerSkills.find(L"Skill_Kamui")->second->Late_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_CHIDORI])
-		m_PlayerSkills.find(L"Skill_Chidori")->second->Late_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_WOODHAND])
-		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Late_Tick(fTimeDelta);
+	Skills_Late_Tick(fTimeDelta);
+	Particles_Late_Tick(fTimeDelta);
 
 	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
 		return;
@@ -268,8 +250,6 @@ void CPlayer_Custom::Late_Tick(_float fTimeDelta)
 
 	for (auto& Pair : m_PlayerUIs)
 		Pair.second->Late_Tick(fTimeDelta);
-
-
 }
 
 HRESULT CPlayer_Custom::Render()
@@ -277,16 +257,7 @@ HRESULT CPlayer_Custom::Render()
 	if (m_bCustom_Mode)
 		return S_OK;
 
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Render();
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Render();
-	if (m_bSkillOn[SKILL_KAMUI])
-		m_PlayerSkills.find(L"Skill_Kamui")->second->Render();
-	if (m_bSkillOn[SKILL_CHIDORI])
-		m_PlayerSkills.find(L"Skill_Chidori")->second->Render();
-	if (m_bSkillOn[SKILL_WOODHAND])
-		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Render();
+	Skills_Render();
 
 	return S_OK;
 }
@@ -1102,6 +1073,10 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 		{
 			Skill_Cancle();
 
+			_vector vParPos = m_MyPos;
+			vParPos.m128_f32[1] += 0.7f;
+			m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Trigger(vParPos);
+
 			_vector		MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			_vector		TargetPos = pTargetCollider->Get_Collider_GameObject()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 			_vector		vDir = TargetPos - MyPos;
@@ -1621,6 +1596,77 @@ void CPlayer_Custom::Skill_Cancle()
 	m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
 }
 
+void CPlayer_Custom::Skills_Priority_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB])
+		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_KAMUI])
+		m_PlayerSkills.find(L"Skill_Kamui")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_CHIDORI])
+		m_PlayerSkills.find(L"Skill_Chidori")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_WOODHAND])
+		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Priority_Tick(fTimeDelta);
+}
+
+void CPlayer_Custom::Skills_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB])
+		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_KAMUI])
+		m_PlayerSkills.find(L"Skill_Kamui")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_CHIDORI])
+		m_PlayerSkills.find(L"Skill_Chidori")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_WOODHAND])
+		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Tick(fTimeDelta);
+}
+
+void CPlayer_Custom::Skills_Late_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_FLAMEBOMB])
+		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_KAMUI])
+		m_PlayerSkills.find(L"Skill_Kamui")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_CHIDORI])
+		m_PlayerSkills.find(L"Skill_Chidori")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_WOODHAND])
+		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Late_Tick(fTimeDelta);
+}
+
+void CPlayer_Custom::Skills_Render()
+{
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Render();
+	if (m_bSkillOn[SKILL_FLAMEBOMB])
+		m_PlayerSkills.find(L"Skill_FlameBomb")->second->Render();
+	if (m_bSkillOn[SKILL_KAMUI])
+		m_PlayerSkills.find(L"Skill_Kamui")->second->Render();
+	if (m_bSkillOn[SKILL_CHIDORI])
+		m_PlayerSkills.find(L"Skill_Chidori")->second->Render();
+	if (m_bSkillOn[SKILL_WOODHAND])
+		m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Render();
+}
+
+void CPlayer_Custom::Particles_Priority_Tick(_float fTimeDelta)
+{
+	m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Priority_Tick(fTimeDelta);
+}
+
+void CPlayer_Custom::Particles_Tick(_float fTimeDelta)
+{
+	m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Tick(fTimeDelta);
+}
+
+void CPlayer_Custom::Particles_Late_Tick(_float fTimeDelta)
+{
+	m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Late_Tick(fTimeDelta);
+}
+
 
 HRESULT CPlayer_Custom::Add_Components()
 {
@@ -1688,7 +1734,6 @@ HRESULT CPlayer_Custom::Add_Components()
 
 HRESULT CPlayer_Custom::Add_PartObjects(LEVEL CurrentLevel)
 {
-
 	//Body_Player_Custom_Face Ãß°¡
 	CBody_Player_Custom_Face::BODY_PLAYER_DESC BodyFaceDesc{};
 	BodyFaceDesc.pParentTransform = m_pTransformCom;
@@ -1919,6 +1964,30 @@ HRESULT CPlayer_Custom::Add_UIs()
 	return S_OK;
 }
 
+HRESULT CPlayer_Custom::Add_Particles()
+{	 
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
+	InstanceDesc.iNumInstance = 30;
+	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
+	InstanceDesc.vSize = _float2(0.05f, 0.051f);
+	InstanceDesc.vSpeed = _float2(1.5f, 2.5f);
+	InstanceDesc.vLifeTime = _float2(0.3f, 0.5f);
+	InstanceDesc.isLoop = false;
+	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
+	InstanceDesc.fDuration = 1.3f;
+	InstanceDesc.MyOption = CVIBuffer_Instancing :: OPTION_SPREAD;
+	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
+
+	CParticle_Point* pParticle_Combo_Attack = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack)
+		return E_FAIL;
+	m_PlayerParticles.emplace(TEXT("Particle_Combo_Attack"), pParticle_Combo_Attack);
+
+	return S_OK;
+}
+
 HRESULT CPlayer_Custom::Add_CustomUI()
 {
 	CUI_Player_Custom::UI_Player_Custom_DESC UI_Custom_Desc{};
@@ -1991,6 +2060,11 @@ void CPlayer_Custom::Free()
 	for (auto& Pair : m_PlayerUIs)
 		Safe_Release(Pair.second);
 	m_PlayerUIs.clear();
+	
+	for (auto& Pair : m_PlayerParticles)
+		Safe_Release(Pair.second);
+	m_PlayerParticles.clear();
+
 	
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

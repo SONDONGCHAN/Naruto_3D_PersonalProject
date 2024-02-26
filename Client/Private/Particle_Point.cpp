@@ -27,7 +27,7 @@ HRESULT CParticle_Point::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Component()))
+	if (FAILED(Add_Component(pArg)))
 		return E_FAIL;
 
 	return S_OK;
@@ -39,12 +39,12 @@ void CParticle_Point::Priority_Tick(_float fTimeDelta)
 
 void CParticle_Point::Tick(_float fTimeDelta)
 {
-	m_pVIBufferCom->Tick_Drop(fTimeDelta);
+	m_pVIBufferCom->Tick_Particle(fTimeDelta);
 }
 
 void CParticle_Point::Late_Tick(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
+	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this)))
 		return;
 }
 
@@ -53,8 +53,14 @@ HRESULT CParticle_Point::Render()
     _float4x4		ViewMatrix = m_pGameInstance->Get_ViewMatrix_Float();
     _float4x4		ProjMatrix = m_pGameInstance->Get_ProjMatrix_Float();
     _float4			CameraPos = m_pGameInstance->Get_CameraPos_Float();
+    _float4x4       RotateMatrix;
+    XMStoreFloat4x4(&RotateMatrix, XMMatrixRotationY(XMConvertToRadians(30.f)));
+  
 
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_RotateMatrix", &RotateMatrix)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
@@ -81,9 +87,16 @@ HRESULT CParticle_Point::Render()
     return S_OK;
 }
 
-HRESULT CParticle_Point::Add_Component()
+void CParticle_Point::Trigger(_vector vCenterPos)
 {
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Snow"),
+    m_pVIBufferCom->Trigger(vCenterPos);
+}
+
+HRESULT CParticle_Point::Add_Component(void* pArg)
+{
+    const wstring& _strTag = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg )->strTextureTag;
+
+    if (FAILED(__super::Add_Component(LEVEL_STATIC, _strTag,
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
         return E_FAIL;
 
@@ -91,18 +104,8 @@ HRESULT CParticle_Point::Add_Component()
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
         return E_FAIL;
 
-    CVIBuffer_Instancing::INSTANCE_DESC			InstanceDesc{};
-    InstanceDesc.vPivot = _float3(0.f, 10.f, 0.f);
-    InstanceDesc.vCenter = _float3(0.0f, 50.f, 0.f);
-    InstanceDesc.vRange = _float3(300.0f, 5.f, 300.f);
-    InstanceDesc.vSize = _float2(0.2f, 0.7f);
-    InstanceDesc.vSpeed = _float2(1.f, 3.f);
-    InstanceDesc.vLifeTime = _float2(20.f, 50.f);
-    InstanceDesc.isLoop = true;
-    InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
-
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Particle_Point"),
-        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), &InstanceDesc)))
+        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), pArg)))
         return E_FAIL;
 
 
