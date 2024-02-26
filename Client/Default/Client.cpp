@@ -103,11 +103,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (fTimeAcc > 1.f / 60.0f)
         {
             /* CMainApp Update*/
-#ifndef _DEBUG
+
             pMainApp->Tick(pGameInstance->Compute_TimeDelta(TEXT("Timer_60")));
-#else
-            pMainApp->Tick(fTime);
-#endif // !_DEBUG
+
+           // pMainApp->Tick(fTime);
+
             /* CMainApp Render*/
             pMainApp->Render();
 
