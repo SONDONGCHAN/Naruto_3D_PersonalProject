@@ -1,25 +1,2 @@
-﻿  Body_Boss_Kurama.cpp
-  Body_Boss_Naruto.cpp
-  Body_Player_Custom_Face.cpp
-  Body_Player_Custom_HeadGear.cpp
-  Body_Player_Custom_Lower.cpp
-  Body_Player_Custom_Upper.cpp
-  Body_Player_Naruto.cpp
-  Boss_Kurama.cpp
-  Boss_Naruto.cpp
-  Camera_Free.cpp
-  FlameBomb.cpp
-  LandObject.cpp
-  Level_BossStage.cpp
-  Level_GamePlay.cpp
-  Level_Loading.cpp
-  Loader.cpp
-  Monster_LeafNinja.cpp
-  Monster_Samurai.cpp
-  Player.cpp
-  Player_Custom.cpp
-  코드를 생성하고 있습니다...
-  컴파일하고 있습니다...
-  Player_Naruto.cpp
-  코드를 생성하고 있습니다...
+﻿  Map.cpp
   Client.vcxproj -> C:\Users\dhqks\Desktop\3DPersonal_Client\3D_Personal_Client\Client\Bin\Client.exe

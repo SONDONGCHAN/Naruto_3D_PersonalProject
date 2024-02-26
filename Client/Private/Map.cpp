@@ -61,18 +61,18 @@ HRESULT CMap::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	for (_uint i = 0; i < iNumMeshes; i++)
-	{
+	//for (_uint i = 0; i < iNumMeshes; i++)
+	//{
 
-		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
-			return E_FAIL;
-	
-		if (FAILED(m_pShaderOutLine->Begin(0)))
-			return E_FAIL;
-		
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
-	}
+	//	if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
+	//		return E_FAIL;
+	//
+	//	if (FAILED(m_pShaderOutLine->Begin(0)))
+	//		return E_FAIL;
+	//	
+	//	if (FAILED(m_pModelCom->Render(i)))
+	//		return E_FAIL;
+	//}
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
