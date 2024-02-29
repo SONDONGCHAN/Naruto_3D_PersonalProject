@@ -1007,7 +1007,9 @@ HRESULT CMonster_LeafNinja::Add_Particles()
 	InstanceDesc.isLoop = false;
 	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
 	InstanceDesc.fDuration = 1.3f;
-	InstanceDesc.MyOption = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc.MyOption_Shape = CVIBuffer_Instancing::SHAPE_NIDDLE;
+	InstanceDesc.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
 	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
 
 	CParticle_Point* pParticle_Combo_Attack_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));

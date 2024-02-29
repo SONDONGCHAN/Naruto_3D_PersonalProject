@@ -40,6 +40,7 @@ void CSkill::Priority_Tick(_float fTimeDelta)
 
 void CSkill::Tick(_float fTimeDelta)
 {
+    m_MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 }
 
 void CSkill::Late_Tick(_float fTimeDelta)

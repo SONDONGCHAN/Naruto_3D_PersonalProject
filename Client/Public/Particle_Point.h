@@ -29,12 +29,23 @@ public:
 	_bool	Trigger(_vector vCenterPos);
 
 private:
+	void	Sprite_Tick(_float fTimeDelta);
+
+private:
 	CShader*						m_pShaderCom = { nullptr };
 	CTexture*						m_pTextureCom = { nullptr };
 	CVIBuffer_Particle_Point*		m_pVIBufferCom = { nullptr };
 
 private:
-	_float4		m_vCenterPos = {0.f, 0.f, 0.f, 1.f};
+	_float4		m_vCenterPos			= {0.f, 0.f, 0.f, 1.f};
+	_float2		m_vSpriteRatio			= { 8.f, 8.f };
+	_float2		m_vSpriteCurrentRatio	= { 0.f, 0.f };
+	_float		m_vSpriteTimeCal		= { 0.f };
+
+
+	CVIBuffer_Instancing::PARTICLE_TEXTURE  m_Option_Texture = { CVIBuffer_Instancing::TEXTURE_END };
+	_vector*	m_pCenterPos = { nullptr };
+	_bool		m_isLoop = {false};
 
 private:
 	HRESULT Add_Component(void* pArg);

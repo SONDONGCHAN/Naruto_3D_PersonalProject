@@ -57,7 +57,8 @@ protected:
 protected:
 	_float		m_fSkill_Power = { 0.f };
 	LEVEL		m_Current_Level = { LEVEL_END };
-	
+	_vector		m_MyPos = {0.f, 0.f, 0.f, 1.f};
+
 
 
 public:

@@ -1,6 +1,8 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Skill.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
 
 BEGIN(Client)
 
@@ -41,14 +43,14 @@ public:
 	_bool			Get_IsHit() { return m_bIsHit; }
 
 public:
-	// 파티클 제어
 	void		Particles_Priority_Tick(_float fTimeDelta) override;
 	void		Particles_Tick(_float fTimeDelta) override;
 	void		Particles_Late_Tick(_float fTimeDelta) override;
 
-
 private:
-	CCollider* m_pColliderMain = { nullptr };
+	CCollider*			m_pColliderMain			= { nullptr };
+	CEffect_Mesh*		m_Effect_Chidori_Main	= { nullptr };
+	CParticle_Point*	m_BasicParticles		= { nullptr };
 
 private:
 	CHIDORI_STATE	myState = { STATE_MAKING };
@@ -59,7 +61,8 @@ private:
 
 private:
 	HRESULT Add_Components();
-
+	HRESULT Add_Effects();
+	HRESULT Add_Particles();
 
 public:
 	static CChidori* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

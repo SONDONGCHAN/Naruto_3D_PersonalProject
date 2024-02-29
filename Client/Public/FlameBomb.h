@@ -37,7 +37,6 @@ public:
 	void	Set_Targeting(_vector Target_Pos);
 
 public:
-	// 파티클 제어
 	void		Particles_Priority_Tick(_float fTimeDelta) override;
 	void		Particles_Tick(_float fTimeDelta) override;
 	void		Particles_Late_Tick(_float fTimeDelta) override;
@@ -50,6 +49,8 @@ private:
 	CEffect_Mesh*		m_Effect_Fireball_Main	= { nullptr };
 	CEffect_Mesh*		m_Effect_Fireball_Ring	= { nullptr };
 	CParticle_Point*	m_BasicParticles		= { nullptr };
+	CParticle_Point*	m_ExplosionParticles	= { nullptr };
+
 
 private:
 	FLAMEBOMB_STATE myState = { STATE_MAKING };

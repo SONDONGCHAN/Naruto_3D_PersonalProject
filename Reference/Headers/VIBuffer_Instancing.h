@@ -7,22 +7,27 @@ BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Instancing abstract : public CVIBuffer
 {
 public:
-	enum  PARTICLE_OPTION {OPTION_DROP, OPTION_SPREAD, OPTION_END};
+	enum  PARTICLE_MOVING { OPTION_DROP, OPTION_SPREAD, OPTION_END};
+	enum  PARTICLE_SHAPE { SHAPE_BASIC, SHAPE_NIDDLE, SHAPE_END };
+	enum  PARTICLE_TEXTURE { TEXTURE_SPRITE, TEXTURE_NONE_SPRITE, TEXTURE_NONE, TEXTURE_END};
 
 	struct INSTANCE_DESC
 	{
-		_uint			iNumInstance;
-		_float3			vPivot;
-		_float3			vCenter;
-		_float3			vRange;
-		_float2			vSize;
-		_float2			vSpeed;
-		_float2			vLifeTime;
-		_bool			isLoop;
-		_float4			vColor;
-		_float			fDuration;
-		PARTICLE_OPTION	MyOption;
-		wstring			strTextureTag;
+		_uint				iNumInstance;
+		_float3				vPivot;
+		_float3				vCenter;
+		_vector*			pCenter;
+		_float3				vRange;
+		_float2				vSize;
+		_float2				vSpeed;
+		_float2				vLifeTime;
+		_bool				isLoop;
+		_float4				vColor;
+		_float				fDuration;
+		PARTICLE_MOVING		MyOption_Moving;
+		PARTICLE_SHAPE		MyOption_Shape;
+		PARTICLE_TEXTURE	MyOption_Texture;
+		wstring				strTextureTag;
 	};
 
 protected:

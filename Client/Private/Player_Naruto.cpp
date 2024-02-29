@@ -1632,6 +1632,7 @@ HRESULT CPlayer_Naruto::Add_Particles()
 	InstanceDesc.iNumInstance = 30;
 	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.pCenter = &m_MyPos;
 	InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
 	InstanceDesc.vSize = _float2(0.01f, 0.04f);
 	InstanceDesc.vSpeed = _float2(2.5f, 3.5f);
@@ -1639,7 +1640,9 @@ HRESULT CPlayer_Naruto::Add_Particles()
 	InstanceDesc.isLoop = false;
 	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
 	InstanceDesc.fDuration = 1.3f;
-	InstanceDesc.MyOption = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc.MyOption_Shape = CVIBuffer_Instancing::SHAPE_NIDDLE;
+	InstanceDesc.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
 	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
 
 	CParticle_Point* pParticle_Combo_Attack_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));

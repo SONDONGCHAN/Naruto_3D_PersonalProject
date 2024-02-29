@@ -5,7 +5,7 @@ texture2D   g_DiffuseTexture;
 float2      g_UVMovement;
 float       g_fAlpha;
 float       g_fBrightness;
-
+float4      g_vColor;
 
 struct VS_IN
 {
@@ -53,7 +53,7 @@ struct PS_OUT
     vector vDiffuse : SV_TARGET0;  
 };
 
-PS_OUT PS_MAIN(PS_IN In)
+PS_OUT PS_FIREBALL_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -70,6 +70,30 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_FIREBALL_RING(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    float4 vColor;
+    
+    if (vMtrlDiffuse.r < 0.8f)
+        vColor.rgb = g_vColor.rgb * (1.f - vMtrlDiffuse.r);
+    else
+        vColor.rgb = vMtrlDiffuse.rgb;
+    
+    vColor.rgb  = saturate(vColor.rgb * g_fBrightness);
+    vColor.a    = g_vColor.a;
+    
+    Out.vDiffuse = vColor;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass FireBall_Main
@@ -80,7 +104,7 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_FIREBALL_MAIN();
     }
 
     pass FireBall_Ring
@@ -91,7 +115,7 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_FIREBALL_RING();
     }
 }
 

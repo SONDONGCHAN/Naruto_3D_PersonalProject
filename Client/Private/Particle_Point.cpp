@@ -19,8 +19,11 @@ HRESULT CParticle_Point::Initialize_Prototype()
 
 HRESULT CParticle_Point::Initialize(void* pArg)
 {
-	CGameObject::GAMEOBJECT_DESC			GameObjectDesc = {};
+    m_Option_Texture    = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->MyOption_Texture;
+    m_pCenterPos        = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->pCenter;
+    m_isLoop            = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->isLoop;
 
+    CGameObject::GAMEOBJECT_DESC			GameObjectDesc = {};
 	GameObjectDesc.fSpeedPerSec = 10.0f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(60.0f);
 
@@ -40,6 +43,7 @@ void CParticle_Point::Priority_Tick(_float fTimeDelta)
 void CParticle_Point::Tick(_float fTimeDelta)
 {
 	m_pVIBufferCom->Tick_Particle(fTimeDelta);
+    Sprite_Tick(fTimeDelta);
 }
 
 void CParticle_Point::Late_Tick(_float fTimeDelta)
@@ -50,37 +54,55 @@ void CParticle_Point::Late_Tick(_float fTimeDelta)
 
 HRESULT CParticle_Point::Render()
 {
+    _uint Shader_Path = { 0 };
+
+    if (m_Option_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
+        Shader_Path = 1;
+
     _float4x4		ViewMatrix = m_pGameInstance->Get_ViewMatrix_Float();
     _float4x4		ProjMatrix = m_pGameInstance->Get_ProjMatrix_Float();
     _float4			CameraPos = m_pGameInstance->Get_CameraPos_Float();
-
+    
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
-
+    
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
         return E_FAIL;
-
+    
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
         return E_FAIL;
-
+    
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &CameraPos, sizeof(_float4))))
         return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCenterPos", &m_vCenterPos, sizeof(_float4))))
+    
+    if (m_isLoop)
+    {
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vCenterPos", m_pCenterPos, sizeof(_float4))))
+            return E_FAIL;
+    }
+    else
+    {
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vCenterPos", &m_vCenterPos, sizeof(_float4))))
+            return E_FAIL;
+    }
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteRatio", &m_vSpriteRatio, sizeof(_float2))))
         return E_FAIL;
-
+    
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteCurrnetRatio", &m_vSpriteCurrentRatio, sizeof(_float2))))
+        return E_FAIL;
+    
     if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Begin(0)))
+    
+    if (FAILED(m_pShaderCom->Begin(Shader_Path)))
         return E_FAIL;
-
+    
     if (FAILED(m_pVIBufferCom->Bind_Buffers()))
         return E_FAIL;
-
+    
     if (FAILED(m_pVIBufferCom->Render()))
         return E_FAIL;
-
+    
     return S_OK;
 }
 
@@ -89,6 +111,30 @@ _bool CParticle_Point::Trigger(_vector vCenterPos)
     XMStoreFloat4(&m_vCenterPos, vCenterPos);
 
     return  m_pVIBufferCom->Trigger(vCenterPos);
+}
+
+void CParticle_Point::Sprite_Tick(_float fTimeDelta)
+{
+    if (m_Option_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
+    {
+        m_vSpriteTimeCal += fTimeDelta;
+
+        if (m_vSpriteTimeCal >= 0.05f)
+        {
+            m_vSpriteTimeCal = 0.f;
+
+            m_vSpriteCurrentRatio.x += 1.f;
+
+            if (m_vSpriteCurrentRatio.x >= 8.f)
+            {
+                m_vSpriteCurrentRatio.x = 0.f;
+                m_vSpriteCurrentRatio.y += 1.f;
+            }
+
+            if (m_vSpriteCurrentRatio.y >= 8.f)
+                m_vSpriteCurrentRatio.y = 0.f;
+        }
+    }
 }
 
 HRESULT CParticle_Point::Add_Component(void* pArg)

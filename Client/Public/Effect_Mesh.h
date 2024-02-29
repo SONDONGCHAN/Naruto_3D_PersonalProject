@@ -13,12 +13,14 @@ BEGIN(Client)
 class CEffect_Mesh : public CGameObject
 {
 public:
-	enum EFFECT_TYPE {EFFECT_FIREBALL_MAIN, EFFECT_FIREBALL_RING, EFFECT_END};
+	enum EFFECT_TYPE {EFFECT_FIREBALL_MAIN, EFFECT_FIREBALL_RING, EFFECT_CHIDORI, EFFECT_END};
+	enum EFFECT_UVOPTION { MOVE_X, MOVE_Y, MOVE_X_INVERSE, MOVE_Y_INVERSE, MOVE_All, MOVE_END};
 
 	struct EFFECT_DESC
 	{
-		EFFECT_TYPE	MyType;
-		_vector vMyScale;
+		EFFECT_TYPE			MyType;
+		EFFECT_UVOPTION		MyUVOption;
+		_vector				vMyScale;
 	};
 
 private:
@@ -36,8 +38,12 @@ public:
 
 public:
 	void	State_Tick(_fmatrix WorldMatrix);
-	void	Move_UV(_float fTimeDelta);
-	void	Get_StartMat(_fmatrix WorldMatrix);
+	void	Start_Trigger();
+	void	Scale_Change(_float fTimeDelta);
+
+private:
+	_float	Lerp(_float start, _float end, _float ratio);
+	void	Move_UV(EFFECT_UVOPTION UVOption, _float fTimeDelta);
 
 private:
 	CShader*				m_pShaderCom	= { nullptr };
@@ -46,12 +52,17 @@ private:
 
 private:
 	EFFECT_DESC m_MyDesc		= {};
-	_float4x4	m_StartMat		= {};
+	_vector		vCurrentScale	= {};
+	_float		m_ScalingSpeed	= { 5.f };
+	_float		m_ScalingRatio	= { 1.f };
+	_uint		m_ModelCount		= { 0 };
+	_float		m_ModelCountCheck = { 0.f };
+
+
 	_float2		m_vUVMovement	= { 0.f, 0.f};
 	_float		m_vUVSpeed		= { 1.f };
 	_float		m_fAlpha		= { 1.f };
 	_float		m_fBrightness	= { 1.f };
-
 
 private:
 	HRESULT		Add_Component();

@@ -121,22 +121,23 @@ _bool CVIBuffer_Instancing::Trigger(_vector vCenterPos)
 			((VTXINSTANCE*)m_SubResource.pData)[i].vColor.w = 1.f;
 
 			_float		fSize = SizeRange(m_RandomNumber);
+			_float		yScale = { 1.f };
 
 			((VTXINSTANCE*)m_SubResource.pData)[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
-			((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, fSize * 60.f, 0.f, 0.f);
-			m_pMaxSizeY[i] = fSize * 60.f;
+
+			if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
+				yScale = 60.f;
+
+			((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, fSize * yScale, 0.f, 0.f);
+			m_pMaxSizeY[i] = fSize * yScale;
 			((VTXINSTANCE*)m_SubResource.pData)[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
 			
-
-			_vector		vDir = XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
-			vDir = XMVectorSetW(vDir, 0.f);
-			XMStoreFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation, XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) + XMVector3Normalize(vDir) * fSize * 60.f );
-			//XMStoreFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation, XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) + XMVector3Normalize(vDir) * m_pSpeed[i] * 0.016);
-
-			//_vector		vDir = XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
-			//vDir = XMVectorSetW(vDir, 0.f);
-			//vDir = XMVector3Normalize(vDir);
-			//XMStoreFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation, (XMLoadFloat3(&m_InstanceData.vPivot) + (vDir * fSize * 60.f) ) );
+			if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
+			{
+				_vector		vDir = XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
+				vDir = XMVectorSetW(vDir, 0.f);
+				XMStoreFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation, XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) + XMVector3Normalize(vDir) * fSize * yScale);
+			}
 		}
 
 		return true;
@@ -148,14 +149,14 @@ _bool CVIBuffer_Instancing::Trigger(_vector vCenterPos)
 
 void CVIBuffer_Instancing::Tick_Particle(_float fTimeDelta)
 {
-	if (m_InstanceData.MyOption == OPTION_DROP)
+	if (m_InstanceData.MyOption_Moving == OPTION_DROP)
 	{
 		if(m_InstanceData.isLoop == true)
 			Tick_Drop(fTimeDelta);
 		else if (m_InstanceData.isLoop == false)
 			Tick_Drop(fTimeDelta);
 	}
-	else if (m_InstanceData.MyOption == OPTION_SPREAD)
+	else if (m_InstanceData.MyOption_Moving == OPTION_SPREAD)
 	{
 		if (m_InstanceData.isLoop == true)
 			Tick_Spread_Loop(fTimeDelta);
@@ -212,38 +213,34 @@ void CVIBuffer_Instancing::Tick_Drop(_float fTimeDelta)
 
 void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 {
-	m_fTimeAcc += fTimeDelta;
-
-	if (m_InstanceData.fDuration <= m_fTimeAcc)
-		m_isFinished = true;
-
 	D3D11_MAPPED_SUBRESOURCE			SubResource{};
-
+	
 	uniform_real_distribution<float>	TimeRange(m_InstanceData.vLifeTime.x, m_InstanceData.vLifeTime.y);
 	uniform_real_distribution<float>	WidthRange(m_InstanceData.vRange.x * -0.5f, m_InstanceData.vRange.x * 0.5f);
 	uniform_real_distribution<float>	HeightRange(m_InstanceData.vRange.y * -0.5f, m_InstanceData.vRange.y * 0.5f);
 	uniform_real_distribution<float>	DepthRange(m_InstanceData.vRange.z * -0.5f, m_InstanceData.vRange.z * 0.5f);
-
+	uniform_real_distribution<float>	SizeRange(m_InstanceData.vSize.x, m_InstanceData.vSize.y);
+	
 	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-
+	
 	for (_uint i = 0; i < m_iNumInstance; ++i)
 	{
 		VTXINSTANCE* pVertices = ((VTXINSTANCE*)SubResource.pData);
-
+	
 		_vector		vDir = XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
 		vDir = XMVectorSetW(vDir, 0.f);
-
+	
 		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + XMVector3Normalize(vDir) * m_pSpeed[i] * fTimeDelta);
-
+	
 		m_pLifeTime[i] -= fTimeDelta;
 
 		if (0.0f >= m_pLifeTime[i])
 		{
-			((VTXINSTANCE*)SubResource.pData)[i].vColor.w = 0.f;
-
-			if ((true == m_InstanceData.isLoop) && (m_isFinished))
+			if (true == m_InstanceData.isLoop)
 			{
-				((VTXINSTANCE*)SubResource.pData)[i].vColor.w = 1.f;
+				
+				XMStoreFloat3(&m_InstanceData.vCenter, *(m_InstanceData.pCenter));
+				m_InstanceData.vPivot = m_InstanceData.vCenter;
 
 				m_pLifeTime[i] = TimeRange(m_RandomNumber);
 				((VTXINSTANCE*)SubResource.pData)[i].vTranslation = _float4(
@@ -252,11 +249,39 @@ void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 					m_InstanceData.vCenter.z + DepthRange(m_RandomNumber),
 					1.f);
 
-				if (m_iNumInstance <= i + 1)
+				_float		fSize = SizeRange(m_RandomNumber);
+				_float		yScale = { 1.f };
+				
+				((VTXINSTANCE*)SubResource.pData)[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
+				
+				if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
+					yScale = 60.f;
+				
+				((VTXINSTANCE*)SubResource.pData)[i].vUp = _float4(0.f, fSize * yScale, 0.f, 0.f);
+				m_pMaxSizeY[i] = fSize * yScale;
+				((VTXINSTANCE*)SubResource.pData)[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
+				
+				if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 				{
-					m_isFinished = false;
-					m_fTimeAcc = 0.f;
+					_vector		vDir = XMLoadFloat4(&((VTXINSTANCE*)SubResource.pData)[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
+					vDir = XMVectorSetW(vDir, 0.f);
+					XMStoreFloat4(&((VTXINSTANCE*)SubResource.pData)[i].vTranslation, XMLoadFloat4(&((VTXINSTANCE*)SubResource.pData)[i].vTranslation) + XMVector3Normalize(vDir) * fSize * yScale);
 				}
+			}
+		}
+		else
+		{
+			_float Alpha = m_pLifeTime[i] / m_pMaxLifeTime[i];
+
+			if (Alpha < 0)
+				Alpha = 0.f;
+
+			((VTXINSTANCE*)SubResource.pData)[i].vColor.w = Alpha;
+
+			if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
+			{
+				m_pMaxSizeY[i] = Lerp(m_pMaxSizeY[i], 0.f, 0.15f);
+				((VTXINSTANCE*)SubResource.pData)[i].vUp = _float4(0.f, m_pMaxSizeY[i], 0.f, 0.f);
 			}
 		}
 	}
@@ -296,8 +321,11 @@ void CVIBuffer_Instancing::Tick_Spread(_float fTimeDelta)
 					Alpha = 0.f;
 				((VTXINSTANCE*)m_SubResource.pData)[i].vColor.w = Alpha;
 
-				m_pMaxSizeY[i] = Lerp(m_pMaxSizeY[i], 0.f, 0.15f );
-				((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, m_pMaxSizeY[i], 0.f, 0.f);
+				if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
+				{
+					m_pMaxSizeY[i] = Lerp(m_pMaxSizeY[i], 0.f, 0.15f);
+					((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, m_pMaxSizeY[i], 0.f, 0.f);
+				}
 			}
 		}
 		m_pContext->Unmap(m_pVBInstance, 0);

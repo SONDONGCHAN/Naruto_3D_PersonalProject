@@ -1872,7 +1872,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pFlameBomb)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_FlameBomb"), pFlameBomb);
-	m_fSkillCoolTime[SKILL_FLAMEBOMB] = 1.f;
+	m_fSkillCoolTime[SKILL_FLAMEBOMB] = 7.f;
 	m_fSkillCurrentCoolTime[SKILL_FLAMEBOMB] = 0.f;
 
 	// 치도리
@@ -1886,7 +1886,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pChidori)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Chidori"), pChidori);
-	m_fSkillCoolTime[SKILL_CHIDORI] = 7.f;
+	m_fSkillCoolTime[SKILL_CHIDORI] = 3.f;
 	m_fSkillCurrentCoolTime[SKILL_CHIDORI] = 0.f;
 
 	// 손뼉치기
@@ -2003,7 +2003,9 @@ HRESULT CPlayer_Custom::Add_Particles()
 	InstanceDesc.isLoop = false;
 	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
 	InstanceDesc.fDuration = 1.3f;
-	InstanceDesc.MyOption = CVIBuffer_Instancing :: OPTION_SPREAD;
+	InstanceDesc.MyOption_Moving = CVIBuffer_Instancing :: OPTION_SPREAD;
+	InstanceDesc.MyOption_Shape = CVIBuffer_Instancing::SHAPE_NIDDLE;
+	InstanceDesc.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
 	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
 
 	CParticle_Point* pParticle_Combo_Attack_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
