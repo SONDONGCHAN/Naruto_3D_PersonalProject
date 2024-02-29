@@ -39,18 +39,19 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	virtual void	Particles_Priority_Tick(_float fTimeDelta) { return; }
+	virtual void	Particles_Tick(_float fTimeDelta) { return; }
+	virtual void	Particles_Late_Tick(_float fTimeDelta) { return; }
+
 public:
 	_float		Get_Skill_Power() { return m_fSkill_Power; }
 	CTransform*	Get_Skill_Transform() { return m_pTransformCom; }
 
 protected:
 	CShader*		m_pShaderCom = { nullptr };
-	CModel*			m_pModelCom = { nullptr };
-
 	CTransform*		m_pParentTransform = { nullptr };
 	USER_TYPE		m_User_Type = { USER_END };
 	CCamera_Free*	m_pCamera = { nullptr };
-	
 	_float4x4		m_WorldMatrix;
 
 protected:

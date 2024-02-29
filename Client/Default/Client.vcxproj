@@ -164,6 +164,7 @@
     <ClInclude Include="..\Public\Chidori.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Deco.h" />
+    <ClInclude Include="..\Public\Effect_Mesh.h" />
     <ClInclude Include="..\Public\EventTrigger.h" />
     <ClInclude Include="..\Public\FlameBomb.h" />
     <ClInclude Include="..\Public\Item.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Chidori.cpp" />
     <ClCompile Include="..\Private\Deco.cpp" />
+    <ClCompile Include="..\Private\Effect_Mesh.cpp" />
     <ClCompile Include="..\Private\EventTrigger.cpp" />
     <ClCompile Include="..\Private\FlameBomb.cpp" />
     <ClCompile Include="..\Private\Item.cpp" />
@@ -291,6 +293,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_Effect.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_OutLine.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Client</EntryPointName>

@@ -36,8 +36,10 @@ public:
 	virtual HRESULT Render();
 	virtual HRESULT Bind_Buffers();
 
+private: _float	Lerp(_float start, _float end, _float ratio);
+
 public:
-	void	Trigger(_vector vCenterPos);
+	_bool	Trigger(_vector vCenterPos);
 	void	Tick_Particle(_float fTimeDelta);
 
 private:
@@ -59,7 +61,7 @@ protected:
 	_float*						m_pSpeed = { nullptr };
 	_float*						m_pLifeTime = { nullptr };
 	_float*						m_pMaxLifeTime = { nullptr };
-
+	_float*						m_pMaxSizeY = { nullptr };
 
 	_float						m_fTimeAcc = { 0.f };
 	_bool						m_isFinished = { true };

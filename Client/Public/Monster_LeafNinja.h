@@ -52,6 +52,11 @@ private:
 	void		Skill_Tick(_float fTimeDelta);
 	void		Skill_Cancle();
 
+	// 파티클 제어
+	void		Particles_Priority_Tick(_float fTimeDelta);
+	void		Particles_Tick(_float fTimeDelta);
+	void		Particles_Late_Tick(_float fTimeDelta);
+
 
 private:
 	CModel*		m_pBodyModelCom	= { nullptr };
@@ -97,12 +102,15 @@ private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
 	map<const wstring, class CSkill*>			m_MonsterSkills;
 	map<const wstring, class CUI*>				m_MonsterUIs;
+	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
+	vector<class CParticle_Point*>	m_BasicParticles;
 
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Add_Skills();
 	HRESULT Add_UIs();
+	HRESULT Add_Particles();
 
 public:
 	static CMonster_LeafNinja*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

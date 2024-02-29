@@ -3,6 +3,8 @@
 #include "Client_Defines.h"
 #include "LandObject.h"
 
+
+
 BEGIN(Client)
 
 class CPlayer_Custom : public CLandObject
@@ -124,7 +126,9 @@ private:
 	map<const wstring, class CSkill*>			m_PlayerSkills;
 	map<const wstring, class CTrail_Line*>		m_PlayerTrails;
 	map<const wstring, class CUI*>				m_PlayerUIs;
-	map<const wstring, class CParticle_Point*>	m_PlayerParticles;
+
+	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
+	vector<class CParticle_Point*>	m_BasicParticles;
 
 
 	CUI* m_Player_Custom_UI = {nullptr};

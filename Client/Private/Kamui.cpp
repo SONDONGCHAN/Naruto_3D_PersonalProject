@@ -119,6 +119,18 @@ void CKamui::Set_Targeting(_vector Target_Pos)
     m_vTarget_Pos = Target_Pos;
 }
 
+void CKamui::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CKamui::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CKamui::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 HRESULT CKamui::Add_Components()
 {
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),

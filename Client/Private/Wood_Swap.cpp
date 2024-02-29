@@ -135,6 +135,18 @@ void CWood_Swap::Set_User_Pos()
     m_pParentTransform->Set_LandObject_Pos(vPlayer_Pos, m_pUser_Navigation);
 }
 
+void CWood_Swap::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CWood_Swap::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CWood_Swap::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 HRESULT CWood_Swap::Add_Components()
 {
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),

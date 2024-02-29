@@ -36,8 +36,16 @@ public:
 
 	WOOD_DRAGON_STATE	Get_State() { return myState; }
 
+public:
+	// 파티클 제어
+	void		Particles_Priority_Tick(_float fTimeDelta) override;
+	void		Particles_Tick(_float fTimeDelta) override;
+	void		Particles_Late_Tick(_float fTimeDelta) override;
+
 private:
-	CCollider* m_pColliderMain = { nullptr };
+	CCollider*	m_pColliderMain = { nullptr };
+	CModel*		m_pModelCom		= { nullptr };
+	CShader*	m_pShaderCom = { nullptr };
 
 private:
 	WOOD_DRAGON_STATE myState = { STATE_MAKING };

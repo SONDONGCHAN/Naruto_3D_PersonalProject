@@ -136,6 +136,18 @@ void CChidori::Set_State()
     myState = STATE_MAKING;
 }
 
+void CChidori::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CChidori::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CChidori::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 HRESULT CChidori::Add_Components()
 {
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),

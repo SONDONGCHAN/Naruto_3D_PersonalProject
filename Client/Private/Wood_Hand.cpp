@@ -191,6 +191,18 @@ void CWood_Hand::Set_Targeting(_vector Target_Pos)
 	m_vTarget_Pos = Target_Pos;
 }
 
+void CWood_Hand::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CWood_Hand::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CWood_Hand::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 HRESULT CWood_Hand::Add_Components()
 {
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimMesh"),
@@ -273,10 +285,10 @@ CGameObject* CWood_Hand::Clone(void* pArg)
 void CWood_Hand::Free()
 {
 	Safe_Release(m_pColliderMain);
+	Safe_Release(m_pShaderCom);
 
 	for (auto pModel : m_vModels)
 		Safe_Release(pModel);
-
 	m_vModels.clear();
 
 	__super::Free();

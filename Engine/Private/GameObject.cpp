@@ -42,14 +42,12 @@ HRESULT CGameObject::Initialize_Prototype()
 HRESULT CGameObject::Initialize(void* pArg)
 {
     if (nullptr != pArg)
-    {
-       
+    {      
         GAMEOBJECT_DESC*    pGameDesc = (GAMEOBJECT_DESC*)pArg;
         if (pGameDesc->fSpeedPerSec != 5.f)
         {
             m_fGameObjectScale = pGameDesc->fGameObjectScale;
         }
-
     }
 
     m_pTransformCom = CTransform::Create(m_pDevice, m_pContext);

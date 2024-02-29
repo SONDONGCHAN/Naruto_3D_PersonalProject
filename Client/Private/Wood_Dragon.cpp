@@ -161,6 +161,18 @@ void CWood_Dragon::RootAnimation()
     m_pTransformCom->SetAnimationMove(XMLoadFloat3(&fInversemovevalue));
 }
 
+void CWood_Dragon::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CWood_Dragon::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CWood_Dragon::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 
 HRESULT CWood_Dragon::Add_Components()
 {
@@ -240,6 +252,8 @@ CGameObject* CWood_Dragon::Clone(void* pArg)
 void CWood_Dragon::Free()
 {
     Safe_Release(m_pColliderMain);
+    Safe_Release(m_pModelCom);
+    Safe_Release(m_pShaderCom);
 
     __super::Free();
 }

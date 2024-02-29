@@ -38,6 +38,12 @@ public:
 	void	Set_State();
 	void	Set_Targeting(_vector Target_Pos);
 
+public:
+	// 파티클 제어
+	void		Particles_Priority_Tick(_float fTimeDelta) override;
+	void		Particles_Tick(_float fTimeDelta) override;
+	void		Particles_Late_Tick(_float fTimeDelta) override;
+
 
 	RASENSHURIKEN_STATE	Get_State() { return myState; }
 

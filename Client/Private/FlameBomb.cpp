@@ -24,7 +24,11 @@ HRESULT CFlameBomb::Initialize(void* pArg)
     if (FAILED(Add_Components()))
         return E_FAIL;
 
-    m_fSkill_Power = 10.f;
+    if (FAILED(Add_Effects()))
+        return E_FAIL;
+
+    if (FAILED(Add_Particles()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -36,12 +40,23 @@ void CFlameBomb::Priority_Tick(_float fTimeDelta)
 void CFlameBomb::Tick(_float fTimeDelta)
 {
     State_Control(fTimeDelta);
+    m_Effect_Fireball_Main->State_Tick(m_pTransformCom->Get_WorldMatrix());
+    m_Effect_Fireball_Ring-> State_Tick(m_pTransformCom->Get_WorldMatrix());
+    m_Effect_Fireball_Main->Tick(fTimeDelta);
+    m_Effect_Fireball_Ring->Tick(fTimeDelta);
+
 }
 
 void CFlameBomb::Late_Tick(_float fTimeDelta)
 {
+    if (myState == STATE_MAKING)
+        m_Effect_Fireball_Ring->Late_Tick(fTimeDelta);
+
+    if ( myState == STATE_DETECTING )
+        m_Effect_Fireball_Main->Late_Tick(fTimeDelta);
+
 #ifdef _DEBUG
-    if (myState == STATE_DETECTING || myState == STATE_HIT)
+    if ( myState == STATE_DETECTING || myState == STATE_HIT)
     {
         m_pGameInstance->Add_DebugComponent(m_pColliderMain);
     }
@@ -67,7 +82,7 @@ void CFlameBomb::Collider_Event_Enter(const wstring& strColliderLayerTag, CColli
         }
     }
 
-    if (m_User_Type == USER_MONSTER)
+    else if (m_User_Type == USER_MONSTER)
     {
         if (strColliderLayerTag == L"Player_Main_Collider")
         {
@@ -94,6 +109,8 @@ void CFlameBomb::State_Control(_float fTimeDelta)
 {
     if (myState == STATE_MAKING)
     {
+        _matrix Mat = m_pParentTransform->Get_WorldMatrix();
+        m_Effect_Fireball_Ring->Get_StartMat(Mat);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         // 이펙트 채워넣기
     }
@@ -161,6 +178,7 @@ void CFlameBomb::Set_Next_State()
         m_pColliderMain->Set_Radius(3.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_fDurTime = 0;
+        m_BasicParticles->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
     }
     else if (myState == STATE_FINISH)
     {
@@ -189,16 +207,23 @@ void CFlameBomb::Set_Targeting(_vector Target_Pos)
     m_vTarget_Pos = Target_Pos;
 }
 
+void CFlameBomb::Particles_Priority_Tick(_float fTimeDelta)
+{
+    m_BasicParticles->Priority_Tick(fTimeDelta);
+}
+
+void CFlameBomb::Particles_Tick(_float fTimeDelta)
+{
+    m_BasicParticles->Tick(fTimeDelta);
+}
+
+void CFlameBomb::Particles_Late_Tick(_float fTimeDelta)
+{
+    m_BasicParticles->Late_Tick(fTimeDelta);
+}
+
 HRESULT CFlameBomb::Add_Components()
 {
-    if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
-        return E_FAIL;
-
-    //if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_"),
-    //    TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
-    //    return E_FAIL;
-
     /* Com_Collider */
     CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
     BoundingDesc.fRadius = 0.f;
@@ -209,6 +234,48 @@ HRESULT CFlameBomb::Add_Components()
 
     m_pGameInstance->Add_Collider(m_Current_Level, TEXT("FlameBomb_Collider"), m_pColliderMain);
     m_pColliderMain->Set_Collider_GameObject(this);
+
+    return S_OK;
+}
+
+HRESULT CFlameBomb::Add_Effects()
+{
+    CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
+    Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_FIREBALL_MAIN;
+    Effect_Desc_1.vMyScale = _vector{0.5f, 0.5f, 0.5f, 1.f};
+    m_Effect_Fireball_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
+    if (nullptr == m_Effect_Fireball_Main)
+        return E_FAIL;
+    
+    CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
+    Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_FIREBALL_RING;
+    Effect_Desc_2.vMyScale = _vector{ 0.5f, 0.5f, 0.5f, 1.f };
+    m_Effect_Fireball_Ring = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
+    if (nullptr == m_Effect_Fireball_Ring)
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CFlameBomb::Add_Particles()
+{
+    CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
+    InstanceDesc.iNumInstance = 70;
+    InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+    InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
+    InstanceDesc.vSize = _float2(0.08f, 0.09f);
+    InstanceDesc.vSpeed = _float2(2.5f, 3.5f);
+    InstanceDesc.vLifeTime = _float2(0.7f, 1.0f);
+    InstanceDesc.isLoop = false;
+    InstanceDesc.vColor = _float4(1.f, 210.f/255.f, 0.f, 1.f);
+    InstanceDesc.fDuration = 1.3f;
+    InstanceDesc.MyOption = CVIBuffer_Instancing::OPTION_SPREAD;
+    InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
+
+    m_BasicParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+    if (nullptr == m_BasicParticles)
+        return E_FAIL;
 
     return S_OK;
 }
@@ -242,6 +309,9 @@ CGameObject* CFlameBomb::Clone(void* pArg)
 void CFlameBomb::Free()
 {
     Safe_Release(m_pColliderMain);
+    Safe_Release(m_Effect_Fireball_Main);
+    Safe_Release(m_Effect_Fireball_Ring);
+    Safe_Release(m_BasicParticles);
 
     __super::Free();
 }

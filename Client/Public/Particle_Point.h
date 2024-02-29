@@ -26,12 +26,15 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	void	Trigger(_vector vCenterPos);
+	_bool	Trigger(_vector vCenterPos);
 
 private:
 	CShader*						m_pShaderCom = { nullptr };
 	CTexture*						m_pTextureCom = { nullptr };
 	CVIBuffer_Particle_Point*		m_pVIBufferCom = { nullptr };
+
+private:
+	_float4		m_vCenterPos = {0.f, 0.f, 0.f, 1.f};
 
 private:
 	HRESULT Add_Component(void* pArg);

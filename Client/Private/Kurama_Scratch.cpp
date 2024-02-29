@@ -184,6 +184,18 @@ void CKurama_Scratch::Set_Targeting(_vector Target_Pos)
     m_vTarget_Pos = Target_Pos;
 }
 
+void CKurama_Scratch::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CKurama_Scratch::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CKurama_Scratch::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 HRESULT CKurama_Scratch::Add_Components()
 {
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),
@@ -198,7 +210,7 @@ HRESULT CKurama_Scratch::Add_Components()
         TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
         return E_FAIL;
 
-    m_pGameInstance->Add_Collider(m_Current_Level, TEXT("FlameBomb_Collider"), m_pColliderMain);
+    m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Kurama_Scratch_Collider"), m_pColliderMain);
     m_pColliderMain->Set_Collider_GameObject(this);
 
     return S_OK;

@@ -137,7 +137,16 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     vector      vShade = g_ShadeTexture.Sample(g_LinearSampler, In.vTexcoord);
 	vector		vSpecular = g_SpecularTexture.Sample(g_LinearSampler, In.vTexcoord);
     
-
+    
+    if (vShade.x < 0.3f)
+        vShade.xyz = float3(0.3f, 0.3f, 0.3f);
+    else if (vShade.x < 0.6f)
+        vShade.xyz = float3(0.6f, 0.6f, 0.6f);
+    else if (vShade.x < 0.9f)
+        vShade.xyz = float3(0.9f, 0.9f, 0.9f);
+    else
+        vShade.xyz = float3(1.f, 1.f, 1.f);
+    
     Out.vColor = vDiffuse * vShade + vSpecular;
 
     return Out;

@@ -6,8 +6,7 @@
 #include "UI_Boss_Status.h"
 #include "Kurama_Scratch.h"
 #include "FlameBomb.h"
-
-
+#include "Particle_Point.h"
 
 CBoss_Kurama::CBoss_Kurama(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLandObject(pDevice, pContext)
@@ -46,8 +45,11 @@ HRESULT CBoss_Kurama::Initialize(void* pArg)
 	if (FAILED(Add_Trails()))
 		return E_FAIL;
 	
-	m_MaxHp = 300.f;
-	m_CurrentHp = 300.f;
+	if (FAILED(Add_Particles()))
+		return E_FAIL;
+
+	m_MaxHp = 700.f;
+	m_CurrentHp = 700.f;
 	
 	if (FAILED(Add_UIs()))
 		return E_FAIL;
@@ -64,6 +66,17 @@ void CBoss_Kurama::Priority_Tick(_float fTimeDelta)
 {
 	if (m_bAppear)
 	{
+		if (m_pGameInstance->Key_Down(DIK_L))
+		{
+			_vector vParPos = m_MyPos;
+			vParPos.m128_f32[1] += 0.7f;
+			for (auto iter : m_BasicParticles)
+			{
+				if (iter->Trigger(vParPos))
+					break;
+			}
+		}
+
 		Cal_Direction();
 		RootAnimation();
 		Set_Gravity(m_pTransformCom, fTimeDelta);
@@ -73,6 +86,8 @@ void CBoss_Kurama::Priority_Tick(_float fTimeDelta)
 			(Pair.second)->Priority_Tick(fTimeDelta);
 
 		Skills_Priority_Tick(fTimeDelta);
+		Particles_Priority_Tick(fTimeDelta);
+
 	}
 }
 
@@ -89,6 +104,8 @@ void CBoss_Kurama::Tick(_float fTimeDelta)
 			(Pair.second)->Tick(fTimeDelta);
 
 		Skills_Tick(fTimeDelta);
+		Particles_Tick(fTimeDelta);
+
 	}
 }
 
@@ -117,6 +134,7 @@ void CBoss_Kurama::Late_Tick(_float fTimeDelta)
 		}
 
 		Skills_Late_Tick(fTimeDelta);
+		Particles_Late_Tick(fTimeDelta);
 
 
 #ifdef _DEBUG
@@ -581,6 +599,18 @@ void CBoss_Kurama::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 	{
 		if (pMyCollider == m_pColliderMain)
 		{		
+			_vector vParPos = m_MyPos;
+			_vector	TargetPos = pTargetCollider->Get_Collider_GameObject()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+			_vector	vDir = TargetPos - vParPos;
+			vDir = XMVector3Normalize(vDir);
+			vParPos += (vDir * 2);
+			vParPos.m128_f32[1] += 1.0f;
+			for (auto iter : m_BasicParticles)
+			{
+				if (iter->Trigger(vParPos))
+					break;
+			}
+
 			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 2.f, 0.05f);
 		
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
@@ -945,6 +975,24 @@ void CBoss_Kurama::Skills_Render()
 		m_MonsterSkills.find(L"Skill_FlameBomb_3")->second->Render();
 }
 
+void CBoss_Kurama::Particles_Priority_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Priority_Tick(fTimeDelta);
+}
+
+void CBoss_Kurama::Particles_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Tick(fTimeDelta);
+}
+
+void CBoss_Kurama::Particles_Late_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Late_Tick(fTimeDelta);
+}
+
 void CBoss_Kurama::Set_Appear_Camera()
 {
 	if (m_iState == BOSS_APPEAR)
@@ -1165,6 +1213,50 @@ HRESULT CBoss_Kurama::Add_UIs()
 	return S_OK;
 }
 
+HRESULT CBoss_Kurama::Add_Particles()
+{
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
+	InstanceDesc.iNumInstance = 30;
+	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
+	InstanceDesc.vSize = _float2(0.01f, 0.04f);
+	InstanceDesc.vSpeed = _float2(2.5f, 3.5f);
+	InstanceDesc.vLifeTime = _float2(0.7f, 1.0f);
+	InstanceDesc.isLoop = false;
+	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
+	InstanceDesc.fDuration = 1.3f;
+	InstanceDesc.MyOption = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
+
+	CParticle_Point* pParticle_Combo_Attack_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_1)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_1);
+
+	CParticle_Point* pParticle_Combo_Attack_2 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_2)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_2);
+
+	CParticle_Point* pParticle_Combo_Attack_3 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_3)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_3);
+
+	CParticle_Point* pParticle_Combo_Attack_4 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_4)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_4);
+
+	CParticle_Point* pParticle_Combo_Attack_5 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_5)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_5);
+
+	return S_OK;
+}
+
 CBoss_Kurama* CBoss_Kurama::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CBoss_Kurama* pInstance = new CBoss_Kurama(pDevice, pContext);
@@ -1208,6 +1300,10 @@ void CBoss_Kurama::Free()
 	for (auto& Pair : m_MonsterUIs)
 		Safe_Release(Pair.second);
 	m_MonsterUIs.clear();
+
+	for (auto& pParticle : m_BasicParticles)
+		Safe_Release(pParticle);
+	m_BasicParticles.clear();
 	
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

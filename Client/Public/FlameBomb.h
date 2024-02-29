@@ -2,6 +2,8 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Skill.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
 
 BEGIN(Client)
 
@@ -34,10 +36,20 @@ public:
 	void	Set_State();
 	void	Set_Targeting(_vector Target_Pos);
 
+public:
+	// 파티클 제어
+	void		Particles_Priority_Tick(_float fTimeDelta) override;
+	void		Particles_Tick(_float fTimeDelta) override;
+	void		Particles_Late_Tick(_float fTimeDelta) override;
+
+public:
 	FLAMEBOMB_STATE	Get_State() { return myState; }
 
 private:
-	CCollider* m_pColliderMain = { nullptr };
+	CCollider*			m_pColliderMain			= { nullptr };
+	CEffect_Mesh*		m_Effect_Fireball_Main	= { nullptr };
+	CEffect_Mesh*		m_Effect_Fireball_Ring	= { nullptr };
+	CParticle_Point*	m_BasicParticles		= { nullptr };
 
 private:
 	FLAMEBOMB_STATE myState = { STATE_MAKING };
@@ -48,6 +60,8 @@ private:
 
 private:
 	HRESULT Add_Components();
+	HRESULT Add_Effects();
+	HRESULT Add_Particles();
 
 
 public:

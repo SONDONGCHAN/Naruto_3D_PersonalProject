@@ -62,6 +62,11 @@ private:
 	void		Skill_Tick(_float fTimeDelta);
 	void		Skill_Cancle();
 
+	// 파티클 제어
+	void		Particles_Priority_Tick(_float fTimeDelta);
+	void		Particles_Tick(_float fTimeDelta);
+	void		Particles_Late_Tick(_float fTimeDelta);
+
 private:
 	CCollider*					m_pColliderMain			= { nullptr };
 	CCollider*					m_pColliderDetecting	= { nullptr };
@@ -109,12 +114,16 @@ private:
 	map<const wstring, class CTrail_Line*>		m_PlayerTrails;
 	map<const wstring, class CUI*>				m_PlayerUIs;
 
+	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
+	vector<class CParticle_Point*>	m_BasicParticles;
+
 private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Add_Skills();
 	HRESULT Add_Trails();
 	HRESULT Add_UIs();
+	HRESULT Add_Particles();
 
 
 public:

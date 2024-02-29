@@ -53,14 +53,8 @@ HRESULT CParticle_Point::Render()
     _float4x4		ViewMatrix = m_pGameInstance->Get_ViewMatrix_Float();
     _float4x4		ProjMatrix = m_pGameInstance->Get_ProjMatrix_Float();
     _float4			CameraPos = m_pGameInstance->Get_CameraPos_Float();
-    _float4x4       RotateMatrix;
-    XMStoreFloat4x4(&RotateMatrix, XMMatrixRotationY(XMConvertToRadians(30.f)));
-  
 
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_RotateMatrix", &RotateMatrix)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
@@ -70,6 +64,9 @@ HRESULT CParticle_Point::Render()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &CameraPos, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCenterPos", &m_vCenterPos, sizeof(_float4))))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
@@ -87,9 +84,11 @@ HRESULT CParticle_Point::Render()
     return S_OK;
 }
 
-void CParticle_Point::Trigger(_vector vCenterPos)
+_bool CParticle_Point::Trigger(_vector vCenterPos)
 {
-    m_pVIBufferCom->Trigger(vCenterPos);
+    XMStoreFloat4(&m_vCenterPos, vCenterPos);
+
+    return  m_pVIBufferCom->Trigger(vCenterPos);
 }
 
 HRESULT CParticle_Point::Add_Component(void* pArg)

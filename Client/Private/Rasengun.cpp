@@ -192,6 +192,18 @@ void CRasengun::Set_State()
     myState = STATE_MAKING; 
 }
 
+void CRasengun::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CRasengun::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CRasengun::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 
 HRESULT CRasengun::Add_Components()
 {

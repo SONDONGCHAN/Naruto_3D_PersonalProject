@@ -1,8 +1,7 @@
 #include "Shader_Defines.hlsli"
 
 matrix      g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-matrix      g_RotateMatrix;
-
+vector      g_vCenterPos;
 texture2D   g_Texture;
 vector      g_vCamPosition;
 
@@ -33,8 +32,10 @@ VS_OUT VS_MAIN(VS_IN In)
     vector vPosition = mul(vector(In.vPosition, 1.f), In.TransformMatrix);
 	
     Out.vPosition = mul(vPosition, g_WorldMatrix);
+
     Out.vPSize = float2(length(In.TransformMatrix._11_12_13) * In.vPSize.x, 
                         length(In.TransformMatrix._21_22_23) * In.vPSize.y);
+    
     Out.vColor = In.vColor;
 
     return Out;
@@ -45,6 +46,7 @@ struct GS_IN
 {
     float4 vPosition    : POSITION;
     float2 vPSize       : PSIZE;
+    
     float4 vColor       : COLOR0;
 };
 
@@ -63,17 +65,18 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> DataStream)
 {
     GS_OUT Out[4];
 
-    float3 vLook = (g_vCamPosition - In[0].vPosition).xyz;
-    float3 vRight = normalize(cross(float3(0.f, 1.f, 0.f), vLook)) * In[0].vPSize.x * 0.5f;
-    float3 vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
+    float3 vLook = (g_vCamPosition - In[0].vPosition).xyz;   
+    float3 vUp = normalize(In[0].vPosition - g_vCenterPos) * In[0].vPSize.y;  
+    float3 vRight = normalize(cross(vLook, vUp)) * In[0].vPSize.x * 0.5f;
+    
     matrix matVP = mul(g_ViewMatrix, g_ProjMatrix);
     
-    Out[0].vPosition = In[0].vPosition + float4(vRight, 0.f) + float4(vUp, 0.f);
+    Out[0].vPosition = In[0].vPosition + float4(vRight, 0.f);
     Out[0].vPosition = mul(Out[0].vPosition, matVP);
     Out[0].vTexcoord = float2(0.f, 0.f);
     Out[0].vColor = In[0].vColor;
 
-    Out[1].vPosition = In[0].vPosition - float4(vRight, 0.f) + float4(vUp, 0.f);
+    Out[1].vPosition = In[0].vPosition + float4(vRight, 0.f) - float4(vUp, 0.f);
     Out[1].vPosition = mul(Out[1].vPosition, matVP);
     Out[1].vTexcoord = float2(1.f, 0.f);
     Out[1].vColor = In[0].vColor;
@@ -83,7 +86,7 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> DataStream)
     Out[2].vTexcoord = float2(1.f, 1.f);
     Out[2].vColor = In[0].vColor;
 
-    Out[3].vPosition = In[0].vPosition + float4(vRight, 0.f) - float4(vUp, 0.f);
+    Out[3].vPosition = In[0].vPosition - float4(vRight, 0.f);
     Out[3].vPosition = mul(Out[3].vPosition, matVP);
     Out[3].vTexcoord = float2(0.f, 1.f);
     Out[3].vColor = In[0].vColor;
@@ -96,6 +99,42 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> DataStream)
     DataStream.Append(Out[0]);
     DataStream.Append(Out[2]);
     DataStream.Append(Out[3]);
+    
+    //GS_OUT Out[4];
+
+    //float3 vLook = (g_vCamPosition - In[0].vPosition).xyz;
+    //float3 vRight = normalize(cross(float3(0.f, 1.f, 0.f), vLook)) * In[0].vPSize.x * 0.5f;
+    //float3 vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
+    //matrix matVP = mul(g_ViewMatrix, g_ProjMatrix);
+    
+    //Out[0].vPosition = In[0].vPosition + float4(vRight, 0.f) + float4(vUp, 0.f);
+    //Out[0].vPosition = mul(Out[0].vPosition, matVP);
+    //Out[0].vTexcoord = float2(0.f, 0.f);
+    //Out[0].vColor = In[0].vColor;
+
+    //Out[1].vPosition = In[0].vPosition - float4(vRight, 0.f) + float4(vUp, 0.f);
+    //Out[1].vPosition = mul(Out[1].vPosition, matVP);
+    //Out[1].vTexcoord = float2(1.f, 0.f);
+    //Out[1].vColor = In[0].vColor;
+
+    //Out[2].vPosition = In[0].vPosition - float4(vRight, 0.f) - float4(vUp, 0.f);
+    //Out[2].vPosition = mul(Out[2].vPosition, matVP);
+    //Out[2].vTexcoord = float2(1.f, 1.f);
+    //Out[2].vColor = In[0].vColor;
+
+    //Out[3].vPosition = In[0].vPosition + float4(vRight, 0.f) - float4(vUp, 0.f);
+    //Out[3].vPosition = mul(Out[3].vPosition, matVP);
+    //Out[3].vTexcoord = float2(0.f, 1.f);
+    //Out[3].vColor = In[0].vColor;
+    
+    //DataStream.Append(Out[0]);
+    //DataStream.Append(Out[1]);
+    //DataStream.Append(Out[2]);
+    //DataStream.RestartStrip();
+
+    //DataStream.Append(Out[0]);
+    //DataStream.Append(Out[2]);
+    //DataStream.Append(Out[3]);
 }
 
 

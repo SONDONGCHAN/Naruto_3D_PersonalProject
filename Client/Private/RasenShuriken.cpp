@@ -210,6 +210,18 @@ void CRasenShuriken::Set_Targeting(_vector Target_Pos)
     m_vTarget_Pos = Target_Pos;
 }
 
+void CRasenShuriken::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CRasenShuriken::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CRasenShuriken::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 HRESULT CRasenShuriken::Add_Components()
 {
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),

@@ -54,6 +54,10 @@ private:
 	void		Skill_Cancle();
 	_bool		Using_Skill();
 
+	// 파티클 제어
+	void		Particles_Priority_Tick(_float fTimeDelta);
+	void		Particles_Tick(_float fTimeDelta);
+	void		Particles_Late_Tick(_float fTimeDelta);
 
 private:
 	CModel* m_pBodyModelCom = { nullptr };
@@ -110,7 +114,8 @@ private:
 	map<const wstring, class CSkill*>			m_MonsterSkills;
 	map<const wstring, class CTrail_Line*>		m_MonsterTrails;
 	map<const wstring, class CUI*>				m_MonsterUIs;
-
+	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
+	vector<class CParticle_Point*>	m_BasicParticles;
 
 private:
 	HRESULT Add_Components();
@@ -118,6 +123,7 @@ private:
 	HRESULT Add_Skills();
 	HRESULT Add_Trails();
 	HRESULT Add_UIs();
+	HRESULT Add_Particles();
 
 public:
 	static CBoss_Naruto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

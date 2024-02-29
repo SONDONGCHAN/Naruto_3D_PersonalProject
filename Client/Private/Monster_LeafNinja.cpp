@@ -5,7 +5,7 @@
 #include "FlameBomb.h"
 #include "Player.h"
 #include "UI_Monster_Status.h"
-
+#include "Particle_Point.h"
 
 CMonster_LeafNinja::CMonster_LeafNinja(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLandObject(pDevice, pContext)
@@ -41,8 +41,11 @@ HRESULT CMonster_LeafNinja::Initialize(void* pArg)
 	if (FAILED(Add_Skills()))
 		return E_FAIL;
 
-	m_MaxHp		= 10.f;
-	m_CurrentHp = 10.f;
+	if (FAILED(Add_Particles()))
+		return E_FAIL;
+
+	m_MaxHp		= 300.f;
+	m_CurrentHp = 300.f;
 
 	if (FAILED(Add_UIs()))
 		return E_FAIL;
@@ -76,6 +79,9 @@ void CMonster_LeafNinja::Priority_Tick(_float fTimeDelta)
 
 	if (m_bSkillOn[SKILL_FLAMEBOMB])
 		m_MonsterSkills.find(L"Skill_FlameBomb")->second->Priority_Tick(fTimeDelta);
+
+	Particles_Priority_Tick(fTimeDelta);
+
 }
 
 void CMonster_LeafNinja::Tick(_float fTimeDelta)
@@ -90,10 +96,15 @@ void CMonster_LeafNinja::Tick(_float fTimeDelta)
 
 	if (m_bSkillOn[SKILL_FLAMEBOMB])
 		m_MonsterSkills.find(L"Skill_FlameBomb")->second->Tick(fTimeDelta);
+
+	Particles_Tick(fTimeDelta);
+
 }
 
 void CMonster_LeafNinja::Late_Tick(_float fTimeDelta)
 {
+	__super::Late_Tick(fTimeDelta);
+
 	//Collision_ToPlayer();
 	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level,m_pColliderMain, L"Player_Main_Collider");
 	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
@@ -110,6 +121,9 @@ void CMonster_LeafNinja::Late_Tick(_float fTimeDelta)
 
 	for (auto& Pair : m_MonsterUIs)
 		Pair.second->Late_Tick(fTimeDelta);
+
+	Particles_Late_Tick(fTimeDelta);
+
 
 #ifdef _DEBUG
 	m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
@@ -522,6 +536,14 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 		{
 			Skill_Cancle();
 
+			_vector vParPos = m_MyPos;
+			vParPos.m128_f32[1] += 0.7f;
+			for (auto iter : m_BasicParticles)
+			{
+				if (iter->Trigger(vParPos))
+					break;
+			}
+
 			_vector		MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			_vector		TargetPos = pTargetCollider->Get_Collider_GameObject()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 			_vector		vDir = TargetPos - MyPos;
@@ -854,6 +876,32 @@ void CMonster_LeafNinja::Skill_Cancle()
 	}
 }
 
+void CMonster_LeafNinja::Particles_Priority_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Priority_Tick(fTimeDelta);
+
+	m_MonsterSkills.find(L"Skill_FlameBomb")->second->Particles_Priority_Tick(fTimeDelta);
+}
+
+void CMonster_LeafNinja::Particles_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Tick(fTimeDelta);
+
+	m_MonsterSkills.find(L"Skill_FlameBomb")->second->Particles_Tick(fTimeDelta);
+
+}
+
+void CMonster_LeafNinja::Particles_Late_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Late_Tick(fTimeDelta);
+
+	m_MonsterSkills.find(L"Skill_FlameBomb")->second->Particles_Late_Tick(fTimeDelta);
+
+}
+
 HRESULT CMonster_LeafNinja::Add_Components()
 {
 	/* Com_Navigation */
@@ -946,6 +994,50 @@ HRESULT CMonster_LeafNinja::Add_UIs()
 	return S_OK;
 }
 
+HRESULT CMonster_LeafNinja::Add_Particles()
+{
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
+	InstanceDesc.iNumInstance = 30;
+	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
+	InstanceDesc.vSize = _float2(0.01f, 0.04f);
+	InstanceDesc.vSpeed = _float2(2.5f, 3.5f);
+	InstanceDesc.vLifeTime = _float2(0.7f, 1.0f);
+	InstanceDesc.isLoop = false;
+	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
+	InstanceDesc.fDuration = 1.3f;
+	InstanceDesc.MyOption = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
+
+	CParticle_Point* pParticle_Combo_Attack_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_1)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_1);
+
+	CParticle_Point* pParticle_Combo_Attack_2 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_2)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_2);
+
+	CParticle_Point* pParticle_Combo_Attack_3 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_3)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_3);
+
+	CParticle_Point* pParticle_Combo_Attack_4 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_4)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_4);
+
+	CParticle_Point* pParticle_Combo_Attack_5 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_5)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_5);
+
+	return S_OK;
+}
+
 CMonster_LeafNinja* CMonster_LeafNinja::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CMonster_LeafNinja* pInstance = new CMonster_LeafNinja(pDevice, pContext);
@@ -985,6 +1077,10 @@ void CMonster_LeafNinja::Free()
 	for (auto& Pair : m_MonsterUIs)
 		Safe_Release(Pair.second);
 	m_MonsterUIs.clear();
+
+	for (auto& pParticle : m_BasicParticles)
+		Safe_Release(pParticle);
+	m_BasicParticles.clear();
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

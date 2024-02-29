@@ -10,6 +10,7 @@
 #include "Trail_Line.h"
 #include "UI_Player_Status.h"
 #include "UI_Player_Skills.h"
+#include "Particle_Point.h"
 
 
 
@@ -54,6 +55,8 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 	if (FAILED(Add_UIs()))
 		return E_FAIL;
 	
+	if (FAILED(Add_Particles()))
+		return E_FAIL;
 	
 	_vector vStart_Pos = { -10.f, 0.f, -10.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
@@ -93,6 +96,8 @@ void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 	if (m_bSkillOn[SKILL_WOOD_SWAP])
 		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Priority_Tick(fTimeDelta);
 
+	Particles_Priority_Tick(fTimeDelta);
+
 	if (m_bOnAir && (m_fGravity < -0.017f) && m_bCellisLand)
 	{
 		m_pTransformCom->Go_Custom_Direction(fTimeDelta, m_fJumpSpeed, m_vJumpDirection, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
@@ -128,6 +133,7 @@ void CPlayer_Naruto::Tick(_float fTimeDelta)
 	if (m_bSkillOn[SKILL_WOOD_SWAP])
 		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Tick(fTimeDelta);
 
+	Particles_Tick(fTimeDelta);
 
 	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -152,6 +158,7 @@ void CPlayer_Naruto::Late_Tick(_float fTimeDelta)
 	if (m_bSkillOn[SKILL_WOOD_SWAP])
 		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Late_Tick(fTimeDelta);
 
+	Particles_Late_Tick(fTimeDelta);
 	
 	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
 		return;
@@ -917,6 +924,14 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 		{
 			Skill_Cancle();
 
+			_vector vParPos = m_MyPos;
+			vParPos.m128_f32[1] += 0.7f;
+			for (auto iter : m_BasicParticles)
+			{
+				if (iter->Trigger(vParPos))
+					break;
+			}
+
 			_vector		MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			_vector		TargetPos = pTargetCollider->Get_Collider_GameObject()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
 			_vector		vDir = TargetPos - MyPos;
@@ -938,6 +953,12 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 				m_iState = (PLAYER_STATE_STRUCK_LEFT * m_iStruckState);
 				m_fDashSpeed = -15.f;
 				m_CurrentHp -= 10;
+			}
+			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
+			{
+				m_iState = (PLAYER_BEATEN_START);
+				m_fDashSpeed = -15.f;
+				m_CurrentHp -= 25;
 			}
 		}
 	}
@@ -1382,6 +1403,24 @@ void CPlayer_Naruto::Skill_Cancle()
 	m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
 }
 
+void CPlayer_Naruto::Particles_Priority_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Priority_Tick(fTimeDelta);
+}
+
+void CPlayer_Naruto::Particles_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Tick(fTimeDelta);
+}
+
+void CPlayer_Naruto::Particles_Late_Tick(_float fTimeDelta)
+{
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Late_Tick(fTimeDelta);
+}
+
 HRESULT CPlayer_Naruto::Add_Components()
 {
 	/* Com_Navigation */
@@ -1414,7 +1453,8 @@ HRESULT CPlayer_Naruto::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
-	
+	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+
 	// 록온 탐색용 콜라이더 //
 	CBounding_OBB::OBB_DESC		DetectingBoundingDesc{};
 	DetectingBoundingDesc.vExtents = { 8.f , 10.f, 8.f };
@@ -1426,6 +1466,7 @@ HRESULT CPlayer_Naruto::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
 	m_pColliderDetecting->Set_Collider_GameObject(this);
+	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
 
 	// 콤보공격 콜라이더 //
 	CBounding_Sphere::SPHERE_DESC		AttackBoundingDesc{};
@@ -1437,6 +1478,8 @@ HRESULT CPlayer_Naruto::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
+	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+
 	Off_Attack_Collider();
 
 	///////////////////////////////////////////////////
@@ -1583,6 +1626,50 @@ HRESULT CPlayer_Naruto::Add_UIs()
 	return S_OK;
 }
 
+HRESULT CPlayer_Naruto::Add_Particles()
+{
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
+	InstanceDesc.iNumInstance = 30;
+	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
+	InstanceDesc.vSize = _float2(0.01f, 0.04f);
+	InstanceDesc.vSpeed = _float2(2.5f, 3.5f);
+	InstanceDesc.vLifeTime = _float2(0.7f, 1.0f);
+	InstanceDesc.isLoop = false;
+	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
+	InstanceDesc.fDuration = 1.3f;
+	InstanceDesc.MyOption = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
+
+	CParticle_Point* pParticle_Combo_Attack_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_1)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_1);
+    
+	CParticle_Point* pParticle_Combo_Attack_2 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_2)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_2);
+    
+	CParticle_Point* pParticle_Combo_Attack_3 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_3)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_3);
+    
+	CParticle_Point* pParticle_Combo_Attack_4 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_4)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_4);
+    
+	CParticle_Point* pParticle_Combo_Attack_5 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_5)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_5);
+   
+	return S_OK;
+}
+
 CPlayer_Naruto* CPlayer_Naruto::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CPlayer_Naruto* pInstance = new CPlayer_Naruto(pDevice, pContext);
@@ -1629,7 +1716,9 @@ void CPlayer_Naruto::Free()
 		Safe_Release(Pair.second);
 	m_PlayerUIs.clear();
 
-	
+	for (auto& pParticle : m_BasicParticles)
+		Safe_Release(pParticle);
+	m_BasicParticles.clear();
 	
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

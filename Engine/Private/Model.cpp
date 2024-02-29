@@ -462,7 +462,6 @@ HRESULT CModel::Ready_Materials(HANDLE	hFile)
 	if (!ReadFile(hFile, &m_iNumMaterials, sizeof(_uint), &dwByte, nullptr))
 		return E_FAIL;
 
-
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
 		MESH_MATERIAL_DESC			MaterialDesc = {};
@@ -479,7 +478,6 @@ HRESULT CModel::Ready_Materials(HANDLE	hFile)
 				continue;
 
 			MaterialDesc.pMtrlTextures[j] = CTexture::Create(m_pDevice, m_pContext, szDirectory, 1);
-
 		}
 
 		m_vecMaterials.push_back(MaterialDesc);

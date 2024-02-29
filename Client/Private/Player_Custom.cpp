@@ -45,6 +45,19 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(__super::Initialize(pArg)))
 			 return E_FAIL;
 
+		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
+		
+		 if (m_Current_Level == LEVEL_GAMEPLAY)
+			 vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
+		 else if (m_Current_Level == LEVEL_BOSS)
+			 vStart_Pos = { 91.f, 26.f, -8.f, 1.f };
+		 //else if (m_Current_Level == LEVEL_BOSS)
+			 //vStart_Pos = { -114.5f, 23.f, 82.5f, 1.f };
+		
+		
+		 // m_bOnAir = true;a
+		 m_pTransformCom->Set_Pos(vStart_Pos);
+		
 		 if (FAILED(Add_Components()))
 			 return E_FAIL;
 
@@ -66,18 +79,7 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(Add_Particles()))
 			 return E_FAIL;
 
-		 _vector vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
 
-		if(m_Current_Level == LEVEL_GAMEPLAY)
-			 vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
-		else if (m_Current_Level == LEVEL_BOSS)
-			 vStart_Pos = { 91.f, 26.f, -8.f, 1.f };
-		//else if (m_Current_Level == LEVEL_BOSS)
-			//vStart_Pos = { -114.5f, 23.f, 82.5f, 1.f };
-
-
-		// m_bOnAir = true;a
-		 m_pTransformCom->Set_Pos(vStart_Pos);
 		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		 m_bCustom_Mode = false;
 	 }
@@ -135,11 +137,6 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 	
 		if (m_fSkillCurrentCoolTime[i] <= 0)
 			m_fSkillCurrentCoolTime[i] = 0.f;
-	}
-
-	if (m_pGameInstance->Key_Down(DIK_L))
-	{
-		m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Trigger(m_MyPos);
 	}
 
 	m_LockOnTargetLength = 99999.f;
@@ -1075,7 +1072,11 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 
 			_vector vParPos = m_MyPos;
 			vParPos.m128_f32[1] += 0.7f;
-			m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Trigger(vParPos);
+			for (auto iter : m_BasicParticles)
+			{
+				if(iter->Trigger(vParPos))
+					break;
+			}
 
 			_vector		MyPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			_vector		TargetPos = pTargetCollider->Get_Collider_GameObject()->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
@@ -1654,17 +1655,38 @@ void CPlayer_Custom::Skills_Render()
 
 void CPlayer_Custom::Particles_Priority_Tick(_float fTimeDelta)
 {
-	m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Priority_Tick(fTimeDelta);
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Priority_Tick(fTimeDelta);	
+
+	m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Priority_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_FlameBomb")->second->Particles_Priority_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Kamui")->second->Particles_Priority_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Chidori")->second->Particles_Priority_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Particles_Priority_Tick(fTimeDelta);
 }
 
 void CPlayer_Custom::Particles_Tick(_float fTimeDelta)
 {
-	m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Tick(fTimeDelta);
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Tick(fTimeDelta);
+
+	m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_FlameBomb")->second->Particles_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Kamui")->second->Particles_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Chidori")->second->Particles_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Particles_Tick(fTimeDelta);
 }
 
 void CPlayer_Custom::Particles_Late_Tick(_float fTimeDelta)
 {
-	m_PlayerParticles.find(L"Particle_Combo_Attack")->second->Late_Tick(fTimeDelta);
+	for (auto pParticle : m_BasicParticles)
+		pParticle->Late_Tick(fTimeDelta);
+
+	m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Late_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_FlameBomb")->second->Particles_Late_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Kamui")->second->Particles_Late_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Chidori")->second->Particles_Late_Tick(fTimeDelta);
+	m_PlayerSkills.find(L"Skill_Wood_Hand")->second->Particles_Late_Tick(fTimeDelta);
 }
 
 
@@ -1703,7 +1725,8 @@ HRESULT CPlayer_Custom::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
-	
+	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+
 	// 록온 탐색용 콜라이더 //
 	CBounding_OBB::OBB_DESC		DetectingBoundingDesc{};
 	DetectingBoundingDesc.vExtents = { 8.f , 10.f, 8.f };
@@ -1715,7 +1738,8 @@ HRESULT CPlayer_Custom::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
 	m_pColliderDetecting->Set_Collider_GameObject(this);
-	
+	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
+
 	// 콤보공격 콜라이더 //
 	CBounding_Sphere::SPHERE_DESC		AttackBoundingDesc{};
 	AttackBoundingDesc.fRadius = 0.f;
@@ -1726,6 +1750,8 @@ HRESULT CPlayer_Custom::Add_Components()
 		return E_FAIL;
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
+	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+
 	Off_Attack_Collider();
 	
 	///////////////////////////////////////////////////
@@ -1846,7 +1872,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pFlameBomb)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_FlameBomb"), pFlameBomb);
-	m_fSkillCoolTime[SKILL_FLAMEBOMB] = 7.f;
+	m_fSkillCoolTime[SKILL_FLAMEBOMB] = 1.f;
 	m_fSkillCurrentCoolTime[SKILL_FLAMEBOMB] = 0.f;
 
 	// 치도리
@@ -1971,19 +1997,39 @@ HRESULT CPlayer_Custom::Add_Particles()
 	InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
 	InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
-	InstanceDesc.vSize = _float2(0.05f, 0.051f);
-	InstanceDesc.vSpeed = _float2(1.5f, 2.5f);
-	InstanceDesc.vLifeTime = _float2(0.3f, 0.5f);
+	InstanceDesc.vSize = _float2(0.01f, 0.04f);
+	InstanceDesc.vSpeed = _float2(2.5f, 3.5f);
+	InstanceDesc.vLifeTime = _float2(0.7f, 1.0f);
 	InstanceDesc.isLoop = false;
 	InstanceDesc.vColor = _float4(1.f, 1.f, 1.f, 1.f);
 	InstanceDesc.fDuration = 1.3f;
 	InstanceDesc.MyOption = CVIBuffer_Instancing :: OPTION_SPREAD;
 	InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
 
-	CParticle_Point* pParticle_Combo_Attack = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
-	if (nullptr == pParticle_Combo_Attack)
+	CParticle_Point* pParticle_Combo_Attack_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_1)
 		return E_FAIL;
-	m_PlayerParticles.emplace(TEXT("Particle_Combo_Attack"), pParticle_Combo_Attack);
+	m_BasicParticles.push_back(pParticle_Combo_Attack_1);
+
+	CParticle_Point* pParticle_Combo_Attack_2 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_2)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_2);
+
+	CParticle_Point* pParticle_Combo_Attack_3 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_3)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_3);
+
+	CParticle_Point* pParticle_Combo_Attack_4 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_4)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_4);
+
+	CParticle_Point* pParticle_Combo_Attack_5 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+	if (nullptr == pParticle_Combo_Attack_5)
+		return E_FAIL;
+	m_BasicParticles.push_back(pParticle_Combo_Attack_5);
 
 	return S_OK;
 }
@@ -2060,11 +2106,10 @@ void CPlayer_Custom::Free()
 	for (auto& Pair : m_PlayerUIs)
 		Safe_Release(Pair.second);
 	m_PlayerUIs.clear();
-	
-	for (auto& Pair : m_PlayerParticles)
-		Safe_Release(Pair.second);
-	m_PlayerParticles.clear();
 
+	for (auto& pParticle : m_BasicParticles)
+		Safe_Release(pParticle);
+	m_BasicParticles.clear();
 	
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

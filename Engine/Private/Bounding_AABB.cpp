@@ -5,7 +5,6 @@ CBounding_AABB::CBounding_AABB(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 {
 }
 
-
 _float3 CBounding_AABB::Get_Extents()
 {
 	return 	m_pAABB->Extents;

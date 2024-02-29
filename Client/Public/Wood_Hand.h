@@ -35,8 +35,15 @@ public:
 
 	WOODD_HAND_STATE	Get_State() { return myState; }
 
+public:
+	// 파티클 제어
+	void		Particles_Priority_Tick(_float fTimeDelta) override;
+	void		Particles_Tick(_float fTimeDelta) override;
+	void		Particles_Late_Tick(_float fTimeDelta) override;
+
 private:
-	CCollider* m_pColliderMain = { nullptr };
+	CCollider*	m_pColliderMain = { nullptr };
+	CShader*	m_pShaderCom = { nullptr };
 
 private:
 	WOODD_HAND_STATE		myState = { STATE_MAKING };
@@ -44,6 +51,7 @@ private:
 	_bool					m_bTargeting = false;
 	_vector					m_vTarget_Pos = {};
 	vector<CModel*>			m_vModels;
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources(_float4x4 _WorldMatrix);

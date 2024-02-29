@@ -137,6 +137,18 @@ void CRasengun_Super::Set_State()
 	myState = STATE_MAKING;
 }
 
+void CRasengun_Super::Particles_Priority_Tick(_float fTimeDelta)
+{
+}
+
+void CRasengun_Super::Particles_Tick(_float fTimeDelta)
+{
+}
+
+void CRasengun_Super::Particles_Late_Tick(_float fTimeDelta)
+{
+}
+
 HRESULT CRasengun_Super::Add_Components()
 {
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxMesh"),

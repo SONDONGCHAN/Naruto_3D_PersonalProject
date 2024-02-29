@@ -31,6 +31,9 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_OutLine.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_Effect.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -200,6 +203,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01.Levels\00.Loading\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Mesh.cpp">
+      <Filter>02.GameObjects\Effect\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -379,6 +385,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\EventTrigger.h">
       <Filter>02.GameObjects\EventTrigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Mesh.h">
+      <Filter>02.GameObjects\Effect\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -593,6 +602,9 @@
     </Filter>
     <Filter Include="02.GameObjects\EventTrigger">
       <UniqueIdentifier>{85317011-e715-4a1b-8fa8-92a6a78ccc34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Mesh">
+      <UniqueIdentifier>{7a5cbd0c-9f6d-421b-bb08-18bbb4012bfc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

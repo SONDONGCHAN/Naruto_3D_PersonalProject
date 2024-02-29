@@ -63,7 +63,6 @@ HRESULT CMap::Render()
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
-
 		if (FAILED(m_pModelCom->Bind_Material_ShaderResource(m_pShaderOutLine, i, 1, "g_DiffuseTexture")))
 			return E_FAIL;
 	
@@ -92,8 +91,6 @@ HRESULT CMap::Render()
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
-
-
 	return S_OK;
 }
 
