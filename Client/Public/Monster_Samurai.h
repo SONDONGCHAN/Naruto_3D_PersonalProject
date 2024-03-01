@@ -97,13 +97,14 @@ private:
 	_bool				m_bSkillOn[SKILL_END] = { false, };
 	_float				m_fSkillDurTime = { 0.f };
 
-
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
 	map<const wstring, class CSkill*>			m_MonsterSkills;
 	map<const wstring, class CUI*>				m_MonsterUIs;
 	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
 	vector<class CParticle_Point*>	m_BasicParticles;
+	vector<class CParticle_Point*>	m_KamuiParticles;
+
 
 private:
 	HRESULT Add_Components();
@@ -114,8 +115,8 @@ private:
 
 public:
 	static CMonster_Samurai*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject*	Clone(void* pArg) override;
-	virtual void			Free() override;
+	virtual CGameObject*			Clone(void* pArg) override;
+	virtual void					Free() override;
 
 };
 

@@ -94,6 +94,45 @@ PS_OUT PS_FIREBALL_RING(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_SHOCK_WAVE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    float4 vColor;
+    float3 vRGB = float3(1.f, 1.f ,1.f);
+    
+    vColor.rgb = vRGB - vMtrlDiffuse.rgb;
+    vColor.a = vMtrlDiffuse.a * g_fAlpha *3.f;
+    
+    Out.vDiffuse = vColor;
+    
+    return Out;
+}
+
+PS_OUT PS_KAMUI(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a < 0.2f)
+        discard;
+
+    float4 vColor;
+    float3 vRGB = float3(1.f, 1.f, 1.f);
+    
+    vColor.rgb = vRGB - vMtrlDiffuse.rgb;
+    vColor.a = vMtrlDiffuse.a * g_fAlpha ;
+    
+    Out.vDiffuse = vColor;
+    
+    return Out;
+}
 technique11 DefaultTechnique
 {
     pass FireBall_Main
@@ -116,6 +155,27 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_FIREBALL_RING();
+    }
+
+    pass ShockWave
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHOCK_WAVE();
+    }
+    pass Kamui
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_KAMUI();
     }
 }
 

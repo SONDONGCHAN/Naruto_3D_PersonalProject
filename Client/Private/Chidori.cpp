@@ -37,7 +37,7 @@ HRESULT CChidori::Initialize(void* pArg)
     m_pTransformCom->Set_Scaling(1.f, 1.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
     m_OriginalMat = m_pTransformCom->Get_WorldMatrix();
-       
+    m_BasicParticles->Set_Loop_ON(true);
     return S_OK;
 }
 
@@ -189,7 +189,7 @@ HRESULT CChidori::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc{};
     Effect_Desc.MyType = CEffect_Mesh::EFFECT_CHIDORI;
     Effect_Desc.MyUVOption = CEffect_Mesh::MOVE_X;
-    Effect_Desc.vMyScale = _vector{ 0.4f, 0.4f, 0.4f, 1.f };
+    Effect_Desc.vMyScale = _vector{ 0.5f, 0.5f, 0.5f, 1.f };
     m_Effect_Chidori_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc));
     if (nullptr == m_Effect_Chidori_Main)
         return E_FAIL;
@@ -200,7 +200,7 @@ HRESULT CChidori::Add_Effects()
 HRESULT CChidori::Add_Particles()
 {
     CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
-    InstanceDesc.iNumInstance = 20;
+    InstanceDesc.iNumInstance = 50;
     InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
     InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
     InstanceDesc.pCenter = &m_MyPos;

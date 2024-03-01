@@ -715,6 +715,14 @@ void CMonster_LeafNinja::Collider_Event_Stay(const wstring& strColliderLayerTag,
 				m_fDashSpeed = -3.f;
 				m_fWaitingTime = 0.f;
 				m_CurrentHp -= 10;
+
+				_vector vParPos = m_MyPos;
+				vParPos.m128_f32[1] += 0.7f;
+				for (auto iter : m_KamuiParticles)
+				{
+					if (iter->Trigger(vParPos))
+						break;
+				}
 			}
 			m_fGetAttack_FrameCount--;
 		}
@@ -881,12 +889,18 @@ void CMonster_LeafNinja::Particles_Priority_Tick(_float fTimeDelta)
 	for (auto pParticle : m_BasicParticles)
 		pParticle->Priority_Tick(fTimeDelta);
 
+	for (auto pParticle : m_KamuiParticles)
+		pParticle->Priority_Tick(fTimeDelta);
+
 	m_MonsterSkills.find(L"Skill_FlameBomb")->second->Particles_Priority_Tick(fTimeDelta);
 }
 
 void CMonster_LeafNinja::Particles_Tick(_float fTimeDelta)
 {
 	for (auto pParticle : m_BasicParticles)
+		pParticle->Tick(fTimeDelta);
+
+	for (auto pParticle : m_KamuiParticles)
 		pParticle->Tick(fTimeDelta);
 
 	m_MonsterSkills.find(L"Skill_FlameBomb")->second->Particles_Tick(fTimeDelta);
@@ -896,6 +910,9 @@ void CMonster_LeafNinja::Particles_Tick(_float fTimeDelta)
 void CMonster_LeafNinja::Particles_Late_Tick(_float fTimeDelta)
 {
 	for (auto pParticle : m_BasicParticles)
+		pParticle->Late_Tick(fTimeDelta);
+
+	for (auto pParticle : m_KamuiParticles)
 		pParticle->Late_Tick(fTimeDelta);
 
 	m_MonsterSkills.find(L"Skill_FlameBomb")->second->Particles_Late_Tick(fTimeDelta);
@@ -1037,6 +1054,52 @@ HRESULT CMonster_LeafNinja::Add_Particles()
 		return E_FAIL;
 	m_BasicParticles.push_back(pParticle_Combo_Attack_5);
 
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc_Kamui{};
+	InstanceDesc_Kamui.iNumInstance = 100;
+	InstanceDesc_Kamui.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc_Kamui.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc_Kamui.vRange = _float3(0.1f, 0.1f, 0.1f);
+	InstanceDesc_Kamui.vSize = _float2(0.02f, 0.03f);
+	InstanceDesc_Kamui.vSpeed = _float2(0.5f, 0.7f);
+	InstanceDesc_Kamui.vLifeTime = _float2(0.4f, 0.6f);
+	InstanceDesc_Kamui.isLoop = false;
+	InstanceDesc_Kamui.vColor = _float4(1.f, 120.f / 255.f, 0.f, 1.f);
+	InstanceDesc_Kamui.fDuration = 0.7f;
+	InstanceDesc_Kamui.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc_Kamui.MyOption_Shape = CVIBuffer_Instancing::SHAPE_NIDDLE;
+	InstanceDesc_Kamui.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
+	InstanceDesc_Kamui.strTextureTag = L"Prototype_Component_Texture_Circle";
+
+	CParticle_Point* pParticle_Kamui_1 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc_Kamui));
+	if (nullptr == pParticle_Kamui_1)
+		return E_FAIL;
+	m_KamuiParticles.push_back(pParticle_Kamui_1);
+
+	CParticle_Point* pParticle_Kamui_2 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc_Kamui));
+	if (nullptr == pParticle_Kamui_2)
+		return E_FAIL;
+	m_KamuiParticles.push_back(pParticle_Kamui_2);
+
+	CParticle_Point* pParticle_Kamui_3 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc_Kamui));
+	if (nullptr == pParticle_Kamui_3)
+		return E_FAIL;
+	m_KamuiParticles.push_back(pParticle_Kamui_3);
+
+	CParticle_Point* pParticle_Kamui_4 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc_Kamui));
+	if (nullptr == pParticle_Kamui_4)
+		return E_FAIL;
+	m_KamuiParticles.push_back(pParticle_Kamui_4);
+
+	CParticle_Point* pParticle_Kamui_5 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc_Kamui));
+	if (nullptr == pParticle_Kamui_5)
+		return E_FAIL;
+	m_KamuiParticles.push_back(pParticle_Kamui_5);
+
+	CParticle_Point* pParticle_Kamui_6 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc_Kamui));
+	if (nullptr == pParticle_Kamui_6)
+		return E_FAIL;
+	m_KamuiParticles.push_back(pParticle_Kamui_6);
+
 	return S_OK;
 }
 
@@ -1083,6 +1146,10 @@ void CMonster_LeafNinja::Free()
 	for (auto& pParticle : m_BasicParticles)
 		Safe_Release(pParticle);
 	m_BasicParticles.clear();
+
+	for (auto& pParticle : m_KamuiParticles)
+		Safe_Release(pParticle);
+	m_KamuiParticles.clear();
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pBodyModelCom);

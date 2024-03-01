@@ -35,10 +35,15 @@ HRESULT CFlameBomb::Initialize(void* pArg)
 
 void CFlameBomb::Priority_Tick(_float fTimeDelta)
 {
+    if (myState == STATE_DETECTING)
+    {
+
+    }
 }
 
 void CFlameBomb::Tick(_float fTimeDelta)
 {
+    __super::Tick(fTimeDelta);
     State_Control(fTimeDelta);
     m_Effect_Fireball_Main-> State_Tick(m_pTransformCom->Get_WorldMatrix());
 
@@ -65,9 +70,10 @@ void CFlameBomb::Late_Tick(_float fTimeDelta)
     if (myState == STATE_MAKING)
         m_Effect_Fireball_Ring->Late_Tick(fTimeDelta);
 
-    if ( myState == STATE_DETECTING )
+    if (myState == STATE_DETECTING)
+    {
         m_Effect_Fireball_Main->Late_Tick(fTimeDelta);
-
+    }
 #ifdef _DEBUG
     if ( myState == STATE_DETECTING || myState == STATE_HIT)
     {
@@ -180,12 +186,14 @@ void CFlameBomb::Set_Next_State()
 
     if (myState == STATE_DETECTING)
     {
+        m_TraceParticles->Set_Loop_ON(true);
         m_Effect_Fireball_Main->Start_Trigger();
         m_pColliderMain->Set_Radius(1.f);
     }
 
     else if (myState == STATE_HIT)
     {
+        m_TraceParticles->Set_Loop_ON(false);
         m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
         m_pColliderMain->Set_Radius(3.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -225,18 +233,21 @@ void CFlameBomb::Particles_Priority_Tick(_float fTimeDelta)
 {
     m_BasicParticles->Priority_Tick(fTimeDelta);
     m_ExplosionParticles->Priority_Tick(fTimeDelta);
+    m_TraceParticles->Priority_Tick(fTimeDelta);
 }
 
 void CFlameBomb::Particles_Tick(_float fTimeDelta)
 {
     m_BasicParticles->Tick(fTimeDelta);
     m_ExplosionParticles->Tick(fTimeDelta);
+    m_TraceParticles->Tick(fTimeDelta);
 }
 
 void CFlameBomb::Particles_Late_Tick(_float fTimeDelta)
 {
     m_BasicParticles->Late_Tick(fTimeDelta);
     m_ExplosionParticles->Late_Tick(fTimeDelta);
+    m_TraceParticles->Late_Tick(fTimeDelta);
 }
 
 HRESULT CFlameBomb::Add_Components()
@@ -306,17 +317,41 @@ HRESULT CFlameBomb::Add_Particles()
     InstanceDesc2.vRange = _float3(7.f, 7.f, 7.f);
     InstanceDesc2.vSize = _float2(3.f, 4.f);
     InstanceDesc2.vSpeed = _float2(0.2f, 0.4f);
-    InstanceDesc2.vLifeTime = _float2(1.5f, 2.f);
+    InstanceDesc2.vLifeTime = _float2(1.5f, 2.5f);
     InstanceDesc2.isLoop = false;
     InstanceDesc2.vColor = _float4(1.f, 120.f / 255.f, 0.f, 1.f);
-    InstanceDesc2.fDuration = 2.5f;
+    InstanceDesc2.fDuration = 2.6f;
     InstanceDesc2.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
     InstanceDesc2.MyOption_Shape = CVIBuffer_Instancing::SHAPE_BASIC;
     InstanceDesc2.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
     InstanceDesc2.strTextureTag = L"Prototype_Component_Texture_FireBall_Explosion";
-    
+    InstanceDesc2.vSpriteRatio = _float2(8.f, 8.f);
+
     m_ExplosionParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc2));
     if (nullptr == m_ExplosionParticles)
+        return E_FAIL;
+
+
+    CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc3{};
+    InstanceDesc3.iNumInstance = 150;
+    InstanceDesc3.vPivot = _float3(0.f, 0.f, 0.f);
+    InstanceDesc3.vCenter = _float3(0.f, 0.f, 0.f);
+    InstanceDesc3.pCenter = &m_MyPos;
+    InstanceDesc3.vRange = _float3(1.f, 1.f, 1.f);
+    InstanceDesc3.vSize = _float2(1.5f, 1.5f);
+    InstanceDesc3.vSpeed = _float2(0.3f, 0.5f);
+    InstanceDesc3.vLifeTime = _float2(0.1f, 2.f);
+    InstanceDesc3.isLoop = true;
+    InstanceDesc3.vColor = _float4(1.f, 110.f / 255.f, 0.f, 0.7f);
+    InstanceDesc3.fDuration = 2.1f;
+    InstanceDesc3.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+    InstanceDesc3.MyOption_Shape = CVIBuffer_Instancing::SHAPE_BASIC;
+    InstanceDesc3.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
+    InstanceDesc3.strTextureTag = L"Prototype_Component_Texture_FireBall_Small";
+    InstanceDesc3.vSpriteRatio = _float2(8.f, 8.f);
+    
+    m_TraceParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc3));
+    if (nullptr == m_TraceParticles)
         return E_FAIL;
 
     return S_OK;
@@ -355,6 +390,7 @@ void CFlameBomb::Free()
     Safe_Release(m_Effect_Fireball_Ring);
     Safe_Release(m_BasicParticles);
     Safe_Release(m_ExplosionParticles);
+    Safe_Release(m_TraceParticles);
 
     __super::Free();
 }

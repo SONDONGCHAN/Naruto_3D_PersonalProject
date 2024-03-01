@@ -23,6 +23,12 @@ HRESULT CWood_Hand::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	if (FAILED(Add_Effects()))
+		return E_FAIL;
+
+	if (FAILED(Add_Particles()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -35,16 +41,28 @@ void CWood_Hand::Priority_Tick(_float fTimeDelta)
 void CWood_Hand::Tick(_float fTimeDelta)
 { 
 	State_Control(fTimeDelta);
+	_matrix ShockWaveMat = m_pTransformCom->Get_WorldMatrix();
+	ShockWaveMat.r[3].m128_f32[1] += 2.5f;
+	m_Effect_ShockWave_Main->State_Tick(ShockWaveMat);
+	m_Effect_ShockWave_Main->Tick(fTimeDelta);
+	if (myState == STATE_HIT)
+	{
+		m_Effect_ShockWave_Main->Scale_Change(fTimeDelta);
+	}
+
 }
 
 void CWood_Hand::Late_Tick(_float fTimeDelta)
 {
-#ifdef _DEBUG
-	if (myState == STATE_HIT)
+	if (myState == STATE_HIT && m_bHitting)
 	{
+		m_Effect_ShockWave_Main->Late_Tick(fTimeDelta);
+
+#ifdef _DEBUG
 		m_pGameInstance->Add_DebugComponent(m_pColliderMain);
-	}
 #endif  
+
+	}
 }
 
 HRESULT CWood_Hand::Render()
@@ -140,9 +158,12 @@ void CWood_Hand::State_Control(_float fTimeDelta)
 		}
 		if (m_fDurTime > 0.5f)
 		{
-			if(m_fDurTime < 0.52f)
+			if (m_fDurTime < 0.52f)
+			{
+				m_bHitting = true;
+				m_Effect_ShockWave_Main->Start_Trigger();
 				m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
-
+			}
 			m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");
 		}
 
@@ -160,6 +181,10 @@ void CWood_Hand::Set_Next_State()
 		_vector vDir = m_pParentTransform->Get_State(CTransform::STATE_LOOK);
 		m_pTransformCom->Set_Look(vDir);
 		m_fDurTime = 0;
+
+		_vector  SmokePos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		SmokePos.m128_f32[1] += 3.f;
+		m_SmokeParticles->Trigger(SmokePos);
 	}
 	if (myState == STATE_HIT)
 	{
@@ -177,6 +202,7 @@ void CWood_Hand::Set_Next_State()
 		m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Wood_Hand_Collider");
 		m_fDurTime = 0;
 		m_bTargeting = false;
+		m_bHitting = false;
 	}
 }
 
@@ -193,14 +219,17 @@ void CWood_Hand::Set_Targeting(_vector Target_Pos)
 
 void CWood_Hand::Particles_Priority_Tick(_float fTimeDelta)
 {
+	m_SmokeParticles->Priority_Tick(fTimeDelta);
 }
 
 void CWood_Hand::Particles_Tick(_float fTimeDelta)
 {
+	m_SmokeParticles->Tick(fTimeDelta);
 }
 
 void CWood_Hand::Particles_Late_Tick(_float fTimeDelta)
 {
+	m_SmokeParticles->Late_Tick(fTimeDelta);
 }
 
 HRESULT CWood_Hand::Add_Components()
@@ -256,6 +285,47 @@ HRESULT CWood_Hand::Bind_ShaderResources(_float4x4 _WorldMatrix)
 	return S_OK;
 }
 
+HRESULT CWood_Hand::Add_Effects()
+{
+	CEffect_Mesh::EFFECT_DESC Effect_Desc{};
+	Effect_Desc.MyType = CEffect_Mesh::EFFECT_SHOCKWAVE;
+	Effect_Desc.MyUVOption = CEffect_Mesh::MOVE_END;
+	Effect_Desc.vMyScale = _vector{ 3.f, 3.f, 3.f, 1.f };
+	m_Effect_ShockWave_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc));
+	if (nullptr == m_Effect_ShockWave_Main)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CWood_Hand::Add_Particles()
+{
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
+	InstanceDesc1.iNumInstance = 100;
+	InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.pCenter = &m_MyPos;
+	InstanceDesc1.vRange = _float3(6.f, 4.f, 6.f);
+	InstanceDesc1.vSize = _float2(4.f, 5.f);
+	InstanceDesc1.vSpeed = _float2(0.1f, 0.2f);
+	InstanceDesc1.vLifeTime = _float2(2.f, 2.5f);
+	InstanceDesc1.isLoop = false;
+	InstanceDesc1.vColor = _float4(0.7f, 0.7f, 0.7f, 0.7f);
+	InstanceDesc1.fDuration = 3.f;
+	InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_BASIC;
+	InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
+	InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Smoke_Sprite";
+	InstanceDesc1.vSpriteRatio = _float2(4.f, 4.f);
+
+
+	m_SmokeParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
+	if (nullptr == m_SmokeParticles)
+		return E_FAIL;
+
+	return S_OK;
+}
+
 CWood_Hand* CWood_Hand::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CWood_Hand* pInstance = new CWood_Hand(pDevice, pContext);
@@ -286,6 +356,8 @@ void CWood_Hand::Free()
 {
 	Safe_Release(m_pColliderMain);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_Effect_ShockWave_Main);
+	Safe_Release(m_SmokeParticles);
 
 	for (auto pModel : m_vModels)
 		Safe_Release(pModel);

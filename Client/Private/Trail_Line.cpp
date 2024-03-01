@@ -108,7 +108,11 @@ HRESULT CTrail_Line::Render()
 
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(_float4))))
 			return E_FAIL;
+
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vfThickness", &m_vThick, sizeof(_float2))))
+			return E_FAIL;
+
+		if (FAILED(m_pTexture->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
 			return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Begin(0)))
@@ -133,6 +137,11 @@ HRESULT CTrail_Line::Add_Component()
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Point"),
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+		return E_FAIL;
+
+	// ÅØ½ºÃÄ
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Chidori_Mask_2"),
+		TEXT("Com_Texture_Mask"), reinterpret_cast<CComponent**>(&m_pTexture))))
 		return E_FAIL;
 
 	return S_OK;
@@ -172,4 +181,5 @@ void CTrail_Line::Free()
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pTexture);	
 }

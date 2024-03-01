@@ -50,14 +50,16 @@ private:
 	CEffect_Mesh*		m_Effect_Fireball_Ring	= { nullptr };
 	CParticle_Point*	m_BasicParticles		= { nullptr };
 	CParticle_Point*	m_ExplosionParticles	= { nullptr };
+	CParticle_Point*	m_TraceParticles		= { nullptr };
+
 
 
 private:
 	FLAMEBOMB_STATE myState = { STATE_MAKING };
-	_bool		m_bIsHit = false;
-	_bool		m_bTargeting = false;
-	_float		m_fDurTime = 0.f;
-	_vector		m_vTarget_Pos = {};
+	_bool			m_bIsHit = false;
+	_bool			m_bTargeting = false;
+	_float			m_fDurTime = 0.f;
+	_vector			m_vTarget_Pos = {};
 
 private:
 	HRESULT Add_Components();

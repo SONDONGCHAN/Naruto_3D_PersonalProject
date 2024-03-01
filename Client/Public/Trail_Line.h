@@ -38,6 +38,7 @@ private:
 	CShader*			m_pShaderCom		= { nullptr };
 	CVIBuffer_Point*	m_pVIBufferCom		= { nullptr };
 	CTransform*			m_pParentTransform	= { nullptr };
+	CTexture*			m_pTexture			= { nullptr };
 
 	_float4x4*			m_pSocketMatrix = { nullptr };
 	_float4x4			m_WorldMatrix_Current;

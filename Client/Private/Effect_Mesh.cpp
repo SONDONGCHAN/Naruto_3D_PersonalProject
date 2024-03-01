@@ -71,7 +71,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 
-				m_fBrightness = 3.f;
+				m_fBrightness = 1.f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 
@@ -106,7 +106,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 			
-				_float4		vColor = { 1.f, 180.f / 255.f, 0.f, 0.5f };
+				_float4		vColor = { 1.f, 110.f / 255.f, 0.f, 0.5f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 
@@ -176,7 +176,83 @@ HRESULT CEffect_Mesh::Render()
 			}
 		}
 	}
+	else if (m_MyDesc.MyType == EFFECT_SHOCKWAVE)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
 
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+
+				_float4		vColor = { 0.f, 0.f, 0.f, 0.5f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(2)))
+					return E_FAIL;
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_KAMUI)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+		
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+		
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+		
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+		
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+		
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+		
+				_float4		vColor = { 0.f, 0.f, 0.f, 0.5f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+		
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+		
+				if (FAILED(m_pShaderCom->Begin(3)))
+					return E_FAIL;
+		
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	
 	return S_OK;
 }
 
@@ -247,6 +323,17 @@ void CEffect_Mesh::Start_Trigger()
 		m_ScalingRatio = 1.f;
 		vCurrentScale = m_MyDesc.vMyScale;
 	}
+	else if (EFFECT_SHOCKWAVE == m_MyDesc.MyType)
+	{
+		m_fAlpha = 1.f;
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+	}
+	else if (EFFECT_KAMUI == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 1.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+	}
 }
 
 void CEffect_Mesh::Scale_Change(_float fTimeDelta)
@@ -266,6 +353,36 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 	else if (EFFECT_FIREBALL_RING == m_MyDesc.MyType)
 	{
 		
+		if (vCurrentScale.m128_f32[0] > 0)
+		{
+			if (m_ScalingRatio > 0.f)
+				m_ScalingRatio -= m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 0.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+	else if (EFFECT_SHOCKWAVE == m_MyDesc.MyType)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+			{
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			}
+			else
+				m_ScalingRatio = 1.f;
+		
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+			m_fAlpha	= Lerp(1.f, 0.f, m_ScalingRatio);
+
+			
+		}
+	}
+	else if (EFFECT_KAMUI == m_MyDesc.MyType)
+	{
+
 		if (vCurrentScale.m128_f32[0] > 0)
 		{
 			if (m_ScalingRatio > 0.f)
@@ -393,6 +510,38 @@ HRESULT CEffect_Mesh::Add_Component()
 
 		vCurrentScale = m_MyDesc.vMyScale;
 		m_vUVSpeed = 1.f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_SHOCKWAVE)
+	{
+		CModel* m_pModel_ShockWave;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_FireBall_Ring"),
+			TEXT("Com_Model_Ring"), reinterpret_cast<CComponent**>(&m_pModel_ShockWave))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_ShockWave);
+	
+		CTexture* m_pTexture_ShockWave;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_ShockWave_Mask"),
+			TEXT("Com_Texture_ShockWave_Mask"), reinterpret_cast<CComponent**>(&m_pTexture_ShockWave))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_ShockWave);
+	}
+	else if (m_MyDesc.MyType == EFFECT_KAMUI)
+	{
+		CModel* m_pModel_Kamui;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kamui"),
+			TEXT("Com_Model_Kamui"), reinterpret_cast<CComponent**>(&m_pModel_Kamui))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Kamui);
+		
+		CTexture* m_pTexture_Kamui;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_kamui_Boom"),
+			TEXT("Com_Texture_Kamui"), reinterpret_cast<CComponent**>(&m_pTexture_Kamui))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Kamui);
+
+		m_ScalingSpeed = 1.9f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 2.f;
 	}
 
 	return S_OK;

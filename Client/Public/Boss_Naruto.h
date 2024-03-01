@@ -116,6 +116,7 @@ private:
 	map<const wstring, class CUI*>				m_MonsterUIs;
 	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
 	vector<class CParticle_Point*>	m_BasicParticles;
+	vector<class CParticle_Point*>	m_KamuiParticles;
 
 private:
 	HRESULT Add_Components();
@@ -126,8 +127,8 @@ private:
 	HRESULT Add_Particles();
 
 public:
-	static CBoss_Naruto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg) override;
+	static CBoss_Naruto*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
 
 };

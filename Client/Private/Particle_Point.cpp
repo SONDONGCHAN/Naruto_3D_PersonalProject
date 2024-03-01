@@ -22,6 +22,7 @@ HRESULT CParticle_Point::Initialize(void* pArg)
     m_Option_Texture    = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->MyOption_Texture;
     m_pCenterPos        = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->pCenter;
     m_isLoop            = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->isLoop;
+    m_vSpriteRatio      = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->vSpriteRatio;
 
     CGameObject::GAMEOBJECT_DESC			GameObjectDesc = {};
 	GameObjectDesc.fSpeedPerSec = 10.0f;
@@ -113,6 +114,11 @@ _bool CParticle_Point::Trigger(_vector vCenterPos)
     return  m_pVIBufferCom->Trigger(vCenterPos);
 }
 
+void CParticle_Point::Set_Loop_ON(_bool isOn)
+{
+    m_pVIBufferCom->Set_Loop_ON(isOn);
+}
+
 void CParticle_Point::Sprite_Tick(_float fTimeDelta)
 {
     if (m_Option_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
@@ -125,13 +131,13 @@ void CParticle_Point::Sprite_Tick(_float fTimeDelta)
 
             m_vSpriteCurrentRatio.x += 1.f;
 
-            if (m_vSpriteCurrentRatio.x >= 8.f)
+            if (m_vSpriteCurrentRatio.x >= m_vSpriteRatio.x)
             {
                 m_vSpriteCurrentRatio.x = 0.f;
                 m_vSpriteCurrentRatio.y += 1.f;
             }
 
-            if (m_vSpriteCurrentRatio.y >= 8.f)
+            if (m_vSpriteCurrentRatio.y >= m_vSpriteRatio.y)
                 m_vSpriteCurrentRatio.y = 0.f;
         }
     }

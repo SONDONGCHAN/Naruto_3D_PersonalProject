@@ -1365,7 +1365,7 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 	}
 	if (m_bSkillOn[SKILL_CHIDORI])
 	{
-		if (m_iState & PLAYER_STATE_CHIDORI_CHARGE)
+		if ( m_iState & PLAYER_STATE_CHIDORI_CHARGE)
 		{
 			m_iState = PLAYER_STATE_CHIDORI_RUN_LOOP;
 			dynamic_cast<CChidori*>(m_PlayerSkills.find(L"Skill_Chidori")->second)->Set_Next_State();
@@ -1519,12 +1519,17 @@ void CPlayer_Custom::Skill_Tick(_float fTimeDelta)
 				m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
 				m_pCamera->Set_Camera_radius(2.f);
 
-				if (m_LockOnTargetLength < 99999.f)
-				{
-					_vector TargetPos = m_pLockOnTarget->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
-					TargetPos.m128_f32[1] += 0.7f;
-					pKamui->Set_Targeting(TargetPos);
-				}
+				
+				_vector KamuiDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+				_vector vKamuiPos = m_MyPos + (XMVector3Normalize(KamuiDir) * 7.f);
+				vKamuiPos.m128_f32[1] += 0.7f;
+				pKamui->Set_Targeting(vKamuiPos);
+				//if (m_LockOnTargetLength < 99999.f)
+				//{
+					//_vector TargetPos = m_pLockOnTarget->Get_TranformCom()->Get_State(CTransform::STATE_POSITION);
+					//TargetPos.m128_f32[1] += 0.7f;
+					//pKamui->Set_Targeting(TargetPos);
+				//}
 				pKamui->Set_Next_State();
 			}
 		}
@@ -1872,7 +1877,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pFlameBomb)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_FlameBomb"), pFlameBomb);
-	m_fSkillCoolTime[SKILL_FLAMEBOMB] = 7.f;
+	m_fSkillCoolTime[SKILL_FLAMEBOMB] = 3.f;
 	m_fSkillCurrentCoolTime[SKILL_FLAMEBOMB] = 0.f;
 
 	// 치도리
@@ -1899,7 +1904,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pWoodHand)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Wood_Hand"), pWoodHand);
-	m_fSkillCoolTime[SKILL_WOODHAND] = 10.f;
+	m_fSkillCoolTime[SKILL_WOODHAND] = 3.f;
 	m_fSkillCurrentCoolTime[SKILL_WOODHAND] = 0.f;
 
 	// 카무이
@@ -1912,7 +1917,7 @@ HRESULT CPlayer_Custom::Add_Skills()
 	if (nullptr == pKamui)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Kamui"), pKamui);
-	m_fSkillCoolTime[SKILL_KAMUI] = 15.f;
+	m_fSkillCoolTime[SKILL_KAMUI] = 3.f;
 	m_fSkillCurrentCoolTime[SKILL_KAMUI] = 0.f;
 
 	// 통나무 바꿔치기 술

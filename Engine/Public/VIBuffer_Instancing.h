@@ -28,6 +28,7 @@ public:
 		PARTICLE_SHAPE		MyOption_Shape;
 		PARTICLE_TEXTURE	MyOption_Texture;
 		wstring				strTextureTag;
+		_float2				vSpriteRatio = {1.f ,1.f};
 	};
 
 protected:
@@ -46,6 +47,8 @@ private: _float	Lerp(_float start, _float end, _float ratio);
 public:
 	_bool	Trigger(_vector vCenterPos);
 	void	Tick_Particle(_float fTimeDelta);
+	void	Set_Loop_ON(_bool isOn) { m_LoopOn = isOn; }
+
 
 private:
 	void Tick_Drop(_float fTimeDelta);
@@ -66,10 +69,12 @@ protected:
 	_float*						m_pSpeed = { nullptr };
 	_float*						m_pLifeTime = { nullptr };
 	_float*						m_pMaxLifeTime = { nullptr };
+	_float*						m_pDelayTime = { nullptr };
 	_float*						m_pMaxSizeY = { nullptr };
 
 	_float						m_fTimeAcc = { 0.f };
 	_bool						m_isFinished = { true };
+	_bool						m_LoopOn	= false;
 
 private:
 	D3D11_MAPPED_SUBRESOURCE			m_SubResource{};

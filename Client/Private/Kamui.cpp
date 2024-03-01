@@ -22,6 +22,9 @@ HRESULT CKamui::Initialize(void* pArg)
 
     if (FAILED(Add_Components()))
         return E_FAIL;
+    
+    if (FAILED(Add_Effects()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -33,16 +36,26 @@ void CKamui::Priority_Tick(_float fTimeDelta)
 void CKamui::Tick(_float fTimeDelta)
 {
     State_Control(fTimeDelta);
+    m_Effect_Kamui_Boom->State_Tick(m_pTransformCom->Get_WorldMatrix());
+    m_Effect_Kamui_Boom->Tick(fTimeDelta);
+
+    if (myState == STATE_HIT)
+    {
+        m_Effect_Kamui_Boom->Scale_Change(fTimeDelta);
+    }
 }
 
 void CKamui::Late_Tick(_float fTimeDelta)
 {
-#ifdef _DEBUG
+
     if (myState == STATE_HIT)
     {
+        m_Effect_Kamui_Boom->Late_Tick(fTimeDelta);
+#ifdef _DEBUG
         m_pGameInstance->Add_DebugComponent(m_pColliderMain);
-    }
 #endif  
+
+    }
 }
 
 HRESULT CKamui::Render()
@@ -66,7 +79,7 @@ void CKamui::State_Control(_float fTimeDelta)
 {
     if (myState == STATE_MAKING)
     {
-        // 이펙트 채워넣기
+
     }
     else if (myState == STATE_HIT)
     {
@@ -92,8 +105,11 @@ void CKamui::Set_Next_State()
 
     if (myState == STATE_HIT)
     {
+        m_Effect_Kamui_Boom->Start_Trigger();
         m_pTransformCom->Set_Pos(m_vTarget_Pos);
-        m_pColliderMain->Set_Radius(0.1f);
+        _vector vDir = m_pParentTransform->Get_State(CTransform::STATE_LOOK);
+        m_pTransformCom->Set_Look(vDir);
+        m_pColliderMain->Set_Radius(8.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_fDurTime = 0;
     }
@@ -149,6 +165,27 @@ HRESULT CKamui::Add_Components()
     return S_OK;
 }
 
+HRESULT CKamui::Add_Effects()
+{
+    CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
+    Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_KAMUI;
+    Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
+    Effect_Desc_1.vMyScale = _vector{ 30.f, 30.f, 30.f, 1.f };
+    m_Effect_Kamui_Boom = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
+    if (nullptr == m_Effect_Kamui_Boom)
+        return E_FAIL;
+    
+    CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
+    Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_KAMUI_SHOCK;
+    Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_END;
+    Effect_Desc_2.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+    m_Effect_Kamui_ShockWave = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
+    if (nullptr == m_Effect_Kamui_ShockWave)
+        return E_FAIL;
+
+    return S_OK;
+}
+
 CKamui* CKamui::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CKamui* pInstance = new CKamui(pDevice, pContext);
@@ -178,6 +215,8 @@ CGameObject* CKamui::Clone(void* pArg)
 void CKamui::Free()
 {
     Safe_Release(m_pColliderMain);
+    Safe_Release(m_Effect_Kamui_Boom);
+    Safe_Release(m_Effect_Kamui_ShockWave);
 
     __super::Free();
 }

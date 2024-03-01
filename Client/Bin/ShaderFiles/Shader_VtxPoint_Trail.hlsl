@@ -5,6 +5,7 @@ matrix      g_WorldMatrix_Old;
 vector      g_vPosition_Old;
 vector      g_vColor;
 float2      g_vfThickness;
+texture2D   g_Texture;
 
 struct VS_IN
 {
@@ -52,7 +53,7 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> DataStream)
     float3 vRight   = normalize(cross(float3(0.f, 1.f, 0.f), vLook)) ;
     float3 vUp      = normalize(cross(vLook, vRight));
 	matrix matVP    = mul(g_ViewMatrix, g_ProjMatrix);
-    
+
     Out[0].vPosition = In[0].vPosition - float4(vRight * g_vfThickness.y, 0.f) + float4(vLook + normalize(vLook) * 0.01f, 0.f);
     Out[0].vPosition = mul(Out[0].vPosition, matVP);
     Out[0].vTexcoord = float2(0.f, 0.f);
@@ -94,6 +95,22 @@ struct PS_OUT
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
+    
+    //vector vMtrlDiffuse = g_Texture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    //if (vMtrlDiffuse.a < 0.01f)
+    //    discard;
+        
+    //float4 vColor;
+    
+    //if (vMtrlDiffuse.a < 0.8f)
+    //    vColor.rgb = g_vColor.rgb * (1.f - vMtrlDiffuse.a);
+    //else
+    //    vColor.rgb = vMtrlDiffuse.rgb;
+    
+    //vColor.a = g_vColor.a;
+    
+    //Out.vColor = vColor;
     
     Out.vColor = g_vColor;
     

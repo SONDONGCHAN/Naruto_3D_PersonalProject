@@ -474,9 +474,6 @@
     <Filter Include="02.GameObjects\LandObject\Monster\Monster_Samurai">
       <UniqueIdentifier>{9d6e48e1-f670-465d-b03e-2dab7ce56286}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Skill\Wood_Dragon">
-      <UniqueIdentifier>{90cca1ad-2ab4-4b55-82d8-75b69e83bc02}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Skill\Wood_Swap">
       <UniqueIdentifier>{8830bc0d-0776-4230-b68a-4b1cc2ab2eb4}</UniqueIdentifier>
     </Filter>
@@ -605,6 +602,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Effect\Mesh">
       <UniqueIdentifier>{7a5cbd0c-9f6d-421b-bb08-18bbb4012bfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Skill\Wood_Dragon">
+      <UniqueIdentifier>{90cca1ad-2ab4-4b55-82d8-75b69e83bc02}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

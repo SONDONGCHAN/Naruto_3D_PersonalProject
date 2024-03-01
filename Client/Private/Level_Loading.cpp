@@ -35,7 +35,6 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevel)
 	//if (FAILED(Ready_Layer_UI()))
 	//	return E_FAIL;
 
-
 	return S_OK;
 }
 

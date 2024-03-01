@@ -1,6 +1,8 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Skill.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
 
 BEGIN(Client)
 
@@ -33,17 +35,18 @@ public:
 	void	Set_State();
 	void	Set_Targeting(_vector Target_Pos);
 
-	WOODD_HAND_STATE	Get_State() { return myState; }
-
 public:
-	// 파티클 제어
 	void		Particles_Priority_Tick(_float fTimeDelta) override;
 	void		Particles_Tick(_float fTimeDelta) override;
 	void		Particles_Late_Tick(_float fTimeDelta) override;
 
+	WOODD_HAND_STATE	Get_State() { return myState; }
+
 private:
-	CCollider*	m_pColliderMain = { nullptr };
-	CShader*	m_pShaderCom = { nullptr };
+	CCollider*			m_pColliderMain				= { nullptr };
+	CShader*			m_pShaderCom				= { nullptr };
+	CEffect_Mesh*		m_Effect_ShockWave_Main		= { nullptr };
+	CParticle_Point*	m_SmokeParticles			= { nullptr };
 
 private:
 	WOODD_HAND_STATE		myState = { STATE_MAKING };
@@ -51,10 +54,13 @@ private:
 	_bool					m_bTargeting = false;
 	_vector					m_vTarget_Pos = {};
 	vector<CModel*>			m_vModels;
+	_bool					m_bHitting = false;
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources(_float4x4 _WorldMatrix);
+	HRESULT Add_Effects();
+	HRESULT Add_Particles();
 
 public:
 	static CWood_Hand* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
