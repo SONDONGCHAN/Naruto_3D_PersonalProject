@@ -1,6 +1,8 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Skill.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
 
 BEGIN(Client)
 
@@ -50,6 +52,15 @@ public:
 private:
 	CCollider* m_pColliderMain = { nullptr };
 
+	CEffect_Mesh* m_Effect_RasenShuriken_Main = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Wing = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Ring = { nullptr };
+
+	CEffect_Mesh* m_Effect_RasenShuriken_Boom = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Deco = { nullptr };
+
+	CParticle_Point* m_BoomParticles = { nullptr };
+
 private:
 	RASENSHURIKEN_STATE myState = { STATE_MAKING };
 	_bool		m_bIsHit = false;
@@ -61,7 +72,8 @@ private:
 
 private:
 	HRESULT Add_Components();
-
+	HRESULT Add_Effects();
+	HRESULT Add_Particles();
 
 public:
 	static CRasenShuriken* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

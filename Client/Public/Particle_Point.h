@@ -38,16 +38,10 @@ private:
 	CVIBuffer_Particle_Point*		m_pVIBufferCom = { nullptr };
 
 private:
-	_float4		m_vCenterPos			= {0.f, 0.f, 0.f, 1.f};
-	_float2		m_vSpriteCurrentRatio	= { 0.f, 0.f };
 	_float		m_vSpriteTimeCal		= { 0.f };
-	_float2		m_vSpriteRatio			= { 1.f, 1.f };
-
-
-
-	CVIBuffer_Instancing::PARTICLE_TEXTURE  m_Option_Texture = { CVIBuffer_Instancing::TEXTURE_END };
-	_vector*	m_pCenterPos = { nullptr };
-	_bool		m_isLoop = {false};
+	_float2		m_vSpriteCurrentRatio	= { 0.f, 0.f };
+	CVIBuffer_Instancing::INSTANCE_DESC m_Instance_Desc = {};
+	_float4		m_vCenterPos			= {0.f, 0.f, 0.f, 1.f};
 
 private:
 	HRESULT Add_Component(void* pArg);

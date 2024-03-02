@@ -322,7 +322,7 @@ HRESULT CFlameBomb::Add_Particles()
     InstanceDesc2.vColor = _float4(1.f, 120.f / 255.f, 0.f, 1.f);
     InstanceDesc2.fDuration = 2.6f;
     InstanceDesc2.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
-    InstanceDesc2.MyOption_Shape = CVIBuffer_Instancing::SHAPE_BASIC;
+    InstanceDesc2.MyOption_Shape = CVIBuffer_Instancing::SHAPE_SQUARE;
     InstanceDesc2.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
     InstanceDesc2.strTextureTag = L"Prototype_Component_Texture_FireBall_Explosion";
     InstanceDesc2.vSpriteRatio = _float2(8.f, 8.f);
@@ -345,7 +345,7 @@ HRESULT CFlameBomb::Add_Particles()
     InstanceDesc3.vColor = _float4(1.f, 110.f / 255.f, 0.f, 0.7f);
     InstanceDesc3.fDuration = 2.1f;
     InstanceDesc3.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
-    InstanceDesc3.MyOption_Shape = CVIBuffer_Instancing::SHAPE_BASIC;
+    InstanceDesc3.MyOption_Shape = CVIBuffer_Instancing::SHAPE_SQUARE;
     InstanceDesc3.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
     InstanceDesc3.strTextureTag = L"Prototype_Component_Texture_FireBall_Small";
     InstanceDesc3.vSpriteRatio = _float2(8.f, 8.f);

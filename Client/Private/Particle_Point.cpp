@@ -19,10 +19,8 @@ HRESULT CParticle_Point::Initialize_Prototype()
 
 HRESULT CParticle_Point::Initialize(void* pArg)
 {
-    m_Option_Texture    = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->MyOption_Texture;
-    m_pCenterPos        = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->pCenter;
-    m_isLoop            = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->isLoop;
-    m_vSpriteRatio      = ((CVIBuffer_Instancing::INSTANCE_DESC*)pArg)->vSpriteRatio;
+    m_Instance_Desc = *(CVIBuffer_Instancing::INSTANCE_DESC*)pArg;
+
 
     CGameObject::GAMEOBJECT_DESC			GameObjectDesc = {};
 	GameObjectDesc.fSpeedPerSec = 10.0f;
@@ -57,8 +55,11 @@ HRESULT CParticle_Point::Render()
 {
     _uint Shader_Path = { 0 };
 
-    if (m_Option_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
+    if (m_Instance_Desc.MyOption_Shape == CVIBuffer_Instancing ::SHAPE_SQUARE && m_Instance_Desc.MyOption_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
         Shader_Path = 1;
+    else  if (m_Instance_Desc.MyOption_Shape == CVIBuffer_Instancing::SHAPE_RECTANGLE && m_Instance_Desc.MyOption_Texture == CVIBuffer_Instancing::TEXTURE_NONE_SPRITE)
+        Shader_Path = 2;
+
 
     _float4x4		ViewMatrix = m_pGameInstance->Get_ViewMatrix_Float();
     _float4x4		ProjMatrix = m_pGameInstance->Get_ProjMatrix_Float();
@@ -76,9 +77,9 @@ HRESULT CParticle_Point::Render()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &CameraPos, sizeof(_float4))))
         return E_FAIL;
     
-    if (m_isLoop)
+    if (m_Instance_Desc.isLoop)
     {
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vCenterPos", m_pCenterPos, sizeof(_float4))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vCenterPos", m_Instance_Desc.pCenter, sizeof(_float4))))
             return E_FAIL;
     }
     else
@@ -86,7 +87,7 @@ HRESULT CParticle_Point::Render()
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vCenterPos", &m_vCenterPos, sizeof(_float4))))
             return E_FAIL;
     }
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteRatio", &m_vSpriteRatio, sizeof(_float2))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteRatio", &m_Instance_Desc.vSpriteRatio, sizeof(_float2))))
         return E_FAIL;
     
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteCurrnetRatio", &m_vSpriteCurrentRatio, sizeof(_float2))))
@@ -121,7 +122,7 @@ void CParticle_Point::Set_Loop_ON(_bool isOn)
 
 void CParticle_Point::Sprite_Tick(_float fTimeDelta)
 {
-    if (m_Option_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
+    if (m_Instance_Desc.MyOption_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
     {
         m_vSpriteTimeCal += fTimeDelta;
 
@@ -131,13 +132,13 @@ void CParticle_Point::Sprite_Tick(_float fTimeDelta)
 
             m_vSpriteCurrentRatio.x += 1.f;
 
-            if (m_vSpriteCurrentRatio.x >= m_vSpriteRatio.x)
+            if (m_vSpriteCurrentRatio.x >= m_Instance_Desc.vSpriteRatio.x)
             {
                 m_vSpriteCurrentRatio.x = 0.f;
                 m_vSpriteCurrentRatio.y += 1.f;
             }
 
-            if (m_vSpriteCurrentRatio.y >= m_vSpriteRatio.y)
+            if (m_vSpriteCurrentRatio.y >= m_Instance_Desc.vSpriteRatio.y)
                 m_vSpriteCurrentRatio.y = 0.f;
         }
     }

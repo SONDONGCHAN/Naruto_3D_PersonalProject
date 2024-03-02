@@ -133,6 +133,86 @@ PS_OUT PS_KAMUI(PS_IN In)
     
     return Out;
 }
+
+PS_OUT PS_RASENGUN_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    float4 vColor;
+    float3 vRGB = float3(1.f, 1.f, 1.f);
+    
+    if (vMtrlDiffuse.r < 0.5)
+    {
+        vColor.rgb = vRGB - vMtrlDiffuse.rgb;
+        vColor.rgb = vColor.rgb * g_vColor.rgb;
+    }
+    else
+        vColor.rgb = float3(1.f, 1.f, 1.f);
+    
+    vColor.a = vMtrlDiffuse.a * g_fAlpha;      
+    
+    Out.vDiffuse = vColor;
+    
+
+    return Out;
+}
+
+PS_OUT PS_RASENGUN_CHARGE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+    
+    float4 vColor = vMtrlDiffuse * g_vColor;
+    
+    Out.vDiffuse = vColor;
+    
+    return Out;
+}
+PS_OUT PS_RASENGUN_RUSH(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+    
+    float4 vColor = vMtrlDiffuse * g_vColor;
+    
+    Out.vDiffuse = vColor;
+  
+    return Out;
+}
+
+PS_OUT PS_RASENGUN_BOOM(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+    
+
+    vMtrlDiffuse.rgb = vMtrlDiffuse.rgb * g_vColor.rgb;
+    vMtrlDiffuse.a = vMtrlDiffuse.a * g_vColor.a;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+    //Out.vDiffuse = g_vColor;
+    return Out;
+}
+
+
 technique11 DefaultTechnique
 {
     pass FireBall_Main
@@ -167,6 +247,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SHOCK_WAVE();
     }
+
     pass Kamui
     {
         SetRasterizerState(RS_None_Cull);
@@ -177,6 +258,51 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_KAMUI();
     }
+
+    pass RasengunMain
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_RASENGUN_MAIN();
+    }
+
+    pass RasengunCharge
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_RASENGUN_CHARGE();
+    }
+
+    pass RasengunRush
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_RASENGUN_RUSH();
+    }
+
+    pass RasengunBoom
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_RASENGUN_BOOM();
+    }
 }
+
 
 

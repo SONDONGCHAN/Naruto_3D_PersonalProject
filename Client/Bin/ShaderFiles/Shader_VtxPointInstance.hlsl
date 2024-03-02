@@ -225,6 +225,29 @@ PS_OUT PS_NONE_DIRECTION(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_NONE_SPRITE(PS_IN In)
+{
+    
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vMtrlDiffuse = g_Texture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+    
+    float4 vColor;
+    
+    vColor = vMtrlDiffuse * In.vColor;
+    
+    if (vColor.r < 0.3f)
+        vColor.rgb = In.vColor * 2.f;
+    
+    Out.vColor = vColor;
+          
+    return Out;
+    
+}
+
 /* EffectFramework */
 
 technique11 DefaultTechnique
@@ -240,6 +263,7 @@ technique11 DefaultTechnique
         GeometryShader = compile gs_5_0 GS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
     }
+
     pass None_Direction
     {
 		/* RenderState설정. */
@@ -250,6 +274,18 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_NONE_DIRECTION();
         PixelShader = compile ps_5_0 PS_NONE_DIRECTION();
+    }
+
+    pass None_Sprite
+    {
+		/* RenderState설정. */
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_NONE_DIRECTION();
+        PixelShader = compile ps_5_0 PS_NONE_SPRITE();
     }
 
 }

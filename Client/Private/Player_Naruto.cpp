@@ -87,15 +87,7 @@ void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 	Player_Dash(fTimeDelta);
 	Key_Input(fTimeDelta);
 
-	if (m_bSkillOn[SKILL_RASENGUN])
-		m_PlayerSkills.find(L"Skill_Rasengun")->second->Priority_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_RASENSHURIKEN])
-		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Priority_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
-		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Priority_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Priority_Tick(fTimeDelta);
-
+	Skills_Priority_Tick(fTimeDelta);
 	Particles_Priority_Tick(fTimeDelta);
 
 	if (m_bOnAir && (m_fGravity < -0.017f) && m_bCellisLand)
@@ -123,16 +115,7 @@ void CPlayer_Naruto::Tick(_float fTimeDelta)
 	for (auto& Pair : m_PlayerParts)
 		(Pair.second)->Tick(fTimeDelta);
 
-
-	if (m_bSkillOn[SKILL_RASENGUN])
-		m_PlayerSkills.find(L"Skill_Rasengun")->second->Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_RASENSHURIKEN])
-		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
-		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Tick(fTimeDelta);
-
+	Skills_Tick(fTimeDelta);
 	Particles_Tick(fTimeDelta);
 
 	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -145,19 +128,10 @@ void CPlayer_Naruto::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-
 	for (auto& Pair : m_PlayerParts)
 		(Pair.second)->Late_Tick(fTimeDelta);
 
-	if (m_bSkillOn[SKILL_RASENGUN])
-		m_PlayerSkills.find(L"Skill_Rasengun")->second->Late_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_RASENSHURIKEN])
-		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Late_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
-		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Late_Tick(fTimeDelta);
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Late_Tick(fTimeDelta);
-
+	Skills_Late_Tick(fTimeDelta);
 	Particles_Late_Tick(fTimeDelta);
 	
 	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
@@ -179,14 +153,7 @@ void CPlayer_Naruto::Late_Tick(_float fTimeDelta)
 
 HRESULT CPlayer_Naruto::Render()
 {
-	if (m_bSkillOn[SKILL_RASENGUN])
-		m_PlayerSkills.find(L"Skill_Rasengun")->second->Render();
-	if (m_bSkillOn[SKILL_RASENSHURIKEN])
-		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Render();
-	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
-		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Render();
-	if (m_bSkillOn[SKILL_WOOD_SWAP])
-		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Render();
+	Skills_Render();
 
 	return S_OK;
 }
@@ -1403,22 +1370,85 @@ void CPlayer_Naruto::Skill_Cancle()
 	m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);
 }
 
+void CPlayer_Naruto::Skills_Priority_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_RASENGUN])
+		m_PlayerSkills.find(L"Skill_Rasengun")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_RASENSHURIKEN])
+		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
+		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Priority_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Priority_Tick(fTimeDelta);
+}
+
+void CPlayer_Naruto::Skills_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_RASENGUN])
+		m_PlayerSkills.find(L"Skill_Rasengun")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_RASENSHURIKEN])
+		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
+		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Tick(fTimeDelta);
+}
+
+void CPlayer_Naruto::Skills_Late_Tick(_float fTimeDelta)
+{
+	if (m_bSkillOn[SKILL_RASENGUN])
+		m_PlayerSkills.find(L"Skill_Rasengun")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_RASENSHURIKEN])
+		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
+		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Late_Tick(fTimeDelta);
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Late_Tick(fTimeDelta);
+}
+
+void CPlayer_Naruto::Skills_Render()
+{
+	if (m_bSkillOn[SKILL_RASENGUN])
+		m_PlayerSkills.find(L"Skill_Rasengun")->second->Render();
+	if (m_bSkillOn[SKILL_RASENSHURIKEN])
+		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Render();
+	if (m_bSkillOn[SKILL_RASENGUN_SUPER])
+		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Render();
+	if (m_bSkillOn[SKILL_WOOD_SWAP])
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Render();
+}
+
 void CPlayer_Naruto::Particles_Priority_Tick(_float fTimeDelta)
 {
 	for (auto pParticle : m_BasicParticles)
 		pParticle->Priority_Tick(fTimeDelta);
+
+		m_PlayerSkills.find(L"Skill_Rasengun")->second->Particles_Priority_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Particles_Priority_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Particles_Priority_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Priority_Tick(fTimeDelta);
 }
 
 void CPlayer_Naruto::Particles_Tick(_float fTimeDelta)
 {
 	for (auto pParticle : m_BasicParticles)
 		pParticle->Tick(fTimeDelta);
+
+		m_PlayerSkills.find(L"Skill_Rasengun")->second->Particles_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Particles_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Particles_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Tick(fTimeDelta);
 }
 
 void CPlayer_Naruto::Particles_Late_Tick(_float fTimeDelta)
 {
 	for (auto pParticle : m_BasicParticles)
 		pParticle->Late_Tick(fTimeDelta);
+
+		m_PlayerSkills.find(L"Skill_Rasengun")->second->Particles_Late_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_RasenShuriken")->second->Particles_Late_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_Rasengun_Super")->second->Particles_Late_Tick(fTimeDelta);
+		m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Late_Tick(fTimeDelta);
 }
 
 HRESULT CPlayer_Naruto::Add_Components()
@@ -1523,7 +1553,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	if (nullptr == pRasengun)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Rasengun"), pRasengun);
-	m_fSkillCoolTime[SKILL_RASENGUN] = 7.f;
+	m_fSkillCoolTime[SKILL_RASENGUN] = 3.f;
 	m_fSkillCurrentCoolTime[SKILL_RASENGUN] = 0.f;
 
 	// 나선 수리검
@@ -1537,7 +1567,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	if (nullptr == pRasenShuriken)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_RasenShuriken"), pRasenShuriken);
-	m_fSkillCoolTime[SKILL_RASENSHURIKEN] = 7.f;
+	m_fSkillCoolTime[SKILL_RASENSHURIKEN] = 3.f;
 	m_fSkillCurrentCoolTime[SKILL_RASENSHURIKEN] = 0.f;
 	
 	// 초대옥 나선환
@@ -1551,7 +1581,7 @@ HRESULT CPlayer_Naruto::Add_Skills()
 	if (nullptr == pRasengun_Super)
 		return E_FAIL;
 	m_PlayerSkills.emplace(TEXT("Skill_Rasengun_Super"), pRasengun_Super);
-	m_fSkillCoolTime[SKILL_RASENGUN_SUPER] = 15.f;
+	m_fSkillCoolTime[SKILL_RASENGUN_SUPER] = 3.f;
 	m_fSkillCurrentCoolTime[SKILL_RASENGUN_SUPER] = 0.f;
 
 	// 통나무 바꿔치기 술
@@ -1729,8 +1759,8 @@ void CPlayer_Naruto::Free()
 	Safe_Release(m_pColliderDetecting);
 	Safe_Release(m_pColliderAttack);
 
-	if (m_pLockOnTarget != nullptr)
-		Safe_Release(m_pLockOnTarget);
+	//if (m_pLockOnTarget != nullptr)
+		//Safe_Release(m_pLockOnTarget);
 
 	__super::Free();
 }

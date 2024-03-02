@@ -252,6 +252,198 @@ HRESULT CEffect_Mesh::Render()
 			}
 		}
 	}
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_MAIN)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+		
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+		
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+		
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+		
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+		
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+		
+				_float4		vColor = { 121.f/255.f, 237.f/255.f, 1.f, 0.6f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+		
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+		
+				if (FAILED(m_pShaderCom->Begin(4)))
+					return E_FAIL;
+		
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_CHARGE)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+	
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+	
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+	
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+	
+				_float4		vColor = { 1.f, 1.f, 1.f, 0.3f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+	
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Begin(5)))
+					return E_FAIL;
+	
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_RUSH)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+
+				_float4		vColor = { 1.f, 1.f, 1.f, 0.2f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(6)))
+					return E_FAIL;
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_BOOM)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.7f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(7)))
+					return E_FAIL;
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_MAIN)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+	
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+	
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+	
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+	
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.6f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+	
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Begin(4)))
+					return E_FAIL;
+	
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
 	
 	return S_OK;
 }
@@ -334,6 +526,26 @@ void CEffect_Mesh::Start_Trigger()
 		m_ScalingRatio = 1.f;
 		vCurrentScale = m_MyDesc.vMyScale;
 	}
+	else if (EFFECT_RASENGUN_MAIN == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+	}
+	else if (EFFECT_RASENGUN_CHARGE == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 1.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+	}
+	else if (EFFECT_RASENGUN_BOOM == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+	}
+	else if (EFFECT_RASENSHURIKEN_MAIN == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+	}
 }
 
 void CEffect_Mesh::Scale_Change(_float fTimeDelta)
@@ -351,8 +563,7 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 		}
 	}
 	else if (EFFECT_FIREBALL_RING == m_MyDesc.MyType)
-	{
-		
+	{		
 		if (vCurrentScale.m128_f32[0] > 0)
 		{
 			if (m_ScalingRatio > 0.f)
@@ -375,20 +586,65 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 				m_ScalingRatio = 1.f;
 		
 			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
-			m_fAlpha	= Lerp(1.f, 0.f, m_ScalingRatio);
-
-			
+			m_fAlpha	= Lerp(1.f, 0.f, m_ScalingRatio);			
 		}
 	}
 	else if (EFFECT_KAMUI == m_MyDesc.MyType)
 	{
-
 		if (vCurrentScale.m128_f32[0] > 0)
 		{
 			if (m_ScalingRatio > 0.f)
 				m_ScalingRatio -= m_ScalingSpeed * fTimeDelta;
 			else
 				m_ScalingRatio = 0.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+	else if (EFFECT_RASENGUN_MAIN == m_MyDesc.MyType)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+	else if (EFFECT_RASENGUN_CHARGE == m_MyDesc.MyType)
+	{
+		if (vCurrentScale.m128_f32[0] > 0)
+		{
+			if (m_ScalingRatio > 0.f)
+				m_ScalingRatio -= m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 0.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+	else if (EFFECT_RASENGUN_BOOM == m_MyDesc.MyType)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+	else if (EFFECT_RASENSHURIKEN_MAIN == m_MyDesc.MyType)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
 
 			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
 		}
@@ -428,9 +684,8 @@ HRESULT CEffect_Mesh::Add_Component()
 			TEXT("Com_Texture_Main"), reinterpret_cast<CComponent**>(&m_pTexture_Main))))
 			return E_FAIL;
 		m_vTextures.push_back(m_pTexture_Main);		
-		
-
 	}
+
 	else if (m_MyDesc.MyType == EFFECT_FIREBALL_RING)
 	{
 		CModel* m_pModel_Ring;
@@ -445,6 +700,7 @@ HRESULT CEffect_Mesh::Add_Component()
 			return E_FAIL;
 		m_vTextures.push_back(m_pTexture_Ring);
 	}
+
 	else if (m_MyDesc.MyType == EFFECT_CHIDORI)
 	{
 		CModel* m_pModel_Chidori_1;
@@ -511,6 +767,7 @@ HRESULT CEffect_Mesh::Add_Component()
 		vCurrentScale = m_MyDesc.vMyScale;
 		m_vUVSpeed = 1.f;
 	}
+
 	else if (m_MyDesc.MyType == EFFECT_SHOCKWAVE)
 	{
 		CModel* m_pModel_ShockWave;
@@ -525,6 +782,7 @@ HRESULT CEffect_Mesh::Add_Component()
 			return E_FAIL;
 		m_vTextures.push_back(m_pTexture_ShockWave);
 	}
+
 	else if (m_MyDesc.MyType == EFFECT_KAMUI)
 	{
 		CModel* m_pModel_Kamui;
@@ -539,9 +797,103 @@ HRESULT CEffect_Mesh::Add_Component()
 			return E_FAIL;
 		m_vTextures.push_back(m_pTexture_Kamui);
 
-		m_ScalingSpeed = 1.9f;
+		m_ScalingSpeed = 2.f;
 		vCurrentScale = m_MyDesc.vMyScale;
 		m_vUVSpeed = 2.f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_MAIN)
+	{
+		CModel* m_pModel_Rasengun_Main;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_FireBall_Main"),
+			TEXT("Com_Model_Rasengun_Main"), reinterpret_cast<CComponent**>(&m_pModel_Rasengun_Main))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Rasengun_Main);
+		
+		CTexture* m_pTexture_Rasengun_Main;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Main"),
+			TEXT("Com_Texture_Rasengun_Main"), reinterpret_cast<CComponent**>(&m_pTexture_Rasengun_Main))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Rasengun_Main);
+		
+		m_ScalingSpeed = 0.85f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 10.f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_CHARGE)
+	{
+		CModel* m_pModel_Rasengun_Charge;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Rasengun_Charge"),
+			TEXT("Com_Model_Rasengun_Charge"), reinterpret_cast<CComponent**>(&m_pModel_Rasengun_Charge))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Rasengun_Charge);
+		
+		CTexture* m_pTexture_Rasengun_Charge;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Rush"),
+			TEXT("Com_Texture_Rasengun_Charge"), reinterpret_cast<CComponent**>(&m_pTexture_Rasengun_Charge))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Rasengun_Charge);
+		
+		m_ScalingSpeed = 1.2f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 2.f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_RUSH)
+	{
+		CModel* m_pModel_Rasengun_Rush;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Rasengun_Rush"),
+			TEXT("Com_Model_Rasengun_Rush"), reinterpret_cast<CComponent**>(&m_pModel_Rasengun_Rush))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Rasengun_Rush);
+		
+		CTexture* m_pTexture_Rasengun_Rush;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Rush"),
+			TEXT("Com_Texture_Rasengun_Rush"), reinterpret_cast<CComponent**>(&m_pTexture_Rasengun_Rush))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Rasengun_Rush);
+		
+		m_ScalingSpeed = 1.2f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 1.5f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENGUN_BOOM)
+	{
+		CModel* m_pModel_Rasengun_Boom;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Rasengun_Boom"),
+			TEXT("Com_Model_Rasengun_Boom"), reinterpret_cast<CComponent**>(&m_pModel_Rasengun_Boom))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Rasengun_Boom);
+
+		CTexture* m_pTexture_Rasengun_Boom;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Boom"),
+			TEXT("Com_Texture_Rasengun_Boom"), reinterpret_cast<CComponent**>(&m_pTexture_Rasengun_Boom))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Rasengun_Boom);
+
+		m_ScalingSpeed = 3.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 0.f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_MAIN)
+	{
+		CModel* m_pModel_RasenShuriken_Main;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_FireBall_Main"),
+			TEXT("Com_Model_RasenShuriken_Main"), reinterpret_cast<CComponent**>(&m_pModel_RasenShuriken_Main))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_RasenShuriken_Main);
+	
+		CTexture* m_pTexture_RasenShuriken_Main;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Main"),
+			TEXT("Com_Texture_RasenShuriken_Main"), reinterpret_cast<CComponent**>(&m_pTexture_RasenShuriken_Main))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_RasenShuriken_Main);
+	
+		m_ScalingSpeed = 1.3f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 10.f;
 	}
 
 	return S_OK;

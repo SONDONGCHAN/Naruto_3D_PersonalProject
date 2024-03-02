@@ -313,7 +313,7 @@ HRESULT CWood_Hand::Add_Particles()
 	InstanceDesc1.vColor = _float4(0.7f, 0.7f, 0.7f, 0.7f);
 	InstanceDesc1.fDuration = 3.f;
 	InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
-	InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_BASIC;
+	InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_SQUARE;
 	InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
 	InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Smoke_Sprite";
 	InstanceDesc1.vSpriteRatio = _float2(4.f, 4.f);

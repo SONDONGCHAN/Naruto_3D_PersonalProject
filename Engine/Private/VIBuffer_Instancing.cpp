@@ -128,9 +128,12 @@ _bool CVIBuffer_Instancing::Trigger(_vector vCenterPos)
 
 			if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 				yScale = 60.f;
+			else if(m_InstanceData.MyOption_Shape == SHAPE_RECTANGLE)
+				fSize = SizeRange(m_RandomNumber);
 
 			((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, fSize * yScale, 0.f, 0.f);
 			m_pMaxSizeY[i] = fSize * yScale;
+
 			((VTXINSTANCE*)m_SubResource.pData)[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
 			
 			if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
@@ -257,6 +260,8 @@ void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 				
 				if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 					yScale = 60.f;
+				else if (m_InstanceData.MyOption_Shape == SHAPE_RECTANGLE)
+					fSize = SizeRange(m_RandomNumber);
 				
 				((VTXINSTANCE*)SubResource.pData)[i].vUp = _float4(0.f, fSize * yScale, 0.f, 0.f);
 				m_pMaxSizeY[i] = fSize * yScale;

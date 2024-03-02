@@ -62,6 +62,11 @@ private:
 	void		Skill_Tick(_float fTimeDelta);
 	void		Skill_Cancle();
 
+	void		Skills_Priority_Tick(_float fTimeDelta);
+	void		Skills_Tick(_float fTimeDelta);
+	void		Skills_Late_Tick(_float fTimeDelta);
+	void		Skills_Render();
+
 	// 파티클 제어
 	void		Particles_Priority_Tick(_float fTimeDelta);
 	void		Particles_Tick(_float fTimeDelta);
