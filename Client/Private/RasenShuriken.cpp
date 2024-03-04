@@ -37,14 +37,9 @@ HRESULT CRasenShuriken::Initialize(void* pArg)
 
     XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
     m_pTransformCom->Set_World(m_WorldMatrix);
-
     m_pTransformCom->Set_Scaling(1.f, 1.f, 1.f);
-    //m_pTransformCom->Rotation(XMVectorSet(, , , 0.f), XMConvertToRadians());
-    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.2f, 0.2f, 1.f));
-
+    m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.0f, 0.4f, 1.f));
     m_OriginalMat = m_pTransformCom->Get_WorldMatrix();
-
-    m_fSkill_Power = 5.f;
 
     return S_OK;
 }
@@ -55,6 +50,8 @@ void CRasenShuriken::Priority_Tick(_float fTimeDelta)
 
 void CRasenShuriken::Tick(_float fTimeDelta)
 {
+    __super::Tick(fTimeDelta);
+
     if (myState == STATE_MAKING || myState == STATE_DETECTING)
     {
         if (myState == STATE_MAKING)
@@ -63,14 +60,35 @@ void CRasenShuriken::Tick(_float fTimeDelta)
             XMStoreFloat4x4(&m_WorldMatrix, m_OriginalMat * BoneMatrix * m_pParentTransform->Get_WorldMatrix());
             m_pTransformCom->Set_World(m_WorldMatrix);
         }
-        m_Effect_RasenShuriken_Main->State_Tick(m_pTransformCom->Get_WorldMatrix());
+
+        _matrix ParentMakingMat = m_pParentTransform->Get_WorldMatrix();
+        _matrix MakingMat = m_pTransformCom->Get_WorldMatrix();
+        ParentMakingMat.r[3] = MakingMat.r[3];
+
         m_Effect_RasenShuriken_Main->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Main->State_Tick(ParentMakingMat);
         m_Effect_RasenShuriken_Main->Scale_Change(fTimeDelta);
 
+        m_Effect_RasenShuriken_Wing->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Wing->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Wing->Scale_Change(fTimeDelta);
+
+        m_Effect_RasenShuriken_Ring->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Ring->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Ring->Scale_Change(fTimeDelta);
     }
+
     else if (myState == STATE_HIT)
     {
+        _matrix ParentMakingMat = m_pParentTransform->Get_WorldMatrix();
+        _matrix MakingMat = m_pTransformCom->Get_WorldMatrix();
+        ParentMakingMat.r[3] = MakingMat.r[3];
+        
+        m_Effect_RasenShuriken_Boom->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Boom->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Boom->Scale_Change(fTimeDelta);
 
+       Deco_Control_Tick(fTimeDelta);
     }
     State_Control(fTimeDelta);
 }
@@ -80,12 +98,16 @@ void CRasenShuriken::Late_Tick(_float fTimeDelta)
     if (myState == STATE_MAKING || myState == STATE_DETECTING)
     {
         m_Effect_RasenShuriken_Main->Late_Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Wing->Late_Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Ring->Late_Tick(fTimeDelta);
+
     }
+
     else if (myState == STATE_HIT)
     {
-
+        m_Effect_RasenShuriken_Boom->Late_Tick(fTimeDelta);
+        Deco_Control_Late_Tick(fTimeDelta);
     }
-
 
     if (myState == STATE_DETECTING || myState == STATE_HIT)
     {
@@ -174,9 +196,9 @@ void CRasenShuriken::State_Control(_float fTimeDelta)
             m_bIsHit = true;
             Set_Next_State();
         }
-
         // 이펙트 채워넣기
     }
+
     else if (myState == STATE_HIT)
     {
         if (m_fDurTime < 0.01f)
@@ -189,9 +211,19 @@ void CRasenShuriken::State_Control(_float fTimeDelta)
 
         m_fDurTime += fTimeDelta;
 
-        if (m_fDurTime > 1.5f)
+        if (m_fDurTime > 2.f)
             Set_Next_State();
-
+        else if (m_fDurTime > 1.f && m_bIsEnd == false)
+        {
+            m_bIsEnd = true;
+            m_Effect_RasenShuriken_Boom->End_Trigger(1.f);
+            m_Effect_RasenShuriken_Deco_1->End_Trigger(1.f);
+            m_Effect_RasenShuriken_Deco_2->End_Trigger(1.f);
+            m_Effect_RasenShuriken_Deco_3->End_Trigger(1.f);
+            m_Effect_RasenShuriken_Deco_4->End_Trigger(1.f);
+            m_Effect_RasenShuriken_Deco_5->End_Trigger(1.f);
+            m_Effect_RasenShuriken_Deco_6->End_Trigger(1.f);
+        }
         // 이펙트 채워넣기
     }
 }
@@ -205,15 +237,39 @@ void CRasenShuriken::Set_Next_State()
     {
         m_pColliderMain->Set_Radius(1.f);
     }
-
     else if (myState == STATE_HIT)
     {
-        m_pColliderMain->Set_Radius(3.f);
+        m_pColliderMain->Set_Radius(4.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_fDurTime = 0;
+        m_Effect_RasenShuriken_Boom->Start_Trigger();
+        m_Effect_RasenShuriken_Deco_1->Start_Trigger();
+        m_Effect_RasenShuriken_Deco_2->Start_Trigger();
+        m_Effect_RasenShuriken_Deco_3->Start_Trigger();
+        m_Effect_RasenShuriken_Deco_4->Start_Trigger();
+        m_Effect_RasenShuriken_Deco_5->Start_Trigger();
+        m_Effect_RasenShuriken_Deco_6->Start_Trigger();
+
+        _matrix ParentMakingMat = m_pParentTransform->Get_WorldMatrix();
+        _matrix MakingMat = m_pTransformCom->Get_WorldMatrix();
+        ParentMakingMat.r[3] = MakingMat.r[3];       
+        m_Effect_RasenShuriken_Boom->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_1->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_2->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_3->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_4->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_5->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_6->State_Tick(ParentMakingMat);
+
+        m_BoomParticles->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+        m_bHitStart = true;
     }
     else if (myState == STATE_FINISH)
     {
+        m_bHitStart = false;
+        m_fCheckDelay = 0.f;
+
+        m_bIsEnd = false;
         m_pColliderMain->Set_Radius(0.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
@@ -232,6 +288,8 @@ void CRasenShuriken::Set_State()
 {
     myState = STATE_MAKING;
     m_Effect_RasenShuriken_Main->Start_Trigger();
+    m_Effect_RasenShuriken_Wing->Start_Trigger();
+    m_Effect_RasenShuriken_Ring->Start_Trigger();
 }
 
 void CRasenShuriken::Set_Targeting(_vector Target_Pos)
@@ -242,14 +300,72 @@ void CRasenShuriken::Set_Targeting(_vector Target_Pos)
 
 void CRasenShuriken::Particles_Priority_Tick(_float fTimeDelta)
 {
+    m_BoomParticles->Priority_Tick(fTimeDelta);
 }
 
 void CRasenShuriken::Particles_Tick(_float fTimeDelta)
 {
+    m_BoomParticles->Tick(fTimeDelta);
 }
 
 void CRasenShuriken::Particles_Late_Tick(_float fTimeDelta)
 {
+    m_BoomParticles->Late_Tick(fTimeDelta);
+}
+
+void CRasenShuriken::Deco_Control_Tick(_float fTimeDelta)
+{
+    if (m_bHitStart)
+        m_fCheckDelay += fTimeDelta;
+
+    _matrix ParentMakingMat = m_pParentTransform->Get_WorldMatrix();
+    _matrix MakingMat = m_pTransformCom->Get_WorldMatrix();
+    ParentMakingMat.r[3] = MakingMat.r[3];
+
+    m_Effect_RasenShuriken_Deco_1->Tick(fTimeDelta);
+    m_Effect_RasenShuriken_Deco_1->State_Tick(ParentMakingMat);
+    m_Effect_RasenShuriken_Deco_1->Scale_Change(fTimeDelta);
+
+    if (m_fCheckDelay > 0.1f)
+    {
+        m_Effect_RasenShuriken_Deco_2->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Deco_2->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_2->Scale_Change(fTimeDelta);
+    }
+    if (m_fCheckDelay > 0.2f)
+    {
+        m_Effect_RasenShuriken_Deco_3->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Deco_3->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_3->Scale_Change(fTimeDelta);
+    }
+    if (m_fCheckDelay > 0.3f)
+    {
+        m_Effect_RasenShuriken_Deco_4->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Deco_4->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_4->Scale_Change(fTimeDelta);
+    }
+    if (m_fCheckDelay > 0.4f)
+    {
+        m_Effect_RasenShuriken_Deco_5->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Deco_5->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_5->Scale_Change(fTimeDelta);
+    }
+    if (m_fCheckDelay > 0.5f)
+    {
+        m_Effect_RasenShuriken_Deco_6->Tick(fTimeDelta);
+        m_Effect_RasenShuriken_Deco_6->State_Tick(ParentMakingMat);
+        m_Effect_RasenShuriken_Deco_6->Scale_Change(fTimeDelta);
+    }
+}
+
+void CRasenShuriken::Deco_Control_Late_Tick(_float fTimeDelta)
+{
+    m_Effect_RasenShuriken_Deco_1->Late_Tick(fTimeDelta);
+    m_Effect_RasenShuriken_Deco_2->Late_Tick(fTimeDelta);
+    m_Effect_RasenShuriken_Deco_3->Late_Tick(fTimeDelta);
+    m_Effect_RasenShuriken_Deco_4->Late_Tick(fTimeDelta);
+    m_Effect_RasenShuriken_Deco_5->Late_Tick(fTimeDelta);
+    m_Effect_RasenShuriken_Deco_6->Late_Tick(fTimeDelta);
 }
 
 HRESULT CRasenShuriken::Add_Components()
@@ -281,7 +397,8 @@ HRESULT CRasenShuriken::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
     Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_MAIN;
     Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
-    Effect_Desc_1.vMyScale = _vector{ 0.12f, 0.12f, 0.12f, 1.f };
+    Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
+    Effect_Desc_1.vMyScale = _vector{ 0.1f, 0.1f, 0.1f, 1.f };
     m_Effect_RasenShuriken_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
     if (nullptr == m_Effect_RasenShuriken_Main)
         return E_FAIL;
@@ -289,7 +406,8 @@ HRESULT CRasenShuriken::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
     Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_WING;
     Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_X;
-    Effect_Desc_2.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+    Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_Y;
+    Effect_Desc_2.vMyScale = _vector{ 3.f, 3.f, 3.f, 1.f };
     m_Effect_RasenShuriken_Wing = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
     if (nullptr == m_Effect_RasenShuriken_Wing)
         return E_FAIL;
@@ -297,7 +415,8 @@ HRESULT CRasenShuriken::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_3{};
     Effect_Desc_3.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_RING;
     Effect_Desc_3.MyUVOption = CEffect_Mesh::MOVE_X;
-    Effect_Desc_3.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+    Effect_Desc_3.MySpinOption = CEffect_Mesh::SPIN_NONE;
+    Effect_Desc_3.vMyScale = _vector{ 3.f, 3.f, 3.f, 1.f };
     m_Effect_RasenShuriken_Ring = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_3));
     if (nullptr == m_Effect_RasenShuriken_Ring)
         return E_FAIL;
@@ -305,17 +424,64 @@ HRESULT CRasenShuriken::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_4{};
     Effect_Desc_4.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_BOOM;
     Effect_Desc_4.MyUVOption = CEffect_Mesh::MOVE_X;
-    Effect_Desc_4.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+    Effect_Desc_4.MySpinOption = CEffect_Mesh::SPIN_NONE;
+    Effect_Desc_4.vMyScale = _vector{ 3.f, 3.f, 3.f, 1.f };
     m_Effect_RasenShuriken_Boom = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_4));
     if (nullptr == m_Effect_RasenShuriken_Boom)
         return E_FAIL;
 
-    CEffect_Mesh::EFFECT_DESC Effect_Desc_5{};
-    Effect_Desc_5.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_DECO;
-    Effect_Desc_5.MyUVOption = CEffect_Mesh::MOVE_X;
-    Effect_Desc_5.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
-    m_Effect_RasenShuriken_Deco = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_5));
-    if (nullptr == m_Effect_RasenShuriken_Deco)
+    CEffect_Mesh::EFFECT_DESC Deco_Desc_1{};
+    Deco_Desc_1.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_DECO;
+    Deco_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
+    Deco_Desc_1.MySpinOption = CEffect_Mesh::SPIN_RANDOM;
+    Deco_Desc_1.vMyScale = _vector{ 20.f, 20.f, 20.f, 1.f };
+    m_Effect_RasenShuriken_Deco_1 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Deco_Desc_1));
+    if (nullptr == m_Effect_RasenShuriken_Deco_1)
+        return E_FAIL;
+
+    CEffect_Mesh::EFFECT_DESC Deco_Desc_2{};
+    Deco_Desc_2.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_DECO;
+    Deco_Desc_2.MyUVOption = CEffect_Mesh::MOVE_X;
+    Deco_Desc_2.MySpinOption = CEffect_Mesh::SPIN_RANDOM;
+    Deco_Desc_2.vMyScale = _vector{ 20.f, 20.f, 20.f, 1.f };
+    m_Effect_RasenShuriken_Deco_2 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Deco_Desc_2));
+    if (nullptr == m_Effect_RasenShuriken_Deco_2)
+        return E_FAIL;
+    
+    CEffect_Mesh::EFFECT_DESC Deco_Desc_3{};
+    Deco_Desc_3.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_DECO;
+    Deco_Desc_3.MyUVOption = CEffect_Mesh::MOVE_X;
+    Deco_Desc_3.MySpinOption = CEffect_Mesh::SPIN_RANDOM;
+    Deco_Desc_3.vMyScale = _vector{ 20.f, 20.f, 20.f, 1.f };
+    m_Effect_RasenShuriken_Deco_3 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Deco_Desc_3));
+    if (nullptr == m_Effect_RasenShuriken_Deco_3)
+        return E_FAIL;
+    
+    CEffect_Mesh::EFFECT_DESC Deco_Desc_4{};
+    Deco_Desc_4.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_DECO;
+    Deco_Desc_4.MyUVOption = CEffect_Mesh::MOVE_X;
+    Deco_Desc_4.MySpinOption = CEffect_Mesh::SPIN_RANDOM;
+    Deco_Desc_4.vMyScale = _vector{ 20.f, 20.f, 20.f, 1.f };
+    m_Effect_RasenShuriken_Deco_4 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Deco_Desc_4));
+    if (nullptr == m_Effect_RasenShuriken_Deco_4)
+        return E_FAIL;
+
+    CEffect_Mesh::EFFECT_DESC Deco_Desc_5{};
+    Deco_Desc_5.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_DECO;
+    Deco_Desc_5.MyUVOption = CEffect_Mesh::MOVE_X;
+    Deco_Desc_5.MySpinOption = CEffect_Mesh::SPIN_RANDOM;
+    Deco_Desc_5.vMyScale = _vector{ 20.f, 20.f, 20.f, 1.f };
+    m_Effect_RasenShuriken_Deco_5 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Deco_Desc_5));
+    if (nullptr == m_Effect_RasenShuriken_Deco_5)
+        return E_FAIL;
+
+    CEffect_Mesh::EFFECT_DESC Deco_Desc_6{};
+    Deco_Desc_6.MyType = CEffect_Mesh::EFFECT_RASENSHURIKEN_DECO;
+    Deco_Desc_6.MyUVOption = CEffect_Mesh::MOVE_X;
+    Deco_Desc_6.MySpinOption = CEffect_Mesh::SPIN_RANDOM;
+    Deco_Desc_6.vMyScale = _vector{ 20.f, 20.f, 20.f, 1.f };
+    m_Effect_RasenShuriken_Deco_6 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Deco_Desc_6));
+    if (nullptr == m_Effect_RasenShuriken_Deco_6)
         return E_FAIL;
 
     return S_OK;
@@ -379,10 +545,16 @@ void CRasenShuriken::Free()
     Safe_Release(m_Effect_RasenShuriken_Ring);
 
     Safe_Release(m_Effect_RasenShuriken_Boom);
-    Safe_Release(m_Effect_RasenShuriken_Deco);
+
+    Safe_Release(m_Effect_RasenShuriken_Deco_1);
+    Safe_Release(m_Effect_RasenShuriken_Deco_2);
+    Safe_Release(m_Effect_RasenShuriken_Deco_3);
+    Safe_Release(m_Effect_RasenShuriken_Deco_4);
+    Safe_Release(m_Effect_RasenShuriken_Deco_5);
+    Safe_Release(m_Effect_RasenShuriken_Deco_6);
+
 
     Safe_Release(m_BoomParticles);
-
     Safe_Release(m_pColliderMain);
 
     __super::Free();

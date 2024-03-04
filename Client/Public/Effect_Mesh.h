@@ -21,13 +21,17 @@ public:
 		EFFECT_KAMUI, EFFECT_KAMUI_SHOCK, 
 		EFFECT_RASENGUN_CHARGE, EFFECT_RASENGUN_MAIN, EFFECT_RASENGUN_RUSH, EFFECT_RASENGUN_BOOM,
 		EFFECT_RASENSHURIKEN_MAIN, EFFECT_RASENSHURIKEN_WING, EFFECT_RASENSHURIKEN_RING, EFFECT_RASENSHURIKEN_BOOM, EFFECT_RASENSHURIKEN_DECO,
+		EFFECT_RASENGUNSUPER_MAIN, EFFECT_RASENGUNSUPER_NOISE, EFFECT_RASENGUNSUPER_DECO,
 		EFFECT_END};
-	enum EFFECT_UVOPTION { MOVE_X, MOVE_Y, MOVE_X_INVERSE, MOVE_Y_INVERSE, MOVE_All, MOVE_END};
+	enum EFFECT_OPTION_UV	{ MOVE_X, MOVE_Y, MOVE_X_INVERSE, MOVE_Y_INVERSE, MOVE_All, MOVE_END};
+	enum EFFECT_OPTION_SPIN { SPIN_X, SPIN_Y, SPIN_Z, SPIN_X_INVERSE, SPIN_Y_INVERSE, SPIN_Z_INVERSE, SPIN_RANDOM, SPIN_NONE, SPIN_END};
 
+	
 	struct EFFECT_DESC
 	{
 		EFFECT_TYPE			MyType;
-		EFFECT_UVOPTION		MyUVOption;
+		EFFECT_OPTION_UV	MyUVOption;
+		EFFECT_OPTION_SPIN	MySpinOption;
 		_vector				vMyScale;
 	};
 
@@ -47,11 +51,12 @@ public:
 public:
 	void	State_Tick(_fmatrix WorldMatrix);
 	void	Start_Trigger();
+	void	End_Trigger(_float fDiscardSpeed);
 	void	Scale_Change(_float fTimeDelta);
 
 private:
 	_float	Lerp(_float start, _float end, _float ratio);
-	void	Move_UV(EFFECT_UVOPTION UVOption, _float fTimeDelta);
+	void	Move_UV(EFFECT_OPTION_UV UVOption, _float fTimeDelta);
 
 private:
 	CShader*				m_pShaderCom	= { nullptr };
@@ -71,6 +76,12 @@ private:
 	_float		m_vUVSpeed		= { 1.f };
 	_float		m_fAlpha		= { 1.f };
 	_float		m_fBrightness	= { 1.f };
+	_float3		m_vRatation		= {0.f, 0.f, 0.f};
+	_float		m_fSpinSpeed	= {1.f};
+	_bool		m_bEndTrigger	= false;
+	_float		m_fDiscardColor = { 0.f };
+	_float		m_fDiscardSpeed = { 1.f };
+
 
 private:
 	HRESULT		Add_Component();

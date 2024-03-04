@@ -170,6 +170,7 @@ HRESULT CKamui::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
     Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_KAMUI;
     Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
+    Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_1.vMyScale = _vector{ 30.f, 30.f, 30.f, 1.f };
     m_Effect_Kamui_Boom = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
     if (nullptr == m_Effect_Kamui_Boom)
@@ -178,6 +179,7 @@ HRESULT CKamui::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
     Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_KAMUI_SHOCK;
     Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_END;
+    Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_2.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
     m_Effect_Kamui_ShockWave = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
     if (nullptr == m_Effect_Kamui_ShockWave)

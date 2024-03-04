@@ -36,9 +36,11 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 	pGameObjectDesc->fSpeedPerSec = 7.f;
 	pGameObjectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	_vector vStart_Pos = { -10.f, 0.f, -10.f, 1.f };
+	m_pTransformCom->Set_Pos(vStart_Pos);
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
@@ -58,8 +60,7 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 	if (FAILED(Add_Particles()))
 		return E_FAIL;
 	
-	_vector vStart_Pos = { -10.f, 0.f, -10.f, 1.f };
-	m_pTransformCom->Set_Pos(vStart_Pos);
+
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
 	return S_OK;
@@ -156,6 +157,28 @@ HRESULT CPlayer_Naruto::Render()
 	Skills_Render();
 
 	return S_OK;
+}
+
+void CPlayer_Naruto::Add_MainCollider()
+{
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
+	m_pColliderMain->Set_Collider_GameObject(this);
+	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+	
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
+	m_pColliderDetecting->Set_Collider_GameObject(this);
+	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
+	
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
+	m_pColliderAttack->Set_Collider_GameObject(this);
+	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+}
+
+void CPlayer_Naruto::Delete_MainCollider()
+{
+	m_pGameInstance->Delete_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
+	m_pGameInstance->Delete_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
+	m_pGameInstance->Delete_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
 }
 
 void CPlayer_Naruto::Player_Dash(_float fTimeDelta)
@@ -1275,8 +1298,8 @@ void CPlayer_Naruto::Skill_Tick(_float fTimeDelta)
 			
 			if (m_fSkillDurTime > 1.5f)
 			{
-				pRasenShuriken->Set_Next_State();
 				pRasenShuriken->Get_TranformCom()->Set_Look(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				pRasenShuriken->Set_Next_State();
 
 				if (m_LockOnTargetLength < 99999.f)
 				{
@@ -1481,23 +1504,23 @@ HRESULT CPlayer_Naruto::Add_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &MainBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
-	m_pColliderMain->Set_Collider_GameObject(this);
-	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+	//m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
+	//m_pColliderMain->Set_Collider_GameObject(this);
+	//m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
 	// 록온 탐색용 콜라이더 //
 	CBounding_OBB::OBB_DESC		DetectingBoundingDesc{};
 	DetectingBoundingDesc.vExtents = { 8.f , 10.f, 8.f };
 	DetectingBoundingDesc.vRadians = { 0.f ,0.f, 0.f };
 	DetectingBoundingDesc.vCenter = _float3(0.f, -2.f, 7.f);
-
+	
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
 		TEXT("Com_Collider_Detecting"), reinterpret_cast<CComponent**>(&m_pColliderDetecting), &DetectingBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
-	m_pColliderDetecting->Set_Collider_GameObject(this);
-	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
-
+	//m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
+	//m_pColliderDetecting->Set_Collider_GameObject(this);
+	//m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
+	
 	// 콤보공격 콜라이더 //
 	CBounding_Sphere::SPHERE_DESC		AttackBoundingDesc{};
 	AttackBoundingDesc.fRadius = 0.f;
@@ -1506,10 +1529,10 @@ HRESULT CPlayer_Naruto::Add_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		TEXT("Com_Collider_Attack"), reinterpret_cast<CComponent**>(&m_pColliderAttack), &AttackBoundingDesc)))
 		return E_FAIL;
-	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
-	m_pColliderAttack->Set_Collider_GameObject(this);
-	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
-
+	//m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
+	//m_pColliderAttack->Set_Collider_GameObject(this);
+	//m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+	
 	Off_Attack_Collider();
 
 	///////////////////////////////////////////////////

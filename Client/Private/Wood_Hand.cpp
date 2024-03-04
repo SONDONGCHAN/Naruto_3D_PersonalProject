@@ -290,6 +290,7 @@ HRESULT CWood_Hand::Add_Effects()
 	CEffect_Mesh::EFFECT_DESC Effect_Desc{};
 	Effect_Desc.MyType = CEffect_Mesh::EFFECT_SHOCKWAVE;
 	Effect_Desc.MyUVOption = CEffect_Mesh::MOVE_END;
+	Effect_Desc.MySpinOption = CEffect_Mesh::SPIN_NONE;
 	Effect_Desc.vMyScale = _vector{ 3.f, 3.f, 3.f, 1.f };
 	m_Effect_ShockWave_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc));
 	if (nullptr == m_Effect_ShockWave_Main)

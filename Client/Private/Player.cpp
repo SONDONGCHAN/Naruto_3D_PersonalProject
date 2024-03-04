@@ -42,6 +42,7 @@ void CPlayer::Priority_Tick(_float fTimeDelta)
 
 void CPlayer::Tick(_float fTimeDelta)
 {
+	m_fTagCool += fTimeDelta;
 	m_pCurrentCharacter->Tick(fTimeDelta);
 }
 
@@ -60,8 +61,10 @@ HRESULT CPlayer::Render()
 
 void CPlayer::Key_Input(_float fTimeDelta)
 {
-	if (m_pGameInstance->Key_Down(DIK_T))
+	if (m_pGameInstance->Key_Down(DIK_T) && m_fTagCool> 1.f)
 	{
+		m_fTagCool = 0.f;
+
 		m_iCurrent_Character_Index++;
 
 		if (m_iCurrent_Character_Index > 1)
@@ -90,21 +93,27 @@ void CPlayer::Check_Tag()
 		if (!(dynamic_cast<CPlayer_Custom*>(m_pCurrentCharacter)->Get_BodyModel()->Get_Current_Animation()->Get_Finished()))
 			return;
 
+		dynamic_cast<CPlayer_Custom*>(m_pCurrentCharacter)->Delete_MainCollider();
+
 		_int NaviIndex = m_pCurrentCharacter->Get_Navigation()->Get_CurrentIndex();
 		m_pCurrentCharacter = m_Charaters.find(L"Character_Naruto")->second;
 		dynamic_cast<CPlayer_Naruto*>(m_pCurrentCharacter)->Set_State(PLAYER_APPEAR);
 		m_pCurrentCharacter->Get_Navigation()->Set_CurrentIndex(NaviIndex);
-
+		dynamic_cast<CPlayer_Naruto*>(m_pCurrentCharacter)->Add_MainCollider();
 	}
+
 	else if (m_iCurrent_Character_Index == 0)
 	{
 		if (!(dynamic_cast<CPlayer_Naruto*>(m_pCurrentCharacter)->Get_BodyModel()->Get_Current_Animation()->Get_Finished()))
 			return;
 
+		dynamic_cast<CPlayer_Naruto*>(m_pCurrentCharacter)->Delete_MainCollider();
+
 		_int NaviIndex = m_pCurrentCharacter->Get_Navigation()->Get_CurrentIndex();
 		m_pCurrentCharacter = m_Charaters.find(L"Character_Custom")->second;
 		dynamic_cast<CPlayer_Custom*>(m_pCurrentCharacter)->Set_State(PLAYER_APPEAR);
 		m_pCurrentCharacter->Get_Navigation()->Set_CurrentIndex(NaviIndex);
+		dynamic_cast<CPlayer_Custom*>(m_pCurrentCharacter)->Add_MainCollider();
 	}
 
 	m_pCurrentCharacter->Get_TranformCom()->Set_World(OldCharacterWorldMat);

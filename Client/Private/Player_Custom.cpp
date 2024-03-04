@@ -259,6 +259,28 @@ HRESULT CPlayer_Custom::Render()
 	return S_OK;
 }
 
+void CPlayer_Custom::Add_MainCollider()
+{
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
+	m_pColliderMain->Set_Collider_GameObject(this);
+	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+	
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
+	m_pColliderDetecting->Set_Collider_GameObject(this);
+	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
+	
+	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
+	m_pColliderAttack->Set_Collider_GameObject(this);
+	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+}
+
+void CPlayer_Custom::Delete_MainCollider()
+{
+	m_pGameInstance->Delete_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
+	m_pGameInstance->Delete_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
+	m_pGameInstance->Delete_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
+}
+
 void CPlayer_Custom::Player_Dash(_float fTimeDelta)
 {
 	if (m_iState & PLAYER_STATE_DASH)
@@ -1731,7 +1753,7 @@ HRESULT CPlayer_Custom::Add_Components()
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Main_Collider", m_pColliderMain);
 	m_pColliderMain->Set_Collider_GameObject(this);
 	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
-
+	
 	// 록온 탐색용 콜라이더 //
 	CBounding_OBB::OBB_DESC		DetectingBoundingDesc{};
 	DetectingBoundingDesc.vExtents = { 8.f , 10.f, 8.f };
@@ -1744,7 +1766,7 @@ HRESULT CPlayer_Custom::Add_Components()
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Detecting_Collider", m_pColliderDetecting);
 	m_pColliderDetecting->Set_Collider_GameObject(this);
 	m_pColliderDetecting->Tick(m_pTransformCom->Get_WorldMatrix());
-
+	
 	// 콤보공격 콜라이더 //
 	CBounding_Sphere::SPHERE_DESC		AttackBoundingDesc{};
 	AttackBoundingDesc.fRadius = 0.f;
@@ -1756,7 +1778,7 @@ HRESULT CPlayer_Custom::Add_Components()
 	m_pGameInstance->Add_Collider(m_Current_Level, L"Player_Attack_Collider", m_pColliderAttack);
 	m_pColliderAttack->Set_Collider_GameObject(this);
 	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
-
+	
 	Off_Attack_Collider();
 	
 	///////////////////////////////////////////////////

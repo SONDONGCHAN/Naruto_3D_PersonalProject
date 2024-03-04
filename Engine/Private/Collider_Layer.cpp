@@ -35,6 +35,17 @@ HRESULT CCollider_Layer::Add_Collider(CCollider* pCollider)
 	return S_OK;
 }
 
+HRESULT CCollider_Layer::Delete_Collider(CCollider* pCollider)
+{
+	if (nullptr == pCollider)
+		return E_FAIL;
+
+	m_Colliders.remove(pCollider);
+	m_iColliderNum--;
+
+	return S_OK;
+}
+
 CCollider_Layer* CCollider_Layer::Create()
 {
 	CCollider_Layer* pInstance = new CCollider_Layer();

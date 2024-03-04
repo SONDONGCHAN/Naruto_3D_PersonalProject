@@ -16,6 +16,8 @@ public:
 public:
 	HRESULT Initialize();
 	HRESULT Add_Collider(class CCollider* pCollider);
+	HRESULT Delete_Collider(class CCollider* pCollider);
+
 
 	list<class CCollider*>* Get_Colliders() { return &m_Colliders; }
 

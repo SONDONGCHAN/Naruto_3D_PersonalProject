@@ -46,8 +46,12 @@ public:
 	void		Particles_Tick(_float fTimeDelta) override;
 	void		Particles_Late_Tick(_float fTimeDelta) override;
 
-
 	RASENSHURIKEN_STATE	Get_State() { return myState; }
+
+private:
+	void		Deco_Control_Tick(_float fTimeDelta);
+	void		Deco_Control_Late_Tick(_float fTimeDelta);
+
 
 private:
 	CCollider* m_pColliderMain = { nullptr };
@@ -57,7 +61,13 @@ private:
 	CEffect_Mesh* m_Effect_RasenShuriken_Ring = { nullptr };
 
 	CEffect_Mesh* m_Effect_RasenShuriken_Boom = { nullptr };
-	CEffect_Mesh* m_Effect_RasenShuriken_Deco = { nullptr };
+
+	CEffect_Mesh* m_Effect_RasenShuriken_Deco_1 = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Deco_2 = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Deco_3 = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Deco_4 = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Deco_5 = { nullptr };
+	CEffect_Mesh* m_Effect_RasenShuriken_Deco_6 = { nullptr };
 
 	CParticle_Point* m_BoomParticles = { nullptr };
 
@@ -69,6 +79,12 @@ private:
 	_vector		m_vTarget_Pos = {};
 	_float4x4*	m_pSocketMatrix = { nullptr };
 	_matrix  	m_OriginalMat = {};
+
+	_bool		m_bIsEnd = false;
+	_bool		m_bHitStart = false;
+	_float		m_fCheckDelay = 0.f;
+
+
 
 private:
 	HRESULT Add_Components();

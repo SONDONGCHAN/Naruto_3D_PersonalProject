@@ -58,6 +58,11 @@ void CChidori::Tick(_float fTimeDelta)
 
     State_Control(fTimeDelta);
 
+    //_matrix ParentMakingMat = m_pParentTransform->Get_WorldMatrix();
+    //_matrix MakingMat = m_pTransformCom->Get_WorldMatrix();
+    //ParentMakingMat.r[3] = MakingMat.r[3];
+    //m_Effect_Chidori_Main->State_Tick((ParentMakingMat));
+
     m_Effect_Chidori_Main->State_Tick(XMLoadFloat4x4(&m_WorldMatrix));
     m_Effect_Chidori_Main->Tick(fTimeDelta);
     m_BasicParticles->Tick(fTimeDelta);
@@ -189,6 +194,7 @@ HRESULT CChidori::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc{};
     Effect_Desc.MyType = CEffect_Mesh::EFFECT_CHIDORI;
     Effect_Desc.MyUVOption = CEffect_Mesh::MOVE_X;
+    Effect_Desc.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc.vMyScale = _vector{ 0.5f, 0.5f, 0.5f, 1.f };
     m_Effect_Chidori_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc));
     if (nullptr == m_Effect_Chidori_Main)

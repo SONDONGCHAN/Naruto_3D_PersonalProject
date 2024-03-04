@@ -22,6 +22,8 @@ public:
 
 public:
 	CLandObject* Get_CurrentCharacter() { return m_pCurrentCharacter; }
+	_uint Get_CurrentCharacter_Index() { return m_iCurrent_Character_Index; }
+
 
 private:
 	void	Key_Input(_float fTimeDelta);
@@ -31,6 +33,7 @@ private:
 	map<const wstring, class CLandObject*>		m_Charaters;
 	_uint	m_iCurrent_Character_Index = { 0 };
 	_bool	m_bTagging = false;
+	_float	m_fTagCool = 0.f;
 
 	CLandObject* m_pCurrentCharacter = { nullptr };
 

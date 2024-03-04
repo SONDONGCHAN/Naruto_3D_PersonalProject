@@ -315,6 +315,7 @@ HRESULT CRasengun::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
     Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_RASENGUN_MAIN;
     Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
+    Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_1.vMyScale = _vector{ 0.08f, 0.08f, 0.08f, 1.f };
     m_Effect_Rasengun_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
     if (nullptr == m_Effect_Rasengun_Main)
@@ -323,6 +324,7 @@ HRESULT CRasengun::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
     Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_RASENGUN_CHARGE;
     Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_X_INVERSE;
+    Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_2.vMyScale = _vector{ 50.f, 50.f, 50.f, 1.f };
     m_Effect_Rasengun_Charge = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
     if (nullptr == m_Effect_Rasengun_Charge)
@@ -331,6 +333,7 @@ HRESULT CRasengun::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_3{};
     Effect_Desc_3.MyType = CEffect_Mesh::EFFECT_RASENGUN_RUSH;
     Effect_Desc_3.MyUVOption = CEffect_Mesh::MOVE_X;
+    Effect_Desc_3.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_3.vMyScale = _vector{ 1.2f, 1.2f, 1.2f, 1.f };
     m_Effect_Rasengun_Rush = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_3));
     if (nullptr == m_Effect_Rasengun_Rush)
@@ -339,13 +342,14 @@ HRESULT CRasengun::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_4{};
     Effect_Desc_4.MyType = CEffect_Mesh::EFFECT_RASENGUN_BOOM;
     Effect_Desc_4.MyUVOption = CEffect_Mesh::MOVE_END;
+    Effect_Desc_4.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_4.vMyScale = _vector{ 20.f, 20.f, 20.f, 1.f };
     m_Effect_Rasengun_Boom = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_4));
     if (nullptr == m_Effect_Rasengun_Boom)
         return E_FAIL;
 
     CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
-    InstanceDesc1.iNumInstance = 150;
+    InstanceDesc1.iNumInstance = 200;
     InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vRange = _float3(5.f, 5.f, 5.f);

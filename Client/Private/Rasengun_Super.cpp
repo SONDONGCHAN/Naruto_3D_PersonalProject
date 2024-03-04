@@ -28,16 +28,17 @@ HRESULT CRasengun_Super::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	if (FAILED(Add_Effects()))
+		return E_FAIL;
+
+	if (FAILED(Add_Particles()))
+		return E_FAIL;
+
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
 	m_pTransformCom->Set_World(m_WorldMatrix);
-	
 	m_pTransformCom->Set_Scaling(1.f, 1.f, 1.f);
-	//m_pTransformCom->Rotation(XMVectorSet(, , , 0.f), XMConvertToRadians());
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
-	
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));	
 	m_OriginalMat = m_pTransformCom->Get_WorldMatrix();
-
-	m_fSkill_Power = 10.f;
 
 	return S_OK;
 }
@@ -48,6 +49,9 @@ void CRasengun_Super::Priority_Tick(_float fTimeDelta)
 
 void CRasengun_Super::Tick(_float fTimeDelta)
 {
+	__super::Tick(fTimeDelta);
+
+
 	_matrix	BoneMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 	XMStoreFloat4x4(&m_WorldMatrix, m_OriginalMat * BoneMatrix * m_pParentTransform->Get_WorldMatrix());
 	m_pTransformCom->Set_World(m_WorldMatrix);
@@ -173,6 +177,36 @@ HRESULT CRasengun_Super::Add_Components()
 	return S_OK;
 }
 
+HRESULT CRasengun_Super::Add_Effects()
+{
+	CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
+	Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_RASENGUNSUPER_MAIN;
+	Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
+	Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
+	Effect_Desc_1.vMyScale = _vector{ 2.f, 2.f, 2.f, 1.f };
+	m_Effect_Rasengun_Super_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
+	if (nullptr == m_Effect_Rasengun_Super_Main)
+		return E_FAIL;
+	
+	CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
+	Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_RASENGUNSUPER_NOISE;
+	Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_X;
+	Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
+	Effect_Desc_2.vMyScale = _vector{ 2.f, 2.f, 2.f, 1.f };
+	m_Effect_Rasengun_Super_Noise = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
+	if (nullptr == m_Effect_Rasengun_Super_Noise)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CRasengun_Super::Add_Particles()
+{
+
+
+	return S_OK;
+}
+
 CRasengun_Super* CRasengun_Super::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CRasengun_Super* pInstance = new CRasengun_Super(pDevice, pContext);
@@ -201,6 +235,16 @@ CGameObject* CRasengun_Super::Clone(void* pArg)
 
 void CRasengun_Super::Free()
 {
+	Safe_Release(m_Effect_Rasengun_Super_Main);
+	Safe_Release(m_Effect_Rasengun_Super_Noise);
+
+	Safe_Release(m_Effect_Rasengun_Super_Deco_1);
+	Safe_Release(m_Effect_Rasengun_Super_Deco_2);
+	Safe_Release(m_Effect_Rasengun_Super_Deco_3);
+	Safe_Release(m_Effect_Rasengun_Super_Deco_4);
+	Safe_Release(m_Effect_Rasengun_Super_Deco_5);
+	Safe_Release(m_Effect_Rasengun_Super_Deco_6);
+
 	Safe_Release(m_pColliderMain);
 
 	__super::Free();

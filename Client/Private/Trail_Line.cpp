@@ -37,11 +37,12 @@ HRESULT CTrail_Line::Initialize(void* pArg)
 	m_OriginalMat = m_pTransformCom->Get_WorldMatrix();
 
 	if (m_eMyCharacter == PLAYER_CUSTOM) {
-		m_vColor = { 113.f / 255.f, 199.f / 255.f, 236.f / 255.f , 1.f };
+		//m_vColor = { 113.f / 255.f, 199.f / 255.f, 236.f / 255.f , 1.f };
+		m_vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 1.f };
 		m_vThickness = 0.025f;
 	}
 	else if (m_eMyCharacter == PLAYER_NARUTO) {
-		m_vColor = { 252.f / 255.f, 220.f / 255.f, 77.f / 255.f , 1.f };
+		m_vColor = { 252.f / 255.f, 220.f / 255.f, 100.f / 255.f , 1.f };
 		m_vThickness = 0.025f;
 	}
 	else if (m_eMyCharacter == MONSTER_NARUTO) {

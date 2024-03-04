@@ -43,9 +43,27 @@ HRESULT CCollider_Manager::Add_Collider(_uint iLevelIndex, const wstring& strLay
 	return S_OK;
 }
 
+HRESULT CCollider_Manager::Delete_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* _pCollider)
+{
+	if (nullptr == _pCollider)
+		return E_FAIL;
+
+	CCollider_Layer* pCollider_Layer = Find_Collider_Layer(iLevelIndex, strLayerTag);
+
+	if (nullptr == pCollider_Layer)
+		return E_FAIL;
+	else
+		pCollider_Layer->Delete_Collider(_pCollider);
+
+	return S_OK;
+}
+
 void CCollider_Manager::Check_Collision_For_MyEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag)
 {   
 	CCollider_Layer* pColliderLayer = Find_Collider_Layer(iLevelIndex, strTargetColliderLayerTag);
+
+	if (pColliderLayer == nullptr)
+		return;
 
 	for (_uint i = 0; ; i++)
 	{
@@ -85,6 +103,9 @@ void CCollider_Manager::Check_Collision_For_TargetEvent(_uint iLevelIndex, CColl
 {
 	CCollider_Layer* pColliderLayer = Find_Collider_Layer(iLevelIndex, strTargetColliderLayerTag);
 	
+	if (pColliderLayer == nullptr)
+		return;
+
 	for (_uint i = 0; ; i++)
 	{
 		CCollider* pTargetCollider = pColliderLayer->Get_Collider(i);

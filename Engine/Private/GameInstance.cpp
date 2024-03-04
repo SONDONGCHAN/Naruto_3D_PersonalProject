@@ -329,6 +329,11 @@ HRESULT CGameInstance::Add_Collider(_uint iLevelIndex, const wstring& strLayerTa
 	return m_pCollider_Manager->Add_Collider(iLevelIndex, strLayerTag, pCollider, pArg);
 }
 
+void CGameInstance::Delete_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* pCollider)
+{
+	m_pCollider_Manager->Delete_Collider(iLevelIndex, strLayerTag, pCollider);
+}
+
 void CGameInstance::Check_Collision_For_MyEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag)
 {
 	if (nullptr == m_pCollider_Manager)

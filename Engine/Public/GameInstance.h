@@ -77,6 +77,7 @@ public: /* For.Light_Manager */
 
 public: /* For.Collider_Manager */
 	HRESULT Add_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* pCollider, void* pArg = nullptr);
+	void	Delete_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* pCollider);
 	void	Check_Collision_For_MyEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strColliderLayerTag);
 	void	Check_Collision_For_TargetEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag);
 	_bool	Is_Collision(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strColliderLayerTag);

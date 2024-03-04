@@ -19,9 +19,8 @@ HRESULT CEffect_Mesh::Initialize_Prototype()
 HRESULT CEffect_Mesh::Initialize(void* pArg)
 {
 	EFFECT_DESC* pDesc = (EFFECT_DESC*)pArg;
-	m_MyDesc.MyType		= pDesc->MyType;
-	m_MyDesc.vMyScale	= pDesc->vMyScale;
-	m_MyDesc.MyUVOption = pDesc->MyUVOption;
+
+	m_MyDesc = *pDesc;
 
 	if (FAILED(__super::Initialize(nullptr)))
 		return E_FAIL;
@@ -39,6 +38,17 @@ void CEffect_Mesh::Priority_Tick(_float fTimeDelta)
 void CEffect_Mesh::Tick(_float fTimeDelta)
 {
 	Move_UV(m_MyDesc.MyUVOption,fTimeDelta);
+
+
+	if (m_bEndTrigger)
+	{
+		if (m_fDiscardColor > 1.f)
+		{
+			m_bEndTrigger = false;
+			return;
+		}
+		m_fDiscardColor += fTimeDelta* m_fDiscardSpeed;
+	}
 }
 
 void CEffect_Mesh::Late_Tick(_float fTimeDelta)
@@ -274,7 +284,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 		
-				_float4		vColor = { 121.f/255.f, 237.f/255.f, 1.f, 0.6f };
+				_float4		vColor = { 121.f/255.f, 237.f/255.f, 1.f, 0.9f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 		
@@ -406,7 +416,7 @@ HRESULT CEffect_Mesh::Render()
 			}
 		}
 	}
-	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_MAIN)
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_MAIN )
 	{
 		for (_uint i = 0; i < m_vModels.size(); i++)
 		{
@@ -428,7 +438,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 	
-				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.6f };
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.9f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 	
@@ -438,6 +448,185 @@ HRESULT CEffect_Mesh::Render()
 	
 				if (FAILED(m_pShaderCom->Begin(4)))
 					return E_FAIL;
+	
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_WING )
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+		
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+		
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+		
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+		
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+		
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+		
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.6f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+		
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+		
+				if (FAILED(m_pShaderCom->Begin(8)))
+					return E_FAIL;
+		
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_RING)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.3f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(4)))
+					return E_FAIL;
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_BOOM)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+	
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+	
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+	
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+	
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.9f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+	
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+	
+				if (m_bEndTrigger == false)
+				{
+					if (FAILED(m_pShaderCom->Begin(4)))
+						return E_FAIL;
+				}
+				else
+				{
+					m_vTextures[1]->Bind_ShaderResource(m_pShaderCom, "g_DissolveTexture", 0);
+
+					if (FAILED(m_pShaderCom->Bind_RawValue("g_fDiscardColor", &m_fDiscardColor, sizeof(_float))))
+						return E_FAIL;
+					
+					if (FAILED(m_pShaderCom->Begin(9)))
+						return E_FAIL;
+				}
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_DECO)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+	
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+	
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+	
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+	
+				_float4		vColor = { 1.f, 1.f, 1.f, 0.9f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+	
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+	
+				if (m_bEndTrigger == false)
+				{
+					if (FAILED(m_pShaderCom->Begin(10)))
+						return E_FAIL;
+				}
+				else
+				{
+					m_vTextures[1]->Bind_ShaderResource(m_pShaderCom, "g_DissolveTexture", 0);
+	
+					if (FAILED(m_pShaderCom->Bind_RawValue("g_fDiscardColor", &m_fDiscardColor, sizeof(_float))))
+						return E_FAIL;
+	
+					if (FAILED(m_pShaderCom->Begin(11)))
+						return E_FAIL;
+				}
 	
 				if (FAILED(m_vModels[i]->Render(j)))
 					return E_FAIL;
@@ -454,13 +643,66 @@ void CEffect_Mesh::State_Tick(_fmatrix WorldMatrix)
 
 	_matrix scaledWorldMatrix = scalingMatrix * WorldMatrix;
 	
+	if (m_MyDesc.MySpinOption == SPIN_X)
+	{
+		_matrix SpinMatrix = XMMatrixRotationX(XMConvertToRadians(m_vRatation.x));
+		scaledWorldMatrix = SpinMatrix * scaledWorldMatrix;
+		m_vRatation.x += m_fSpinSpeed;
+	}
+	else if (m_MyDesc.MySpinOption == SPIN_Y)
+	{
+		_matrix SpinMatrix  = XMMatrixRotationY(XMConvertToRadians(m_vRatation.x));
+		scaledWorldMatrix = SpinMatrix * scaledWorldMatrix;
+		m_vRatation.x += m_fSpinSpeed;
+	}
+	else if (m_MyDesc.MySpinOption == SPIN_Z)
+	{
+		_matrix SpinMatrix = XMMatrixRotationZ(XMConvertToRadians(m_vRatation.x));
+		scaledWorldMatrix = SpinMatrix * scaledWorldMatrix;
+		m_vRatation.x += m_fSpinSpeed;
+	}
+	else if (m_MyDesc.MySpinOption == SPIN_X_INVERSE)
+	{
+		_matrix SpinMatrix = XMMatrixRotationX(XMConvertToRadians(m_vRatation.x));
+		scaledWorldMatrix = SpinMatrix * scaledWorldMatrix;
+		m_vRatation.x -= m_fSpinSpeed;
+	}
+	else if (m_MyDesc.MySpinOption == SPIN_Y_INVERSE)
+	{
+		_matrix SpinMatrix = XMMatrixRotationY(XMConvertToRadians(m_vRatation.x));
+		scaledWorldMatrix = SpinMatrix * scaledWorldMatrix;
+		m_vRatation.x -= m_fSpinSpeed;
+	}
+	else if (m_MyDesc.MySpinOption == SPIN_Z_INVERSE)
+	{
+		_matrix SpinMatrix = XMMatrixRotationZ(XMConvertToRadians(m_vRatation.x));
+		scaledWorldMatrix = SpinMatrix * scaledWorldMatrix;
+		m_vRatation.x -= m_fSpinSpeed;
+	}
+	else if (m_MyDesc.MySpinOption == SPIN_RANDOM )
+	{
+		if (vCurrentScale.m128_f32[0] == 0.f)
+		{
+			m_vRatation.x = rand() % 360;
+			m_vRatation.y = rand() % 360;
+			m_vRatation.z = rand() % 360;
+		}		
+		_matrix SpinMatrixX = XMMatrixRotationX(XMConvertToRadians(m_vRatation.x));
+		_matrix SpinMatrixY = XMMatrixRotationY(XMConvertToRadians(m_vRatation.y));
+		_matrix SpinMatrixZ = XMMatrixRotationZ(XMConvertToRadians(m_vRatation.z));
+
+		_matrix SpinMatrixFinal = SpinMatrixX * SpinMatrixY * SpinMatrixZ;
+
+		scaledWorldMatrix = SpinMatrixFinal * scaledWorldMatrix;
+	}
+
 	_float4x4 Effect_WorldMat;
 	XMStoreFloat4x4(&Effect_WorldMat, scaledWorldMatrix);
 	
 	m_pTransformCom->Set_World(Effect_WorldMat);
 }
 
-void CEffect_Mesh::Move_UV(EFFECT_UVOPTION UVOption, _float fTimeDelta)
+void CEffect_Mesh::Move_UV(EFFECT_OPTION_UV UVOption, _float fTimeDelta)
 {
 	if (UVOption == MOVE_X)
 	{
@@ -541,11 +783,25 @@ void CEffect_Mesh::Start_Trigger()
 		m_ScalingRatio = 0.f;
 		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
 	}
-	else if (EFFECT_RASENSHURIKEN_MAIN == m_MyDesc.MyType)
+	else if (EFFECT_RASENSHURIKEN_MAIN == m_MyDesc.MyType || EFFECT_RASENSHURIKEN_WING == m_MyDesc.MyType || EFFECT_RASENSHURIKEN_RING == m_MyDesc.MyType || EFFECT_RASENSHURIKEN_BOOM == m_MyDesc.MyType)
 	{
 		m_ScalingRatio = 0.f;
 		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
 	}
+
+	else if ( EFFECT_RASENSHURIKEN_DECO == m_MyDesc.MyType )
+	{
+		m_fAlpha = 1.f;
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+	}
+}
+
+void CEffect_Mesh::End_Trigger(_float fDiscardSpeed)
+{
+	m_fDiscardColor = 0.f;
+	m_fDiscardSpeed = fDiscardSpeed;
+	m_bEndTrigger = true;
 }
 
 void CEffect_Mesh::Scale_Change(_float fTimeDelta)
@@ -637,7 +893,7 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
 		}
 	}
-	else if (EFFECT_RASENSHURIKEN_MAIN == m_MyDesc.MyType)
+	else if (EFFECT_RASENSHURIKEN_MAIN == m_MyDesc.MyType || EFFECT_RASENSHURIKEN_WING == m_MyDesc.MyType || EFFECT_RASENSHURIKEN_RING == m_MyDesc.MyType || EFFECT_RASENSHURIKEN_BOOM == m_MyDesc.MyType)
 	{
 		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
 		{
@@ -647,6 +903,24 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 				m_ScalingRatio = 1.f;
 
 			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+	else if (EFFECT_RASENSHURIKEN_DECO == m_MyDesc.MyType )
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+			{
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			}
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+			m_fAlpha = Lerp(1.f, 0.f, m_ScalingRatio);
+		}
+		else
+		{
+			m_ScalingRatio = 0.f;
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+			
 		}
 	}
 }
@@ -880,7 +1154,7 @@ HRESULT CEffect_Mesh::Add_Component()
 	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_MAIN)
 	{
 		CModel* m_pModel_RasenShuriken_Main;
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_FireBall_Main"),
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Rasengun_Main"),
 			TEXT("Com_Model_RasenShuriken_Main"), reinterpret_cast<CComponent**>(&m_pModel_RasenShuriken_Main))))
 			return E_FAIL;
 		m_vModels.push_back(m_pModel_RasenShuriken_Main);
@@ -894,6 +1168,92 @@ HRESULT CEffect_Mesh::Add_Component()
 		m_ScalingSpeed = 1.3f;
 		vCurrentScale = m_MyDesc.vMyScale;
 		m_vUVSpeed = 10.f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_WING)
+	{
+		CModel* m_pModel_RasenShuriken_Wing;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_RasenShuriken_Wing"),
+			TEXT("Com_Model_RasenShuriken_Wing"), reinterpret_cast<CComponent**>(&m_pModel_RasenShuriken_Wing))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_RasenShuriken_Wing);
+		
+		CTexture* m_pTexture_RasenShuriken_Wing;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasenshuriken_Wing"),
+			TEXT("Com_Texture_RasenShuriken_Wing"), reinterpret_cast<CComponent**>(&m_pTexture_RasenShuriken_Wing))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_RasenShuriken_Wing);
+		
+		m_ScalingSpeed = 1.3f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 0.f;
+		m_fSpinSpeed = 20.f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_RING)
+	{
+		CModel* m_pModel_RasenShuriken_Ring;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_RasenShuriken_Ring"),
+			TEXT("Com_Model_RasenShuriken_Ring"), reinterpret_cast<CComponent**>(&m_pModel_RasenShuriken_Ring))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_RasenShuriken_Ring);
+	
+		CTexture* m_pTexture_RasenShuriken_Ring;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasenshuriken_Ring"),
+			TEXT("Com_Texture_RasenShuriken_Ring"), reinterpret_cast<CComponent**>(&m_pTexture_RasenShuriken_Ring))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_RasenShuriken_Ring);
+	
+		m_ScalingSpeed = 1.3f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 1.f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_BOOM)
+	{
+		CModel* m_pModel_RasenShuriken_Boom;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Rasengun_Main"),
+			TEXT("Com_Model_RasenShuriken_Boom"), reinterpret_cast<CComponent**>(&m_pModel_RasenShuriken_Boom))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_RasenShuriken_Boom);
+	
+		CTexture* m_pTexture_RasenShuriken_Boom;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Main"),
+			TEXT("Com_Texture_RasenShuriken_Boom"), reinterpret_cast<CComponent**>(&m_pTexture_RasenShuriken_Boom))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_RasenShuriken_Boom);
+
+		CTexture* m_pTexture_RasenShuriken_Dissolve;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasenshuriken_Dissolve"),
+			TEXT("Com_Texture_RasenShuriken_Dissolve"), reinterpret_cast<CComponent**>(&m_pTexture_RasenShuriken_Dissolve))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_RasenShuriken_Dissolve);
+
+		m_ScalingSpeed = 2.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 5.f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_DECO)
+	{
+		CModel* m_pModel_RasenShuriken_Deco;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_RasenShuriken_Deco"),
+			TEXT("Com_Model_RasenShuriken_Deco"), reinterpret_cast<CComponent**>(&m_pModel_RasenShuriken_Deco))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_RasenShuriken_Deco);
+
+		CTexture* m_pTexture_RasenShuriken_Deco;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasenshuriken_Deco"),
+			TEXT("Com_Texture_RasenShuriken_Deco"), reinterpret_cast<CComponent**>(&m_pTexture_RasenShuriken_Deco))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_RasenShuriken_Deco);
+
+		CTexture* m_pTexture_RasenShuriken_Dissolve;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasenshuriken_Dissolve"),
+			TEXT("Com_Texture_RasenShuriken_Dissolve"), reinterpret_cast<CComponent**>(&m_pTexture_RasenShuriken_Dissolve))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_RasenShuriken_Dissolve);
+	
+		m_ScalingSpeed = 2.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 1.f;
 	}
 
 	return S_OK;

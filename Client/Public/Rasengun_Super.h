@@ -2,6 +2,9 @@
 #include "Client_Defines.h"
 #include "Skill.h"
 
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
+
 BEGIN(Client)
 
 class CRasengun_Super : public CSkill
@@ -48,6 +51,17 @@ public:
 private:
 	CCollider* m_pColliderMain = { nullptr };
 
+	CEffect_Mesh* m_Effect_Rasengun_Super_Main = { nullptr };
+	CEffect_Mesh* m_Effect_Rasengun_Super_Noise = { nullptr };
+								
+	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_1 = { nullptr };
+	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_2 = { nullptr };
+	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_3 = { nullptr };
+	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_4 = { nullptr };
+	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_5 = { nullptr };
+	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_6 = { nullptr };
+
+	CParticle_Point* m_Basic_Particles = { nullptr };
 private:
 	RASENGUN_SUPER_STATE myState = { STATE_MAKING };
 	_float		m_fDurTime = 0.f;
@@ -56,7 +70,8 @@ private:
 
 private:
 	HRESULT Add_Components();
-
+	HRESULT Add_Effects();
+	HRESULT Add_Particles();
 
 public:
 	static CRasengun_Super* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

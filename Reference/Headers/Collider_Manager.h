@@ -15,7 +15,8 @@ public:
 	HRESULT Initialize(_uint iNumLevels);
 
 public:
-	HRESULT		Add_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* pCollider, void* pArg);
+	HRESULT		Add_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* _pCollider, void* pArg);
+	HRESULT		Delete_Collider(_uint iLevelIndex, const wstring& strLayerTag, CCollider* _pCollider);
 	void		Check_Collision_For_MyEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strRaegetColliderLayerTag);
 	void		Check_Collision_For_TargetEvent(_uint iLevelIndex, CCollider* MyColliderCom, const wstring& strTargetColliderLayerTag, const wstring& strMyColliderLayerTag);
 

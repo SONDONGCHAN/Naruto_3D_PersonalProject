@@ -28,6 +28,8 @@ public:
 public:
 	void		Set_State(_ulonglong _state) { m_iState = _state; }
 	CModel*		Get_BodyModel() { return m_pBodyModelCom; }
+	void		Add_MainCollider();
+	void		Delete_MainCollider();
 
 private:
 	void		Player_Dash(_float fTimeDelta);

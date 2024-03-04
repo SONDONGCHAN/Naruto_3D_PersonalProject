@@ -271,6 +271,7 @@ HRESULT CFlameBomb::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
     Effect_Desc_1.MyType        = CEffect_Mesh::EFFECT_FIREBALL_MAIN;
     Effect_Desc_1.MyUVOption    = CEffect_Mesh::MOVE_X;
+    Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_1.vMyScale      = _vector{0.5f, 0.5f, 0.5f, 1.f};
     m_Effect_Fireball_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
     if (nullptr == m_Effect_Fireball_Main)
@@ -279,6 +280,7 @@ HRESULT CFlameBomb::Add_Effects()
     CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
     Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_FIREBALL_RING;
     Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_Y_INVERSE;
+    Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
     Effect_Desc_2.vMyScale = _vector{ 0.5f, 0.5f, 0.5f, 1.f };
     m_Effect_Fireball_Ring = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
     if (nullptr == m_Effect_Fireball_Ring)
@@ -304,7 +306,7 @@ HRESULT CFlameBomb::Add_Particles()
     InstanceDesc.MyOption_Shape = CVIBuffer_Instancing::SHAPE_NIDDLE;
     InstanceDesc.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
     InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
-
+    
     m_BasicParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
     if (nullptr == m_BasicParticles)
         return E_FAIL;
@@ -353,6 +355,7 @@ HRESULT CFlameBomb::Add_Particles()
     m_TraceParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc3));
     if (nullptr == m_TraceParticles)
         return E_FAIL;
+
 
     return S_OK;
 }
