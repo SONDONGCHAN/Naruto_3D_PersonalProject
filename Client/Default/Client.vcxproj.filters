@@ -456,9 +456,6 @@
     <Filter Include="02.GameObjects\Skill">
       <UniqueIdentifier>{f322995c-f6c8-411b-a67e-e85e089395e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Skill\Rasengun">
-      <UniqueIdentifier>{89ed652d-c011-403c-89cd-367bed0c5ed5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Skill\RasenShuriken">
       <UniqueIdentifier>{9dca1bc5-32ce-4bf5-b26b-fc407b7128e2}</UniqueIdentifier>
     </Filter>
@@ -605,6 +602,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Skill\Wood_Dragon">
       <UniqueIdentifier>{90cca1ad-2ab4-4b55-82d8-75b69e83bc02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Skill\Rasengun">
+      <UniqueIdentifier>{89ed652d-c011-403c-89cd-367bed0c5ed5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

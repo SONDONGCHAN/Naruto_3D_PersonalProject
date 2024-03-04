@@ -184,7 +184,7 @@ void CBody_Player_Naruto::Set_Animation_State(_float fTimeDelta)
 		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_pPlayerState & PLAYER_STATE_RASENSGUN_SUPER) {
-		m_pModelCom->Set_Animation(149, 0.1f, false, 1.3f, false, false);
+		m_pModelCom->Set_Animation(149, 0.1f, false, 1.f, false, false);
 		m_fAnimationPlayRatio = 1.f;
 	}
 	else if (*m_pPlayerState & PLAYER_STATE_AERIAL_RASENGUN_CHARGE) {
@@ -208,7 +208,7 @@ void CBody_Player_Naruto::Set_Animation_State(_float fTimeDelta)
 		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
 	}
 	else if (*m_pPlayerState & PLAYER_STATE_AERIAL_RASENGUN_SUPER) {
-		m_pModelCom->Set_Animation(141, 0.1f, false, 1.3f, false, false);
+		m_pModelCom->Set_Animation(141, 0.1f, false, 1.f, false, false);
 		m_fAnimationPlayRatio = 1.f;
 		*m_pPlayerGravity = -(fTimeDelta * *m_pPlayerGForcePerSec);
 	}

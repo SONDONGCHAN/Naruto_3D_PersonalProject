@@ -36,7 +36,7 @@ public:
 	virtual void	Collider_Event_Stay(const wstring& strColliderLayerTag, _Out_ CCollider* pMyCollider, _Out_ CCollider* pTargetCollider) {};
 	virtual void	Collider_Event_Exit(const wstring& strColliderLayerTag, _Out_ CCollider* pMyCollider, _Out_ CCollider* pTargetCollider) {};
 
-
+	void			Compute_Z();
 
 	CTransform*		Get_TranformCom() { return m_pTransformCom; }
 	_bool			Get_isDead()	{ return m_bDead; }

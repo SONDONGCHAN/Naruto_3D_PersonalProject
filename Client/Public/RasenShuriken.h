@@ -9,7 +9,7 @@ BEGIN(Client)
 class CRasenShuriken : public CSkill
 {
 public:
-	enum RASENSHURIKEN_STATE { STATE_MAKING, STATE_DETECTING, STATE_HIT, STATE_FINISH, STATE_END };
+	enum RASENSHURIKEN_STATE { STATE_MAKING, STATE_DETECTING, STATE_HIT, STATE_DISSOLVE, STATE_FINISH, STATE_END };
 
 	struct SKILL_RASENSHURIKEN_DESC : public  CSkill::SKILL_DESC
 	{
@@ -80,8 +80,6 @@ private:
 	_float4x4*	m_pSocketMatrix = { nullptr };
 	_matrix  	m_OriginalMat = {};
 
-	_bool		m_bIsEnd = false;
-	_bool		m_bHitStart = false;
 	_float		m_fCheckDelay = 0.f;
 
 

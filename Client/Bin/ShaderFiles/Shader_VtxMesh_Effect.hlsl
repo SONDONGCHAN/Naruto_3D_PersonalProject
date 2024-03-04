@@ -324,6 +324,51 @@ PS_OUT PS_RASENSHURIKEN_DECO_END(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_RASENGUN_SUPER_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_vColor;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+    //Out.vDiffuse = g_vColor;
+    return Out;
+}
+
+PS_OUT PS_RASENGUN_SUPER_MAIN_END(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vDissolve = g_DissolveTexture.Sample(g_LinearSampler, In.vTexcoord2);
+    vector vMtrlDiffuse = g_vColor;
+    
+    if (vDissolve.r < g_fDiscardColor)
+        discard;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+    
+    //Out.vDiffuse = g_vColor;
+    return Out;
+}
+
+PS_OUT PS_WOOD_SWAP(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+     
+
+    vMtrlDiffuse.a = g_fAlpha;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+
+    return Out;
+}
+
+
 technique11 DefaultTechnique
 {
     pass FireBall_Main //0
@@ -457,6 +502,40 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_RASENSHURIKEN_DECO_END();
     }
+
+    pass RasengunSuper_Main //12
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_RASENGUN_SUPER_MAIN();
+    }
+
+    pass RasengunSuper_Main_End //13
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_DISSOLVE();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_RASENGUN_SUPER_MAIN_END();
+    }
+
+    pass Wood_Swap //14
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_WOOD_SWAP();
+    }
+
 
 }
 

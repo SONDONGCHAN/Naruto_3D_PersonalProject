@@ -81,6 +81,11 @@ HRESULT CGameObject::Render()
     return S_OK;
 }
 
+void CGameObject::Compute_Z()
+{
+
+}
+
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComTag, CComponent** ppOut, void* pArg)
 {
     auto	iter = m_Components.find(strComTag);

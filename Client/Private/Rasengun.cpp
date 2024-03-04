@@ -348,20 +348,28 @@ HRESULT CRasengun::Add_Effects()
     if (nullptr == m_Effect_Rasengun_Boom)
         return E_FAIL;
 
+
+
+    return S_OK;
+}
+
+HRESULT CRasengun::Add_Particles()
+{
     CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
     InstanceDesc1.iNumInstance = 200;
     InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vRange = _float3(5.f, 5.f, 5.f);
-    InstanceDesc1.vSize = _float2(0.01f, 0.06f);
+    InstanceDesc1.vSize = _float2(0.03f, 0.04f);
     InstanceDesc1.vSpeed = _float2(0.3f, 0.7f);
     InstanceDesc1.vLifeTime = _float2(2.5f, 3.f);
     InstanceDesc1.isLoop = false;
-    InstanceDesc1.vColor = _float4( 121.f / 255.f, 237.f / 255.f, 1.f, 0.7f );
+    InstanceDesc1.vColor = _float4(121.f / 255.f, 237.f / 255.f, 1.f, 0.7f);
     InstanceDesc1.fDuration = 3.1f;
     InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
     InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_RECTANGLE;
     InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
+    InstanceDesc1.MyOption_Size = CVIBuffer_Instancing::SIZE_DIMINISH;
     InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Circle_Noise";
     InstanceDesc1.vSpriteRatio = _float2(1.f, 1.f);
 
@@ -369,11 +377,6 @@ HRESULT CRasengun::Add_Effects()
     if (nullptr == m_BoomParticles)
         return E_FAIL;
 
-    return S_OK;
-}
-
-HRESULT CRasengun::Add_Particles()
-{
     return S_OK;
 }
 

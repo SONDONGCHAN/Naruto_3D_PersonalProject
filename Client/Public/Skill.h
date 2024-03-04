@@ -54,6 +54,7 @@ protected:
 	CCamera_Free*	m_pCamera = { nullptr };
 	_float4x4		m_WorldMatrix;
 
+
 protected:
 	_float		m_fSkill_Power = { 0.f };
 	LEVEL		m_Current_Level = { LEVEL_END };

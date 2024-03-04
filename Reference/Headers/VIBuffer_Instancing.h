@@ -10,6 +10,8 @@ public:
 	enum  PARTICLE_MOVING { OPTION_DROP, OPTION_SPREAD, OPTION_END};
 	enum  PARTICLE_SHAPE { SHAPE_SQUARE, SHAPE_RECTANGLE, SHAPE_NIDDLE, SHAPE_END };
 	enum  PARTICLE_TEXTURE { TEXTURE_SPRITE, TEXTURE_NONE_SPRITE, TEXTURE_NONE, TEXTURE_END};
+	enum  PARTICLE_SIZE { SIZE_NONE, SIZE_GROW, SIZE_DIMINISH, SIZE_END };
+
 
 	struct INSTANCE_DESC
 	{
@@ -27,6 +29,7 @@ public:
 		PARTICLE_MOVING		MyOption_Moving;
 		PARTICLE_SHAPE		MyOption_Shape;
 		PARTICLE_TEXTURE	MyOption_Texture;
+		PARTICLE_SIZE		MyOption_Size;
 		wstring				strTextureTag;
 		_float2				vSpriteRatio = {1.f ,1.f};
 	};
@@ -70,7 +73,11 @@ protected:
 	_float*						m_pLifeTime = { nullptr };
 	_float*						m_pMaxLifeTime = { nullptr };
 	_float*						m_pDelayTime = { nullptr };
+
+	_float*						m_pMaxSizeX = { nullptr };
 	_float*						m_pMaxSizeY = { nullptr };
+	_float*						m_pMaxSizeZ = { nullptr };
+
 
 	_float						m_fTimeAcc = { 0.f };
 	_bool						m_isFinished = { true };

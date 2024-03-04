@@ -52,7 +52,7 @@ void CRasenShuriken::Tick(_float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
 
-    if (myState == STATE_MAKING || myState == STATE_DETECTING)
+    if (myState == STATE_MAKING || myState == STATE_DETECTING  )
     {
         if (myState == STATE_MAKING)
         {
@@ -78,7 +78,7 @@ void CRasenShuriken::Tick(_float fTimeDelta)
         m_Effect_RasenShuriken_Ring->Scale_Change(fTimeDelta);
     }
 
-    else if (myState == STATE_HIT)
+    else if (myState == STATE_HIT || myState == STATE_DISSOLVE)
     {
         _matrix ParentMakingMat = m_pParentTransform->Get_WorldMatrix();
         _matrix MakingMat = m_pTransformCom->Get_WorldMatrix();
@@ -103,7 +103,7 @@ void CRasenShuriken::Late_Tick(_float fTimeDelta)
 
     }
 
-    else if (myState == STATE_HIT)
+    else if (myState == STATE_HIT || myState == STATE_DISSOLVE)
     {
         m_Effect_RasenShuriken_Boom->Late_Tick(fTimeDelta);
         Deco_Control_Late_Tick(fTimeDelta);
@@ -213,18 +213,14 @@ void CRasenShuriken::State_Control(_float fTimeDelta)
 
         if (m_fDurTime > 2.f)
             Set_Next_State();
-        else if (m_fDurTime > 1.f && m_bIsEnd == false)
-        {
-            m_bIsEnd = true;
-            m_Effect_RasenShuriken_Boom->End_Trigger(1.f);
-            m_Effect_RasenShuriken_Deco_1->End_Trigger(1.f);
-            m_Effect_RasenShuriken_Deco_2->End_Trigger(1.f);
-            m_Effect_RasenShuriken_Deco_3->End_Trigger(1.f);
-            m_Effect_RasenShuriken_Deco_4->End_Trigger(1.f);
-            m_Effect_RasenShuriken_Deco_5->End_Trigger(1.f);
-            m_Effect_RasenShuriken_Deco_6->End_Trigger(1.f);
-        }
         // 이펙트 채워넣기
+    }
+    else if (myState == STATE_DISSOLVE)
+    {
+        m_fDurTime += fTimeDelta;
+
+        if (m_fDurTime > 1.f)
+            Set_Next_State();
     }
 }
 
@@ -262,14 +258,9 @@ void CRasenShuriken::Set_Next_State()
         m_Effect_RasenShuriken_Deco_6->State_Tick(ParentMakingMat);
 
         m_BoomParticles->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-        m_bHitStart = true;
     }
-    else if (myState == STATE_FINISH)
+    else if (myState == STATE_DISSOLVE)
     {
-        m_bHitStart = false;
-        m_fCheckDelay = 0.f;
-
-        m_bIsEnd = false;
         m_pColliderMain->Set_Radius(0.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
@@ -278,6 +269,19 @@ void CRasenShuriken::Set_Next_State()
         else if (m_User_Type == USER_MONSTER)
             m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider", L"RasenShuriken_Collider");
 
+        m_fDurTime = 0;
+
+        m_Effect_RasenShuriken_Boom->End_Trigger(1.f);
+        m_Effect_RasenShuriken_Deco_1->End_Trigger(1.f);
+        m_Effect_RasenShuriken_Deco_2->End_Trigger(1.f);
+        m_Effect_RasenShuriken_Deco_3->End_Trigger(1.f);
+        m_Effect_RasenShuriken_Deco_4->End_Trigger(1.f);
+        m_Effect_RasenShuriken_Deco_5->End_Trigger(1.f);
+        m_Effect_RasenShuriken_Deco_6->End_Trigger(1.f);       
+    }
+    else if (myState == STATE_FINISH)
+    {
+        m_fCheckDelay = 0.f;
         m_fDurTime = 0;
         m_bTargeting = false;
         m_bIsHit = false;
@@ -315,8 +319,7 @@ void CRasenShuriken::Particles_Late_Tick(_float fTimeDelta)
 
 void CRasenShuriken::Deco_Control_Tick(_float fTimeDelta)
 {
-    if (m_bHitStart)
-        m_fCheckDelay += fTimeDelta;
+     m_fCheckDelay += fTimeDelta;
 
     _matrix ParentMakingMat = m_pParentTransform->Get_WorldMatrix();
     _matrix MakingMat = m_pTransformCom->Get_WorldMatrix();
@@ -553,8 +556,8 @@ void CRasenShuriken::Free()
     Safe_Release(m_Effect_RasenShuriken_Deco_5);
     Safe_Release(m_Effect_RasenShuriken_Deco_6);
 
-
     Safe_Release(m_BoomParticles);
+
     Safe_Release(m_pColliderMain);
 
     __super::Free();

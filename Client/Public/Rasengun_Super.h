@@ -10,7 +10,7 @@ BEGIN(Client)
 class CRasengun_Super : public CSkill
 {
 public:
-	enum RASENGUN_SUPER_STATE { STATE_MAKING, STATE_HIT, STATE_FINISH, STATE_END };
+	enum RASENGUN_SUPER_STATE { STATE_MAKING, STATE_HIT, STATE_DISSOLVE, STATE_FINISH, STATE_END };
 
 	struct SKILL_RASENGUN_SUPER_DESC : public  CSkill::SKILL_DESC
 	{
@@ -49,6 +49,12 @@ public:
 	void		Particles_Late_Tick(_float fTimeDelta) override;
 
 private:
+	void		Deco_Control_Tick(_float fTimeDelta);
+	void		Deco_Control_Late_Tick(_float fTimeDelta);
+	void		Deco_Start_Trigger();
+
+
+private:
 	CCollider* m_pColliderMain = { nullptr };
 
 	CEffect_Mesh* m_Effect_Rasengun_Super_Main = { nullptr };
@@ -61,12 +67,22 @@ private:
 	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_5 = { nullptr };
 	CEffect_Mesh* m_Effect_Rasengun_Super_Deco_6 = { nullptr };
 
-	CParticle_Point* m_Basic_Particles = { nullptr };
+	CParticle_Point* m_Making_Particles = { nullptr };
+	CParticle_Point* m_Boom_Particles = { nullptr };
+
+
 private:
 	RASENGUN_SUPER_STATE myState = { STATE_MAKING };
 	_float		m_fDurTime = 0.f;
 	_float4x4* m_pSocketMatrix = { nullptr };
 	_matrix  	m_OriginalMat = {};
+	_matrix		m_FinalMat = {};
+
+	_bool		m_bIsEnd = false;
+	_bool		m_bHitStart = false;
+	_float		m_fCheckDelay = 0.f;
+	_float		m_fMaking_Delay= 0.f;
+	_bool		m_bMakeParticle = false;
 
 private:
 	HRESULT Add_Components();

@@ -1,6 +1,9 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Skill.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
+
 BEGIN(Client)
 
 class CWood_Swap : public CSkill
@@ -45,15 +48,22 @@ public:
 	void		Particles_Late_Tick(_float fTimeDelta) override;
 
 private:
+	CEffect_Mesh*		m_Effect_WoodSwap_Main = { nullptr };
+	CParticle_Point*	m_SmokeParticles	= { nullptr };
+	
+private:
 	WOOD_SWAP_STATE		myState = { STATE_APPEAR };
 	_float				m_fDurTime = 0.f;
 	random_device		m_RandomDevice;
 	mt19937_64			m_RandomNumber;
 	CNavigation*		m_pUser_Navigation;
 
+	_matrix				m_MyMat = {};
+
 private:
 	HRESULT Add_Components();
-
+	HRESULT Add_Effects();
+	HRESULT Add_Particles();
 
 public:
 	static CWood_Swap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

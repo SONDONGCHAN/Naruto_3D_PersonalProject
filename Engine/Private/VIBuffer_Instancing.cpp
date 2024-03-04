@@ -35,7 +35,11 @@ HRESULT CVIBuffer_Instancing::Initialize(void* pArg)
 	m_pSpeed	= new _float[m_iNumInstance];
 	m_pLifeTime = new _float[m_iNumInstance];
 	m_pMaxLifeTime = new _float[m_iNumInstance];
+
+	m_pMaxSizeX = new _float[m_iNumInstance];
 	m_pMaxSizeY = new _float[m_iNumInstance];
+	m_pMaxSizeZ = new _float[m_iNumInstance];
+
 	m_pDelayTime = new _float[m_iNumInstance];
 
 	uniform_real_distribution<float>	SpeedRange(m_InstanceData.vSpeed.x, m_InstanceData.vSpeed.y);
@@ -125,6 +129,7 @@ _bool CVIBuffer_Instancing::Trigger(_vector vCenterPos)
 			_float		yScale = { 1.f };
 
 			((VTXINSTANCE*)m_SubResource.pData)[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
+			m_pMaxSizeX[i] = fSize;
 
 			if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 				yScale = 60.f;
@@ -135,7 +140,8 @@ _bool CVIBuffer_Instancing::Trigger(_vector vCenterPos)
 			m_pMaxSizeY[i] = fSize * yScale;
 
 			((VTXINSTANCE*)m_SubResource.pData)[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
-			
+			m_pMaxSizeZ[i] = fSize;
+
 			if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 			{
 				_vector		vDir = XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
@@ -267,6 +273,8 @@ void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 				m_pMaxSizeY[i] = fSize * yScale;
 				((VTXINSTANCE*)SubResource.pData)[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
 				
+
+
 				if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 				{
 					_vector		vDir = XMLoadFloat4(&((VTXINSTANCE*)SubResource.pData)[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
@@ -292,6 +300,13 @@ void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 			{
 				m_pMaxSizeY[i] = Lerp(m_pMaxSizeY[i], 0.f, 0.15f);
 				((VTXINSTANCE*)SubResource.pData)[i].vUp = _float4(0.f, m_pMaxSizeY[i], 0.f, 0.f);
+			}
+			else if (m_InstanceData.MyOption_Size == SIZE_DIMINISH)
+			{
+				((VTXINSTANCE*)SubResource.pData)[i].vRight = _float4(m_pMaxSizeX[i] * Alpha, 0.f, 0.f, 0.f);
+				((VTXINSTANCE*)SubResource.pData)[i].vUp	= _float4(0.f, m_pMaxSizeY[i] * Alpha, 0.f, 0.f);
+				((VTXINSTANCE*)SubResource.pData)[i].vLook	= _float4(0.f, 0.f, m_pMaxSizeY[i] * Alpha, 0.f);
+
 			}
 		}
 	}
@@ -336,6 +351,12 @@ void CVIBuffer_Instancing::Tick_Spread(_float fTimeDelta)
 					m_pMaxSizeY[i] = Lerp(m_pMaxSizeY[i], 0.f, 0.15f);
 					((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, m_pMaxSizeY[i], 0.f, 0.f);
 				}
+				else if (m_InstanceData.MyOption_Size == SIZE_DIMINISH)
+				{
+					((VTXINSTANCE*)m_SubResource.pData)[i].vRight = _float4(m_pMaxSizeX[i] * Alpha, 0.f, 0.f, 0.f);
+					((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, m_pMaxSizeY[i] * Alpha, 0.f, 0.f);
+					((VTXINSTANCE*)m_SubResource.pData)[i].vLook = _float4(0.f, 0.f, m_pMaxSizeY[i] * Alpha, 0.f);
+				}
 			}
 		}
 		m_pContext->Unmap(m_pVBInstance, 0);
@@ -347,7 +368,10 @@ void CVIBuffer_Instancing::Free()
 {
 	__super::Free();
 
+	Safe_Delete_Array(m_pMaxSizeX);
 	Safe_Delete_Array(m_pMaxSizeY);
+	Safe_Delete_Array(m_pMaxSizeZ);
+
 	Safe_Delete_Array(m_pMaxLifeTime);
 	Safe_Delete_Array(m_pLifeTime);
 	Safe_Delete_Array(m_pSpeed);

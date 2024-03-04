@@ -1131,7 +1131,7 @@ void CPlayer_Naruto::Use_Skill(const wstring& strSkillName)
 		m_pCamera->Set_Camera_radius_Immediate(2.f);
 		m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
 		m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
-		m_pCamera->Set_Camera_radius(4.f, 0.03f);
+		m_pCamera->Set_Camera_radius(8.f, 0.025f);
 
 		m_Skill_Animation_State = SKILL_RASENGUN_SUPER;
 	
@@ -1333,7 +1333,7 @@ void CPlayer_Naruto::Skill_Tick(_float fTimeDelta)
 		{
 			m_fSkillDurTime += fTimeDelta;
 
-			if (m_fSkillDurTime > 2.f)
+			if (m_fSkillDurTime > 2.7f)
 			{
 				m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_BACK);
 				m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_PLAYER_CHASE);

@@ -252,6 +252,8 @@ HRESULT CRenderer::Render_NonLight()
 
 HRESULT CRenderer::Render_Blend()
 {
+    //m_RenderObjects[RENDER_ALPHA].sort([](CGameObject* pDst, CGameObject* pSrc)->bool { return pDst->Get_ViewZ() > pSrc->Get_ViewZ();  });
+
     for (auto& pGameObject : m_RenderObjects[RENDER_BLEND])
     {
         if (nullptr != pGameObject)
