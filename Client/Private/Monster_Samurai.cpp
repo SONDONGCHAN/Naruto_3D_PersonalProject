@@ -642,6 +642,7 @@ void CMonster_Samurai::Collider_Event_Enter(const wstring& strColliderLayerTag, 
 			_vector		vDir = TargetPos - MyPos;
 			vDir.m128_f32[1] = 0.f;
 			m_pTransformCom->Set_Look(vDir);
+			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 2.f, 0.05f);
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{

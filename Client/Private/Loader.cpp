@@ -592,6 +592,10 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Skill/Rasengun_Super/Rasengun_Super.dat"))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Rasengun_Super_"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Skill/Rasengun_Super/Rasengun_Super_.dat"))))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Super_Noise"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Masking/Rasengun_Super_Noise.png"), 1))))
 		return E_FAIL;
@@ -603,6 +607,25 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Wood_Swap"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Masking/Wood_Swap.png"), 1))))
+		return E_FAIL;
+
+	////////////Kurama_Scratch///////////
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Scratch"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Skill/Kurama/Kurama_Scratch.dat"))))
+		return E_FAIL;
+
+	////////////Kurama_Claw///////////
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Claw"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Skill/Kurama/Kurama_Claw_.dat"))))
+		return E_FAIL;
+
+	////////////Kurama_Rush///////////
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Rush"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Skill/Kurama/Kurama_Rush.dat"))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Kurama_Rush"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Masking/Crack.png"), 1))))
 		return E_FAIL;
 
 

@@ -261,6 +261,8 @@ void CRasenShuriken::Set_Next_State()
     }
     else if (myState == STATE_DISSOLVE)
     {
+        m_DissolveParticles->Trigger(m_pTransformCom->Get_WorldMatrix().r[3]);
+
         m_pColliderMain->Set_Radius(0.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 
@@ -305,16 +307,19 @@ void CRasenShuriken::Set_Targeting(_vector Target_Pos)
 void CRasenShuriken::Particles_Priority_Tick(_float fTimeDelta)
 {
     m_BoomParticles->Priority_Tick(fTimeDelta);
+    m_DissolveParticles->Priority_Tick(fTimeDelta);
 }
 
 void CRasenShuriken::Particles_Tick(_float fTimeDelta)
 {
     m_BoomParticles->Tick(fTimeDelta);
+    m_DissolveParticles->Tick(fTimeDelta);
 }
 
 void CRasenShuriken::Particles_Late_Tick(_float fTimeDelta)
 {
     m_BoomParticles->Late_Tick(fTimeDelta);
+    m_DissolveParticles->Late_Tick(fTimeDelta);
 }
 
 void CRasenShuriken::Deco_Control_Tick(_float fTimeDelta)
@@ -512,6 +517,29 @@ HRESULT CRasenShuriken::Add_Particles()
     if (nullptr == m_BoomParticles)
         return E_FAIL;
 
+
+    CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
+    InstanceDesc1.iNumInstance = 500;
+    InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
+    InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
+    InstanceDesc1.vRange = _float3(3.f, 3.f, 3.f);
+    InstanceDesc1.vSize = _float2(0.04f, 0.05f);
+    InstanceDesc1.vSpeed = _float2(1.5f, 2.f);
+    InstanceDesc1.vLifeTime = _float2(2.5f, 3.f);
+    InstanceDesc1.isLoop = false;
+    InstanceDesc1.vColor = _float4(121.f / 255.f, 237.f / 255.f, 1.f, 0.7f);
+    InstanceDesc1.fDuration = 3.1f;
+    InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+    InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_RECTANGLE;
+    InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
+    InstanceDesc1.MyOption_Size = CVIBuffer_Instancing::SIZE_DIMINISH;
+    InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Circle_Noise";
+    InstanceDesc1.vSpriteRatio = _float2(1.f, 1.f);
+    
+    m_DissolveParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
+    if (nullptr == m_DissolveParticles)
+        return E_FAIL;
+    
     return S_OK;
 }
 
@@ -557,6 +585,7 @@ void CRasenShuriken::Free()
     Safe_Release(m_Effect_RasenShuriken_Deco_6);
 
     Safe_Release(m_BoomParticles);
+    Safe_Release(m_DissolveParticles);
 
     Safe_Release(m_pColliderMain);
 

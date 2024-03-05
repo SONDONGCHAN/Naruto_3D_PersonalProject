@@ -23,6 +23,12 @@ HRESULT CKurama_Scratch::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+    if (FAILED(Add_Effects()))
+        return E_FAIL;
+
+    if (FAILED(Add_Particles()))
+        return E_FAIL;
+
 	return S_OK;
 }
 
@@ -33,16 +39,28 @@ void CKurama_Scratch::Priority_Tick(_float fTimeDelta)
 void CKurama_Scratch::Tick(_float fTimeDelta)
 {
 	State_Control(fTimeDelta);
+
+    if (STATE_DETECTING == myState)
+    {
+        m_Effect_Scratch_Main->State_Tick(m_pTransformCom->Get_WorldMatrix());
+        m_Effect_Scratch_Main->Tick(fTimeDelta);
+        m_Effect_Scratch_Main->Scale_Change(fTimeDelta);
+    }
 }
 
 void CKurama_Scratch::Late_Tick(_float fTimeDelta)
 {
-#ifdef _DEBUG
 	if (myState == STATE_DETECTING || myState == STATE_HIT)
 	{
+        if (STATE_DETECTING == myState)
+        {
+            m_Effect_Scratch_Main->Late_Tick(fTimeDelta);
+        }
+#ifdef _DEBUG
 		m_pGameInstance->Add_DebugComponent(m_pColliderMain);
-	}
 #endif  
+
+	}
 }
 
 HRESULT CKurama_Scratch::Render()
@@ -99,6 +117,7 @@ void CKurama_Scratch::State_Control(_float fTimeDelta)
         if (m_bTargeting)
         {
             m_pTransformCom->MoveTo(m_vTarget_Pos, 20.f, fTimeDelta);
+            m_pTransformCom->LookAt(m_vTarget_Pos);
 
             if (XMVectorGetX(XMVector3Length(m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_vTarget_Pos)) < 0.4f)
             {
@@ -147,12 +166,15 @@ void CKurama_Scratch::Set_Next_State()
 
     if (myState == STATE_DETECTING)
     {
+        m_Effect_Scratch_Main->Start_Trigger();
+
         m_pColliderMain->Set_Radius(1.f);
     }
 
     else if (myState == STATE_HIT)
     {
        // m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+        m_BoomParticles->Trigger(m_pTransformCom->Get_WorldMatrix().r[3]);
         m_pColliderMain->Set_Radius(3.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_fDurTime = 0;
@@ -186,14 +208,17 @@ void CKurama_Scratch::Set_Targeting(_vector Target_Pos)
 
 void CKurama_Scratch::Particles_Priority_Tick(_float fTimeDelta)
 {
+    m_BoomParticles->Priority_Tick(fTimeDelta);
 }
 
 void CKurama_Scratch::Particles_Tick(_float fTimeDelta)
 {
+    m_BoomParticles->Tick(fTimeDelta);
 }
 
 void CKurama_Scratch::Particles_Late_Tick(_float fTimeDelta)
 {
+    m_BoomParticles->Late_Tick(fTimeDelta);
 }
 
 HRESULT CKurama_Scratch::Add_Components()
@@ -212,6 +237,46 @@ HRESULT CKurama_Scratch::Add_Components()
 
     m_pGameInstance->Add_Collider(m_Current_Level, TEXT("Kurama_Scratch_Collider"), m_pColliderMain);
     m_pColliderMain->Set_Collider_GameObject(this);
+
+    return S_OK;
+}
+
+HRESULT CKurama_Scratch::Add_Effects()
+{
+    CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
+    Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_KURAMA_SCRATCH;
+    Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
+    Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
+    Effect_Desc_1.vMyScale = _vector{ 10.f, 10.f, 10.f, 0.8f };
+    m_Effect_Scratch_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
+    if (nullptr == m_Effect_Scratch_Main)
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CKurama_Scratch::Add_Particles()
+{
+    CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
+    InstanceDesc.iNumInstance = 150;
+    InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+    InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
+    InstanceDesc.vSize = _float2(0.05f, 0.08f);
+    InstanceDesc.vSpeed = _float2(2.5f, 3.5f);
+    InstanceDesc.vLifeTime = _float2(0.7f, 1.0f);
+    InstanceDesc.isLoop = false;
+    InstanceDesc.vColor = _float4(138.f / 255.f, 43.f / 255.f, 226.f / 255.f, 1.0f);
+    InstanceDesc.fDuration = 1.1f;
+    InstanceDesc.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+    InstanceDesc.MyOption_Shape = CVIBuffer_Instancing::SHAPE_NIDDLE;
+    InstanceDesc.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
+    InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
+    InstanceDesc.vSpriteRatio = _float2(1.f, 1.f);
+    
+    m_BoomParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+    if (nullptr == m_BoomParticles)
+        return E_FAIL;
 
     return S_OK;
 }
@@ -245,6 +310,8 @@ CGameObject* CKurama_Scratch::Clone(void* pArg)
 void CKurama_Scratch::Free()
 {
     Safe_Release(m_pColliderMain);
-
+    Safe_Release(m_Effect_Scratch_Main); 
+    Safe_Release(m_BoomParticles);
+ 
     __super::Free();
 }

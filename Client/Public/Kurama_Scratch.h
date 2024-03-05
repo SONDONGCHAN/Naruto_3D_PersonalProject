@@ -1,6 +1,8 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Skill.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
 
 BEGIN(Client)
 
@@ -42,7 +44,9 @@ public:
 	void		Particles_Late_Tick(_float fTimeDelta) override;
 
 private:
-	CCollider* m_pColliderMain = { nullptr };
+	CCollider*			m_pColliderMain = { nullptr };
+	CEffect_Mesh*		m_Effect_Scratch_Main= { nullptr };
+	CParticle_Point*	m_BoomParticles = { nullptr };
 
 private:
 	KURAMA_SCRATCH_STATE myState = { STATE_MAKING };
@@ -53,6 +57,8 @@ private:
 
 private:
 	HRESULT Add_Components();
+	HRESULT Add_Effects();
+	HRESULT Add_Particles();
 
 public:
 	static CKurama_Scratch* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -356,12 +356,12 @@ HRESULT CRasengun::Add_Effects()
 HRESULT CRasengun::Add_Particles()
 {
     CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
-    InstanceDesc1.iNumInstance = 200;
+    InstanceDesc1.iNumInstance = 300;
     InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
-    InstanceDesc1.vRange = _float3(5.f, 5.f, 5.f);
+    InstanceDesc1.vRange = _float3(3.f, 3.f, 3.f);
     InstanceDesc1.vSize = _float2(0.03f, 0.04f);
-    InstanceDesc1.vSpeed = _float2(0.3f, 0.7f);
+    InstanceDesc1.vSpeed = _float2(0.6f, 1.f);
     InstanceDesc1.vLifeTime = _float2(2.5f, 3.f);
     InstanceDesc1.isLoop = false;
     InstanceDesc1.vColor = _float4(121.f / 255.f, 237.f / 255.f, 1.f, 0.7f);

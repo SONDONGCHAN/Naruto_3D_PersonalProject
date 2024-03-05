@@ -720,7 +720,126 @@ HRESULT CEffect_Mesh::Render()
 			}
 		}	
 	}
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_SCRATCH)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
 
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+
+				_float4		vColor = { 138.f/255.f, 43.f/255.f,226.f/255.f, 1.0f };
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(15)))
+					return E_FAIL;
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_CLAW)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+
+				//_float4		vColor = { 1.f, 110.f / 255.f, 0.f, 1.f };
+				_float4		vColor = { 0.f, 0.f, 0.f, 1.f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(16)))
+					return E_FAIL;
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_RUSH)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+	
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+	
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+	
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+	
+				//_float4		vColor = { 1.f, 110.f / 255.f, 0.f, 1.f };
+				_float4		vColor = { 0.f, 0.f, 0.f, 1.f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+	
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Begin(17)))
+					return E_FAIL;
+	
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+	
 	return S_OK;
 }
 
@@ -890,6 +1009,21 @@ void CEffect_Mesh::Start_Trigger()
 	{
 		m_ScalingRatio = 0.f;
 	}
+	else if (EFFECT_KURAMA_SCRATCH == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+	}
+	else if (EFFECT_KURAMA_CLAW == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+		m_fAlpha = 1.f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_RUSH)
+	{
+		m_fAlpha = 1.f;
+	}
 }
 
 void CEffect_Mesh::End_Trigger(_float fDiscardSpeed)
@@ -1040,6 +1174,47 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 		m_fAlpha = Lerp(1.f, 0.f, m_ScalingRatio);
 	}
 
+	else if (EFFECT_KURAMA_SCRATCH == m_MyDesc.MyType)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_CLAW)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+			
+		}
+		else
+		{
+			if (m_fAlpha > 0.f)
+				m_fAlpha -= m_AlphaSpeed * fTimeDelta;
+			
+			else
+				m_fAlpha = 0.f;
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_RUSH)
+	{
+		if (m_fAlpha > 0.f)
+			m_fAlpha -= m_AlphaSpeed * fTimeDelta;
+		
+		else
+			m_fAlpha = 0.f;
+	}
 }
 
 _float CEffect_Mesh::Lerp(_float start, _float end, _float ratio)
@@ -1397,7 +1572,7 @@ HRESULT CEffect_Mesh::Add_Component()
 			TEXT("Com_Model_Rasengun_Super_Noise"), reinterpret_cast<CComponent**>(&m_pModel_Rasengun_Super_Noise))))
 			return E_FAIL;
 		m_vModels.push_back(m_pModel_Rasengun_Super_Noise);
-	
+
 		CTexture* m_pTexture_Rasengun_Super_Noise;
 		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Super_Noise"),
 			TEXT("Com_Texture_Rasengun_Super_Noise"), reinterpret_cast<CComponent**>(&m_pTexture_Rasengun_Super_Noise))))
@@ -1436,7 +1611,68 @@ HRESULT CEffect_Mesh::Add_Component()
 		m_fSpinSpeed = 1.f;
 	}
 
-	
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_SCRATCH)
+	{
+		CModel* m_pModel_Kurama_Scratch;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Scratch"),
+			TEXT("Com_Model_Kurama_Scratch"), reinterpret_cast<CComponent**>(&m_pModel_Kurama_Scratch))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Kurama_Scratch);
+    
+		CTexture* m_pTexture_Kurama_Scratch;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_kamui_Boom"),
+			TEXT("Com_Texture_Kurama_Scratch"), reinterpret_cast<CComponent**>(&m_pTexture_Kurama_Scratch))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Kurama_Scratch);
+    
+		m_ScalingSpeed = 1.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 2.f;
+		m_fSpinSpeed = 0.f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_CLAW)
+	{
+		CModel* m_pModel_Kurama_Claw;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Claw"),
+			TEXT("Com_Model_Kurama_Claw"), reinterpret_cast<CComponent**>(&m_pModel_Kurama_Claw))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Kurama_Claw);
+		
+		CTexture* m_pTexture_Kurama_Claw;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasenshuriken_Deco"),
+			TEXT("Com_Texture_Kurama_Claw"), reinterpret_cast<CComponent**>(&m_pTexture_Kurama_Claw))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Kurama_Claw);
+
+		m_ScalingSpeed = 4.f;
+		m_AlphaSpeed = 4.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 0.f;
+		m_fSpinSpeed = 0.f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_RUSH)
+	{
+		CModel* m_pModel_Kurama_Rush;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Rush"),
+			TEXT("Com_Model_Kurama_Claw"), reinterpret_cast<CComponent**>(&m_pModel_Kurama_Rush))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Kurama_Rush);
+		
+		CTexture* m_pTexture_Kurama_Rush;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Kurama_Rush"),
+			TEXT("Com_Texture_Kurama_Claw"), reinterpret_cast<CComponent**>(&m_pTexture_Kurama_Rush))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Kurama_Rush);
+		
+		m_ScalingSpeed = 0.f;
+		m_AlphaSpeed = 2.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 0.f;
+		m_fSpinSpeed = 0.f;
+
+	}
 	
 	return S_OK;
 }

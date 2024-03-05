@@ -45,6 +45,9 @@ HRESULT CBoss_Kurama::Initialize(void* pArg)
 	if (FAILED(Add_Trails()))
 		return E_FAIL;
 	
+	if (FAILED(Add_Effects()))
+		return E_FAIL;
+
 	if (FAILED(Add_Particles()))
 		return E_FAIL;
 
@@ -55,7 +58,7 @@ HRESULT CBoss_Kurama::Initialize(void* pArg)
 		return E_FAIL;
 	
 	m_CurrentState = BOSS_STATE_APPEAR;
-	_vector vStart_Pos = { 77.f, 28.f, -67.f, 1.f };
+	_vector vStart_Pos = { 77.f, 28.f, -60.f, 1.f };
 	m_pTransformCom->Set_Pos(vStart_Pos);
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	
@@ -105,6 +108,10 @@ void CBoss_Kurama::Tick(_float fTimeDelta)
 
 		Skills_Tick(fTimeDelta);
 		Particles_Tick(fTimeDelta);
+		if (m_iState == BOSS_ATTACK_SCRATCH || m_iState == BOSS_RUSH_ATTACK)
+		{
+			Attack_Effect_Tick(fTimeDelta, m_iState);
+		}
 
 	}
 }
@@ -136,7 +143,11 @@ void CBoss_Kurama::Late_Tick(_float fTimeDelta)
 		Skills_Late_Tick(fTimeDelta);
 		Particles_Late_Tick(fTimeDelta);
 
-
+		if (m_iState == BOSS_ATTACK_SCRATCH || m_iState == BOSS_RUSH_ATTACK)
+		{
+			Attack_Effect_Late_Tick(fTimeDelta, m_iState);
+		}
+		
 #ifdef _DEBUG
 		m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
 		m_pGameInstance->Add_DebugComponent(m_pColliderMain);
@@ -225,11 +236,22 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 	{
 		m_ColliderDelay += fTimeDelta;
 
-		if (m_ColliderDelay > 1.f)
+		if (m_ColliderDelay > 1.2f) {
 			Off_Attack_Collider();
-		else if (m_ColliderDelay > 0.8f)
+		}
+		else if (m_ColliderDelay > 1.0)
+		{
+			if (!m_bCrash_Start) {
+				m_Effect_Rush_Main->Start_Trigger();
+				m_bCrash_Start = true;
+				m_CrashMat = m_pTransformCom->Get_WorldMatrix();
+				_vector Dir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+				m_CrashMat.r[3] += XMVector3Normalize(Dir) * 2;
+				m_CrashMat.r[3] += _vector{ 0.f, 0.001f ,0.f };
+				
+			}
 			On_Attack_Collider(4.f, 3.f, HIT_BEATEN);
-
+		}
 		Dash_Move(DIR_FRONT, 0.96f, fTimeDelta);
 	}
 	else if (m_iState & BOSS_ATTACK_SCRATCH)
@@ -312,6 +334,8 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			return;
 		}
 	}
+
+
 	//if (Skill_State(fTimeDelta))
 	//	return;
 
@@ -326,9 +350,14 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 		if (InNormalAttackRange()) {
 			m_CurrentState = BOSS_STATE_ATTACK;
 			_uint iRandom = (rand() % 2) + 1;
-			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
+			//m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
+			m_iState |= (BOSS_ATTACK_SCRATCH);
+
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			if(m_iState == BOSS_ATTACK_SCRATCH)
+				m_Effect_Claw_Main->Start_Trigger();
+
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
@@ -381,6 +410,8 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			if (m_iState == BOSS_ATTACK_SCRATCH)
+				m_Effect_Claw_Main->Start_Trigger();
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <=0.f)) {
@@ -433,6 +464,8 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			if (m_iState == BOSS_ATTACK_SCRATCH)
+				m_Effect_Claw_Main->Start_Trigger();
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
@@ -485,6 +518,8 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
+			if (m_iState == BOSS_ATTACK_SCRATCH)
+				m_Effect_Claw_Main->Start_Trigger();
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
@@ -605,6 +640,7 @@ void CBoss_Kurama::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			vDir = XMVector3Normalize(vDir);
 			vParPos += (vDir * 2);
 			vParPos.m128_f32[1] += 1.0f;
+
 			for (auto iter : m_BasicParticles)
 			{
 				if (iter->Trigger(vParPos))
@@ -904,7 +940,6 @@ void CBoss_Kurama::Skill_Tick(_float fTimeDelta)
 				TargetPos.m128_f32[1] += 0.7f;
 				pFlameBomb_3->Set_Targeting(TargetPos);
 				pFlameBomb_3->Set_Next_State();
-
 			}
 		}
 		else if (pFlameBomb_3->Get_State() == CFlameBomb::STATE_FINISH)
@@ -923,6 +958,53 @@ _bool CBoss_Kurama::Using_Skill()
 			return true;
 	}
 	return false;
+}
+
+void CBoss_Kurama::Attack_Effect_Tick(_float fTimeDelta, _ulonglong iState)
+{
+	_matrix ClawMat = m_pTransformCom->Get_WorldMatrix();
+	_vector Dir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	ClawMat.r[3] += XMVector3Normalize(Dir)*2;
+	ClawMat.r[3] += _vector{ 0.f, 0.7f ,0.f };
+
+	if (iState == BOSS_ATTACK_SCRATCH)
+	{
+		m_Effect_Claw_Main->State_Tick(ClawMat);
+		m_Effect_Claw_Main->Tick(fTimeDelta);
+		m_Effect_Claw_Main->Scale_Change(fTimeDelta);
+	}
+
+	else if (iState == BOSS_RUSH_ATTACK)
+	{
+		if (m_bCrash_Start)
+		{
+			m_fEffect_DurTime += fTimeDelta;
+
+			if (m_fEffect_DurTime > 1.f) {
+				m_fEffect_DurTime = 0.f;
+				m_bCrash_Start = false;
+			}
+			//m_CrashMat
+			m_Effect_Rush_Main->State_Tick(ClawMat);
+			m_Effect_Rush_Main->Tick(fTimeDelta);
+			m_Effect_Rush_Main->Scale_Change(fTimeDelta);
+		}
+	}
+}
+
+void CBoss_Kurama::Attack_Effect_Late_Tick(_float fTimeDelta, _ulonglong iState)
+{
+	if (iState == BOSS_ATTACK_SCRATCH)
+	{
+		m_Effect_Claw_Main->Late_Tick(fTimeDelta);
+	}
+	else if (iState == BOSS_RUSH_ATTACK)
+	{
+		if (m_bCrash_Start)
+		{
+			m_Effect_Rush_Main->Late_Tick(fTimeDelta);
+		}
+	}
 }
 
 void CBoss_Kurama::CoolTimeTick(_float fTimeDelta)
@@ -1245,6 +1327,30 @@ HRESULT CBoss_Kurama::Add_UIs()
 	return S_OK;
 }
 
+HRESULT CBoss_Kurama::Add_Effects()
+{
+	CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
+	Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_KURAMA_CLAW;
+	Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_Y;
+	Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
+	Effect_Desc_1.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+	m_Effect_Claw_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
+	if (nullptr == m_Effect_Claw_Main)
+		return E_FAIL;
+
+	CEffect_Mesh::EFFECT_DESC Effect_Desc_2{};
+	Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_KURAMA_RUSH;
+	Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_END;
+	Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
+	Effect_Desc_2.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+	m_Effect_Rush_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
+	if (nullptr == m_Effect_Rush_Main)
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
 HRESULT CBoss_Kurama::Add_Particles()
 {
 	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
@@ -1392,6 +1498,9 @@ void CBoss_Kurama::Free()
 	Safe_Release(m_pBodyModelCom);
 	Safe_Release(m_pColliderMain);
 	Safe_Release(m_pColliderAttack);
-	
+
+	Safe_Release(m_Effect_Claw_Main);
+	Safe_Release(m_Effect_Rush_Main);
+
 	__super::Free();
 }

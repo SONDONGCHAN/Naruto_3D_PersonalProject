@@ -2,6 +2,8 @@
 
 #include "Client_Defines.h"
 #include "LandObject.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
 
 BEGIN(Client)
 
@@ -55,6 +57,11 @@ private:
 	_bool		Skill_State(_float fTimeDelta);
 	void		Skill_Tick(_float fTimeDelta);
 	_bool		Using_Skill();
+
+	// 傍拜 荤侩
+	void		Attack_Effect_Tick(_float fTimeDelta, _ulonglong iState);
+	void		Attack_Effect_Late_Tick(_float fTimeDelta, _ulonglong iState);
+
 
 	void		CoolTimeTick(_float fTimeDelta);
 	void		Skills_Priority_Tick(_float fTimeDelta);
@@ -125,8 +132,12 @@ private:
 
 	// 公利
 	_bool				m_bInvincible = false;
-
 	
+	// 东户 函荐
+	_bool				m_bCrash_Start = false;
+	_float				m_fEffect_DurTime = 0.f;
+	_matrix				m_CrashMat = {};
+
 
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
@@ -138,11 +149,18 @@ private:
 	vector<class CParticle_Point*>	m_KamuiParticles;
 
 private:
+	CEffect_Mesh*		m_Effect_Claw_Main = { nullptr };
+	CEffect_Mesh*		m_Effect_Rush_Main = { nullptr };
+
+	//CParticle_Point*	m_BoomParticles = { nullptr };
+
+private:
 	HRESULT Add_Components();
 	HRESULT Add_PartObjects();
 	HRESULT Add_Skills();
 	HRESULT Add_Trails();
 	HRESULT Add_UIs();
+	HRESULT Add_Effects();
 	HRESULT Add_Particles();
 
 public:

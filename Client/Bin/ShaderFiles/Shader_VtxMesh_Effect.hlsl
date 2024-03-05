@@ -368,6 +368,58 @@ PS_OUT PS_WOOD_SWAP(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_KURAMA_SCRATCH(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+     
+    if (vMtrlDiffuse.a < 0.3f || vMtrlDiffuse.r < 0.3f )
+        discard;
+    
+    vMtrlDiffuse *= g_vColor;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+
+    return Out;
+}
+
+PS_OUT PS_KURAMA_CLAW(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+    if (vMtrlDiffuse.a < 0.3f || vMtrlDiffuse.r < 0.3f)
+        discard;
+    
+     vMtrlDiffuse *= g_vColor;
+    vMtrlDiffuse.a = g_fAlpha;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+    return Out;
+}
+
+PS_OUT PS_KURAMA_CRUSH(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+    
+    vMtrlDiffuse *= g_vColor;
+    vMtrlDiffuse.a = g_fAlpha;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+    return Out;
+}
+
+
+
 
 technique11 DefaultTechnique
 {
@@ -536,6 +588,38 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_WOOD_SWAP();
     }
 
+    pass Kurama_Scratch //15
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_KURAMA_SCRATCH();
+    }
+
+    pass Kurama_Claw //16
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_KURAMA_CLAW();
+    }
+
+    pass Kurama_Crush //17
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_KURAMA_CRUSH();
+    }
 
 }
 

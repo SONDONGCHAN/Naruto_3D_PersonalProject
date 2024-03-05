@@ -70,6 +70,7 @@ private:
 	CEffect_Mesh* m_Effect_RasenShuriken_Deco_6 = { nullptr };
 
 	CParticle_Point* m_BoomParticles = { nullptr };
+	CParticle_Point* m_DissolveParticles = { nullptr };
 
 private:
 	RASENSHURIKEN_STATE myState = { STATE_MAKING };
