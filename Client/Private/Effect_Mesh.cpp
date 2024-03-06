@@ -760,7 +760,7 @@ HRESULT CEffect_Mesh::Render()
 		}
 	}
 
-	else if (m_MyDesc.MyType == EFFECT_KURAMA_CLAW)
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_CLAW || m_MyDesc.MyType == EFFECT_KURAMA_KICK)
 	{
 		for (_uint i = 0; i < m_vModels.size(); i++)
 		{
@@ -1024,6 +1024,13 @@ void CEffect_Mesh::Start_Trigger()
 	{
 		m_fAlpha = 1.f;
 	}
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_KICK)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+		m_fAlpha = 1.f;
+		m_vUVMovement.x = -0.4f;
+	}
 }
 
 void CEffect_Mesh::End_Trigger(_float fDiscardSpeed)
@@ -1214,6 +1221,27 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 		
 		else
 			m_fAlpha = 0.f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_KICK)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+		
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		
+		}
+		else
+		{
+			if (m_fAlpha > 0.f)
+				m_fAlpha -= m_AlphaSpeed * fTimeDelta;
+		
+			else
+				m_fAlpha = 0.f;
+		}
 	}
 }
 
@@ -1671,8 +1699,28 @@ HRESULT CEffect_Mesh::Add_Component()
 		vCurrentScale = m_MyDesc.vMyScale;
 		m_vUVSpeed = 0.f;
 		m_fSpinSpeed = 0.f;
-
 	}
+
+	else if (m_MyDesc.MyType == EFFECT_KURAMA_KICK)
+	{
+		CModel* m_pModel_Kurama_Kick;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Kick"),
+			TEXT("Com_Model_Kurama_Kick"), reinterpret_cast<CComponent**>(&m_pModel_Kurama_Kick))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Kurama_Kick);
+
+		CTexture* m_pTexture_Kurama_Kick;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Super_Noise"),
+			TEXT("Com_Texture_Kurama_Kick"), reinterpret_cast<CComponent**>(&m_pTexture_Kurama_Kick))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Kurama_Kick);
+
+		m_ScalingSpeed = 4.f;
+		m_AlphaSpeed = 4.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 1.f;
+		m_fSpinSpeed = 0.f;
+		}
 	
 	return S_OK;
 }

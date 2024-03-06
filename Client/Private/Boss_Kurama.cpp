@@ -108,11 +108,16 @@ void CBoss_Kurama::Tick(_float fTimeDelta)
 
 		Skills_Tick(fTimeDelta);
 		Particles_Tick(fTimeDelta);
-		if (m_iState == BOSS_ATTACK_SCRATCH || m_iState == BOSS_RUSH_ATTACK)
+
+		if (m_iState == BOSS_ATTACK_SCRATCH || m_iState == BOSS_RUSH_ATTACK || m_iState == BOSS_ATTACK_KICK)
 		{
 			Attack_Effect_Tick(fTimeDelta, m_iState);
 		}
-
+		else
+		{
+			m_bKick_1_Start = false;
+			m_bKick_2_Start = false;
+		}
 	}
 }
 
@@ -142,8 +147,8 @@ void CBoss_Kurama::Late_Tick(_float fTimeDelta)
 
 		Skills_Late_Tick(fTimeDelta);
 		Particles_Late_Tick(fTimeDelta);
-
-		if (m_iState == BOSS_ATTACK_SCRATCH || m_iState == BOSS_RUSH_ATTACK)
+		
+		if (m_iState == BOSS_ATTACK_SCRATCH || m_iState == BOSS_RUSH_ATTACK || m_iState == BOSS_ATTACK_KICK)
 		{
 			Attack_Effect_Late_Tick(fTimeDelta, m_iState);
 		}
@@ -246,11 +251,11 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 				m_bCrash_Start = true;
 				m_CrashMat = m_pTransformCom->Get_WorldMatrix();
 				_vector Dir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-				m_CrashMat.r[3] += XMVector3Normalize(Dir) * 2;
-				m_CrashMat.r[3] += _vector{ 0.f, 0.001f ,0.f };
-				
+				m_CrashMat.r[3] += XMVector3Normalize(Dir) * 5;
+				m_CrashMat.r[3] += _vector{ 0.f, 0.1f ,0.f };
+				m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.2f);
 			}
-			On_Attack_Collider(4.f, 3.f, HIT_BEATEN);
+			On_Attack_Collider(4.f, 5.f, HIT_BEATEN);
 		}
 		Dash_Move(DIR_FRONT, 0.96f, fTimeDelta);
 	}
@@ -270,12 +275,29 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 
 		if (m_ColliderDelay > 0.75f)
 			Off_Attack_Collider();
+
 		else if (m_ColliderDelay > 0.6f)
+		{
+			if (!m_bKick_2_Start) {
+				m_Effect_Kick_2->Start_Trigger();
+				m_bKick_2_Start = true;
+				m_bKick_1_Start = false;
+			}
 			On_Attack_Collider(2.5f, 2.5f);
+
+		}
+
 		else if (m_ColliderDelay > 0.25f)
 			Off_Attack_Collider();
+
 		else if (m_ColliderDelay > 0.15f)
+		{
+			if (!m_bKick_1_Start) {
+				m_Effect_Kick_1->Start_Trigger();
+				m_bKick_1_Start = true;
+			}
 			On_Attack_Collider(2.5f, 2.5f);
+		}
 	}
 
 	else if (m_iState & BOSS_DASH) {
@@ -761,7 +783,7 @@ void CBoss_Kurama::Collider_Event_Exit(const wstring& strColliderLayerTag, CColl
 void CBoss_Kurama::On_Attack_Collider(_float radius, _float distance, HIT_TYPE HitType)
 {
 	m_pColliderAttack->Set_Radius(radius);
-	m_pColliderAttack->Set_Center(_float3{ 0.f, radius -1.f, distance });
+	m_pColliderAttack->Set_Center(_float3{ 0.f, radius -2.f, distance });
 	m_pColliderAttack->Set_HitType(HitType);
 }
 
@@ -965,7 +987,7 @@ void CBoss_Kurama::Attack_Effect_Tick(_float fTimeDelta, _ulonglong iState)
 	_matrix ClawMat = m_pTransformCom->Get_WorldMatrix();
 	_vector Dir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	ClawMat.r[3] += XMVector3Normalize(Dir)*2;
-	ClawMat.r[3] += _vector{ 0.f, 0.7f ,0.f };
+	ClawMat.r[3] += _vector{ 0.f, 1.f ,0.f };
 
 	if (iState == BOSS_ATTACK_SCRATCH)
 	{
@@ -974,18 +996,34 @@ void CBoss_Kurama::Attack_Effect_Tick(_float fTimeDelta, _ulonglong iState)
 		m_Effect_Claw_Main->Scale_Change(fTimeDelta);
 	}
 
+	else if (iState == BOSS_ATTACK_KICK)
+	{
+		if (m_bKick_1_Start)
+		{
+			m_Effect_Kick_1->State_Tick(ClawMat);
+			m_Effect_Kick_1->Tick(fTimeDelta);
+			m_Effect_Kick_1->Scale_Change(fTimeDelta);
+		}
+		if (m_bKick_2_Start)
+		{
+			m_Effect_Kick_2->State_Tick(ClawMat);
+			m_Effect_Kick_2->Tick(fTimeDelta);
+			m_Effect_Kick_2->Scale_Change(fTimeDelta);
+		}
+	}
+
 	else if (iState == BOSS_RUSH_ATTACK)
 	{
 		if (m_bCrash_Start)
 		{
-			m_fEffect_DurTime += fTimeDelta;
+			m_fCrash_Effect_DurTime += fTimeDelta;
 
-			if (m_fEffect_DurTime > 1.f) {
-				m_fEffect_DurTime = 0.f;
+			if (m_fCrash_Effect_DurTime > 1.f) {
+				m_fCrash_Effect_DurTime = 0.f;
 				m_bCrash_Start = false;
 			}
 			//m_CrashMat
-			m_Effect_Rush_Main->State_Tick(ClawMat);
+			m_Effect_Rush_Main->State_Tick(m_CrashMat);
 			m_Effect_Rush_Main->Tick(fTimeDelta);
 			m_Effect_Rush_Main->Scale_Change(fTimeDelta);
 		}
@@ -998,12 +1036,18 @@ void CBoss_Kurama::Attack_Effect_Late_Tick(_float fTimeDelta, _ulonglong iState)
 	{
 		m_Effect_Claw_Main->Late_Tick(fTimeDelta);
 	}
+	else if (iState == BOSS_ATTACK_KICK)
+	{
+		if (m_bKick_1_Start)
+			m_Effect_Kick_1->Late_Tick(fTimeDelta);
+		if (m_bKick_2_Start)
+			m_Effect_Kick_2->Late_Tick(fTimeDelta);
+	}
 	else if (iState == BOSS_RUSH_ATTACK)
 	{
 		if (m_bCrash_Start)
-		{
 			m_Effect_Rush_Main->Late_Tick(fTimeDelta);
-		}
+		
 	}
 }
 
@@ -1342,12 +1386,30 @@ HRESULT CBoss_Kurama::Add_Effects()
 	Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_KURAMA_RUSH;
 	Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_END;
 	Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
-	Effect_Desc_2.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+	Effect_Desc_2.vMyScale = _vector{ 10.f, 10.f, 10.f, 10.f };
 	m_Effect_Rush_Main = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
 	if (nullptr == m_Effect_Rush_Main)
 		return E_FAIL;
 
+	CEffect_Mesh::EFFECT_DESC Effect_Desc_3{};
+	Effect_Desc_3.MyType = CEffect_Mesh::EFFECT_KURAMA_KICK;
+	Effect_Desc_3.MyUVOption = CEffect_Mesh::MOVE_X;
+	Effect_Desc_3.MySpinOption = CEffect_Mesh::SPIN_NONE;
+	Effect_Desc_3.vMyScale = _vector{ 10.f, 10.f, 10.f, 1.f };
+	m_Effect_Kick_1 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_3));
+	if (nullptr == m_Effect_Kick_1)
+		return E_FAIL;
 
+	CEffect_Mesh::EFFECT_DESC Effect_Desc_4{};
+	Effect_Desc_4.MyType = CEffect_Mesh::EFFECT_KURAMA_KICK;
+	Effect_Desc_4.MyUVOption = CEffect_Mesh::MOVE_X;
+	Effect_Desc_4.MySpinOption = CEffect_Mesh::SPIN_NONE;
+	Effect_Desc_4.vMyScale = _vector{ 10.f, 10.f, 10.f, 1.f };
+	m_Effect_Kick_2 = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_4));
+	if (nullptr == m_Effect_Kick_2)
+		return E_FAIL;
+
+	
 	return S_OK;
 }
 
@@ -1501,6 +1563,8 @@ void CBoss_Kurama::Free()
 
 	Safe_Release(m_Effect_Claw_Main);
 	Safe_Release(m_Effect_Rush_Main);
+	Safe_Release(m_Effect_Kick_1);
+	Safe_Release(m_Effect_Kick_2);
 
 	__super::Free();
 }

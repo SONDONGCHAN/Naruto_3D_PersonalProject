@@ -37,7 +37,14 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
 	
     Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
-    Out.vTexcoord = In.vTexcoord + g_UVMovement;
+    
+    float2 vTex = In.vTexcoord + g_UVMovement;
+    if (vTex.x < 0.f)
+        vTex.x += 1.f;
+    if (vTex.y < 0.f)
+        vTex.y += 1.f;
+    
+    Out.vTexcoord = saturate(vTex);
     Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
     Out.vNormal = mul(vector(In.vNormal, 0.f), g_WorldMatrix);
     return Out;

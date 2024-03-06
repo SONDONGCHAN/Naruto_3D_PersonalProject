@@ -628,6 +628,11 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Masking/Crack.png"), 1))))
 		return E_FAIL;
 
+	////////////Kurama_Kick///////////
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Kurama_Kick"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Skill/Kurama/Kurama_Kick.dat"))))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("이펙트(을) 로딩 중 입니다.");
 	///////////Particle///////////

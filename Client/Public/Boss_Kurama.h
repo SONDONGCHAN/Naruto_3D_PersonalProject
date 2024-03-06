@@ -135,9 +135,11 @@ private:
 	
 	// ¶«»§ º¯¼ö
 	_bool				m_bCrash_Start = false;
-	_float				m_fEffect_DurTime = 0.f;
+	_float				m_fCrash_Effect_DurTime = 0.f;
 	_matrix				m_CrashMat = {};
 
+	_bool				m_bKick_1_Start = false;
+	_bool				m_bKick_2_Start = false;
 
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
@@ -151,6 +153,8 @@ private:
 private:
 	CEffect_Mesh*		m_Effect_Claw_Main = { nullptr };
 	CEffect_Mesh*		m_Effect_Rush_Main = { nullptr };
+	CEffect_Mesh*		m_Effect_Kick_1 = { nullptr };
+	CEffect_Mesh*		m_Effect_Kick_2 = { nullptr };
 
 	//CParticle_Point*	m_BoomParticles = { nullptr };
 
