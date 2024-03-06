@@ -579,6 +579,8 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 	{
 		if (!m_bOnAir)
 		{
+			m_pGameInstance->PlaySoundW("aaaa", SOUND_TEST, 0.8f, true);
+
 			if (m_fComboTime > 1.0f)
 			{
 				m_iCombo = 0x00000000;

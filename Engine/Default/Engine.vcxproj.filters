@@ -169,6 +169,9 @@
     <Filter Include="01. Utility\04. Component\VIBuffer\Point">
       <UniqueIdentifier>{39878be0-f189-43f8-bdad-3db2e52fdf2f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\09. Sound_Manager">
+      <UniqueIdentifier>{de3a2037-d378-465c-97c7-0196ef1ba40c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -336,6 +339,9 @@
     <ClInclude Include="..\Public\Cell.h">
       <Filter>01. Utility\04. Component\Navigation\Cell</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Sound_Manager.h">
+      <Filter>01. Utility\09. Sound_Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -490,6 +496,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Cell.cpp">
       <Filter>01. Utility\04. Component\Navigation\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sound_Manager.cpp">
+      <Filter>01. Utility\09. Sound_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

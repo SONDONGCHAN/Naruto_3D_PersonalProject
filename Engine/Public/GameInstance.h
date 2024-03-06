@@ -95,6 +95,14 @@ public: /* For.Target_Manager */
 	HRESULT End_MRT();
 	HRESULT Bind_SRV(const wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
 
+public: /* For.Sound_Manager */
+	void PlaySoundW(const string pSoundKey, CHANNELID eID, float fVolume, _bool _overlap = false);
+	void PlayBGM(string pSoundKey, float fVolume);
+	void StopSound(CHANNELID eID);
+	void StopAll();
+	void SetChannelVolume(CHANNELID eID, float fVolume);
+
+
 #ifdef _DEBUG
 	HRESULT Ready_Debug(const wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Render_MRT(const wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
@@ -113,6 +121,8 @@ private:
 	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
 	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
+	class CSound_Manager*		m_pSound_Manager = { nullptr };
+
 
 
 public:

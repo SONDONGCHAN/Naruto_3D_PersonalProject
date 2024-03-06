@@ -3,8 +3,6 @@
 #include "Client_Defines.h"
 #include "LandObject.h"
 
-
-
 BEGIN(Client)
 
 class CPlayer_Custom : public CLandObject

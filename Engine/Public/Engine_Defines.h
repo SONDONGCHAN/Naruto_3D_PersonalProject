@@ -18,6 +18,11 @@
 #include <DirectXTK\SpriteBatch.h>
 #include <DirectXTK\SpriteFont.h>
 #include <random>
+#include < io.h >
+#include "fmod.h"
+#include "fmod.hpp"
+#include <conio.h>
+
 
 using namespace DirectX;
 
@@ -39,6 +44,12 @@ namespace Engine
 	enum HIT_TYPE{ HIT_NORMAL, HIT_STRONG, HIT_THROW, HIT_BEATEN,  HIT_END};
 
 	enum FONT_ORIGIN_OPTION { ORIGIN_CENTER, ORIGIN_LEFT_TOP, ORIGIN_RIGHT_TOP, ORIGIN_LEFT_BOTTOM, ORIGIN_RIGHT_BOTTOM, ORIGIN_END};
+
+	enum CHANNELID {
+		SOUND_BGM,
+		SOUND_TEST,
+		MAXCHANNEL
+	};
 
 }
 

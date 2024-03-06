@@ -8,6 +8,8 @@
 #include "Collider_Manager.h"
 #include "Font_Manager.h"
 #include "Target_Manager.h"
+#include "Sound_Manager.h"
+
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -63,6 +65,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 
 	m_pFont_Manager = CFont_Manager::Create(*ppDevice, *ppDeviceContext);
 	if (nullptr == m_pFont_Manager)
+		return E_FAIL;
+
+	m_pSound_Manager = CSound_Manager::Create();
+	if (nullptr == m_pSound_Manager)
 		return E_FAIL;
 
 	return S_OK;
@@ -393,6 +399,29 @@ HRESULT CGameInstance::Bind_SRV(const wstring& strTargetTag, CShader* pShader, c
 {
 	return m_pTarget_Manager->Bind_SRV(strTargetTag, pShader, pConstantName);
 }
+
+/* For.Sound_Manager */
+void CGameInstance::PlaySoundW(const string pSoundKey, CHANNELID eID, float fVolume, _bool _overlap)
+{
+	m_pSound_Manager->PlaySoundW(pSoundKey, eID, fVolume, _overlap);
+}
+void CGameInstance::PlayBGM(string pSoundKey, float fVolume)
+{
+	m_pSound_Manager->PlayBGM(pSoundKey, fVolume);
+}
+void CGameInstance::StopSound(CHANNELID eID)
+{
+	m_pSound_Manager->StopSound(eID);
+}
+void CGameInstance::StopAll()
+{
+	m_pSound_Manager->StopAll();
+}
+void CGameInstance::SetChannelVolume(CHANNELID eID, float fVolume)
+{
+	m_pSound_Manager->SetChannelVolume(eID, fVolume);
+}
+
 #ifdef _DEBUG
 HRESULT CGameInstance::Ready_Debug(const wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
@@ -425,7 +454,7 @@ void CGameInstance::Release_Manager()
 	Safe_Release(m_pCollider_Manager);
 	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pTarget_Manager);
-
+	Safe_Release(m_pSound_Manager);	
 }
 
 void CGameInstance::Free()
