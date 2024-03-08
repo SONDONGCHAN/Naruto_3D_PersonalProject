@@ -97,6 +97,11 @@ private:
 	_bool				m_bSkillOn[SKILL_END] = { false, };
 	_float				m_fSkillDurTime = { 0.f };
 
+	_bool				m_bVitalize = true;
+
+public:
+	void	Set_Vitalize() { m_bVitalize = true; }
+
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
 	map<const wstring, class CSkill*>			m_MonsterSkills;
@@ -104,7 +109,7 @@ private:
 	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
 	vector<class CParticle_Point*>	m_BasicParticles;
 	vector<class CParticle_Point*>	m_KamuiParticles;
-
+	CParticle_Point* m_SmokeParticle = { nullptr };
 
 private:
 	HRESULT Add_Components();

@@ -672,16 +672,25 @@ void CBoss_Kurama::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 2.f, 0.05f);
 		
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
+			{
+				m_pGameInstance->PlaySoundW("Hit_Boss", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentHp -= 20;
-			
+			}
 			else if (pTargetCollider->Get_HitType() == HIT_STRONG)
+			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentHp -= 15;
-			
+			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
+			{
+				m_pGameInstance->PlaySoundW("Hit_Boss", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentHp -= 25;
-			
+			}
 			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
-				m_CurrentHp -= 10;	
+			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
+				m_CurrentHp -= 10;
+			}
 		}
 	}
 	else if (strColliderLayerTag == L"Rasengun_Collider" || strColliderLayerTag == L"FlameBomb_Collider" || strColliderLayerTag == L"Wood_Hand_Collider")

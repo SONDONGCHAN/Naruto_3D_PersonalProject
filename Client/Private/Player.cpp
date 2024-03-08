@@ -100,6 +100,8 @@ void CPlayer::Check_Tag()
 		dynamic_cast<CPlayer_Naruto*>(m_pCurrentCharacter)->Set_State(PLAYER_APPEAR);
 		m_pCurrentCharacter->Get_Navigation()->Set_CurrentIndex(NaviIndex);
 		dynamic_cast<CPlayer_Naruto*>(m_pCurrentCharacter)->Add_MainCollider();
+
+		m_pGameInstance->PlaySoundW("Player_Tag", SOUND_ETC_1, 1.f, true);
 	}
 
 	else if (m_iCurrent_Character_Index == 0)
@@ -114,6 +116,9 @@ void CPlayer::Check_Tag()
 		dynamic_cast<CPlayer_Custom*>(m_pCurrentCharacter)->Set_State(PLAYER_APPEAR);
 		m_pCurrentCharacter->Get_Navigation()->Set_CurrentIndex(NaviIndex);
 		dynamic_cast<CPlayer_Custom*>(m_pCurrentCharacter)->Add_MainCollider();
+
+		m_pGameInstance->PlaySoundW("Player_Tag", SOUND_ETC_1, 1.f, true);
+
 	}
 
 	m_pCurrentCharacter->Get_TranformCom()->Set_World(OldCharacterWorldMat);

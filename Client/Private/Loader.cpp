@@ -46,11 +46,7 @@
 #include "UI_Boss_Status.h"
 #include "EventTrigger.h"
 #include "Effect_Mesh.h"
-
-
-
-
-
+#include "Sky.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -349,7 +345,17 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Boss_Hp"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Base_UI/Boss/T_UI_Boss_Gauge2_M.png"), 1))))
 		return E_FAIL;
-	
+
+	/* For.Prototype_Component_Texture_Sky */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Sky"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Texture_BlueSky */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_BlueSky"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/BlueSky.dds"), 1))))
+		return E_FAIL;
+
 
 	// 플레이어 상태 UI
 	/* For.Prototype_Component_Texture_Status */
@@ -633,6 +639,18 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Skill/Kurama/Kurama_Kick.dat"))))
 		return E_FAIL;
 
+	////////////CheckPoint///////////
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_CheckPoint"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Deco/CheckPoint/CheckPoint.dat"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Check_Point"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Skill/Masking/CheckPoint.png"), 1))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Model_Line"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, L"../Bin/Resources/Models/NonAnim/Deco/Line/Line.dat"))))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("이펙트(을) 로딩 중 입니다.");
 	///////////Particle///////////
@@ -699,6 +717,11 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh_Effect.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Shader_VtxCube */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxCube"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
+		return E_FAIL;
+
 
 	m_strLoadingText = TEXT("객체원형를(을) 로딩 중 입니다.");
 
@@ -747,16 +770,15 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CBody_Boss_Naruto::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-
 	// /* For.Prototype_GameObject_Map */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Map"),
 		CMap::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	
+
 	/* For.Prototype_GameObject_Item */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Item"),
-	 CItem::Create(m_pDevice, m_pContext))))
-	 return E_FAIL;
+		CItem::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 	
 	// ====이펙트====
 	/* For.Prototype_GameObject_Particle_Rect */
@@ -798,6 +820,14 @@ HRESULT CLoader::Loading_For_GamePlayLevel()
 		CUI_Boss_Status::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	/* For.Prototype_GameObject_Sky */
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Sky"),
+		CSky::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_Component_VIBuffer_Cube */
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	m_strLoadingText = TEXT("스킬를(을) 로딩 중 입니다.");
 	

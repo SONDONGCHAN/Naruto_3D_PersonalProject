@@ -191,6 +191,7 @@
     <ClInclude Include="..\Public\Rasengun_Super.h" />
     <ClInclude Include="..\Public\RasenShuriken.h" />
     <ClInclude Include="..\Public\Skill.h" />
+    <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Trail_Line.h" />
     <ClInclude Include="..\Public\UI.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\Private\Rasengun_Super.cpp" />
     <ClCompile Include="..\Private\RasenShuriken.cpp" />
     <ClCompile Include="..\Private\Skill.cpp" />
+    <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Trail_Line.cpp" />
     <ClCompile Include="..\Private\UI.cpp" />
@@ -285,6 +287,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh_OutLine.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Client</EntryPointName>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

@@ -62,81 +62,91 @@ HRESULT CMonster_LeafNinja::Initialize(void* pArg)
 	m_pTransformCom->Set_Pos(vStart_Pos);
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 	
-
+	if (pGameObjectDesc->Current_Level == LEVEL_BOSS)
+		m_bVitalize = false;
 
 	return S_OK;
 }
 
 void CMonster_LeafNinja::Priority_Tick(_float fTimeDelta)
 {
-	Set_Direction();
-	RootAnimation();
-	Set_Gravity(m_pTransformCom, fTimeDelta);
-	State_Control(fTimeDelta);
+	if (m_bVitalize)
+	{
+		Set_Direction();
+		RootAnimation();
+		Set_Gravity(m_pTransformCom, fTimeDelta);
+		State_Control(fTimeDelta);
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Priority_Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Priority_Tick(fTimeDelta);
 
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_MonsterSkills.find(L"Skill_FlameBomb")->second->Priority_Tick(fTimeDelta);
+		if (m_bSkillOn[SKILL_FLAMEBOMB])
+			m_MonsterSkills.find(L"Skill_FlameBomb")->second->Priority_Tick(fTimeDelta);
 
-	Particles_Priority_Tick(fTimeDelta);
-
+		Particles_Priority_Tick(fTimeDelta);
+	}
 }
 
 void CMonster_LeafNinja::Tick(_float fTimeDelta)
 {
-	Skill_Tick(fTimeDelta);
+	if (m_bVitalize)
+	{
+		Skill_Tick(fTimeDelta);
 
-	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
-	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+		m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+		m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Tick(fTimeDelta);
 
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_MonsterSkills.find(L"Skill_FlameBomb")->second->Tick(fTimeDelta);
+		if (m_bSkillOn[SKILL_FLAMEBOMB])
+			m_MonsterSkills.find(L"Skill_FlameBomb")->second->Tick(fTimeDelta);
 
-	Particles_Tick(fTimeDelta);
-
+		Particles_Tick(fTimeDelta);
+	}
 }
 
 void CMonster_LeafNinja::Late_Tick(_float fTimeDelta)
 {
-	__super::Late_Tick(fTimeDelta);
+	if (m_bVitalize)
+	{
+		__super::Late_Tick(fTimeDelta);
 
-	//Collision_ToPlayer();
-	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level,m_pColliderMain, L"Player_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
+		//Collision_ToPlayer();
+		m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
+		m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
 
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Late_Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Late_Tick(fTimeDelta);
 
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
-		return;
+		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
+			return;
 
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_MonsterSkills.find(L"Skill_FlameBomb")->second->Late_Tick(fTimeDelta);
+		if (m_bSkillOn[SKILL_FLAMEBOMB])
+			m_MonsterSkills.find(L"Skill_FlameBomb")->second->Late_Tick(fTimeDelta);
 
-	for (auto& Pair : m_MonsterUIs)
-		Pair.second->Late_Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterUIs)
+			Pair.second->Late_Tick(fTimeDelta);
 
-	Particles_Late_Tick(fTimeDelta);
+		Particles_Late_Tick(fTimeDelta);
 
 
 #ifdef _DEBUG
-	m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
-	m_pGameInstance->Add_DebugComponent(m_pColliderMain);
-	m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
+		m_pGameInstance->Add_DebugComponent(m_pNavigationCom);
+		m_pGameInstance->Add_DebugComponent(m_pColliderMain);
+		m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
 #endif
+	}
 }
 
 HRESULT CMonster_LeafNinja::Render()
 {
-	if (m_bSkillOn[SKILL_FLAMEBOMB])
-		m_MonsterSkills.find(L"Skill_FlameBomb")->second->Render();
-
+	if (m_bVitalize)
+	{
+		if (m_bSkillOn[SKILL_FLAMEBOMB])
+			m_MonsterSkills.find(L"Skill_FlameBomb")->second->Render();
+	}
 	return S_OK;
 }
 
@@ -555,6 +565,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iState = (MONSTER_THROW);
 				m_fDashSpeed = -15.f;
@@ -563,6 +574,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 			}
 			else if(pTargetCollider->Get_HitType() == HIT_STRONG)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)
@@ -574,6 +586,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iState = (MONSTER_BEATEN_START);
 				m_fDashSpeed = -15.f;
@@ -582,6 +595,7 @@ void CMonster_LeafNinja::Collider_Event_Enter(const wstring& strColliderLayerTag
 			}
 			else if(pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)

@@ -39,12 +39,8 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vPosition = mul(vector(In.vPosition, 1.f), matWVP);
     
     float2 vTex = In.vTexcoord + g_UVMovement;
-    if (vTex.x < 0.f)
-        vTex.x += 1.f;
-    if (vTex.y < 0.f)
-        vTex.y += 1.f;
-    
-    Out.vTexcoord = saturate(vTex);
+
+    Out.vTexcoord = vTex; 
     Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
     Out.vNormal = mul(vector(In.vNormal, 0.f), g_WorldMatrix);
     return Out;
@@ -425,6 +421,39 @@ PS_OUT PS_KURAMA_CRUSH(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_CHECKPOINT_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.01)
+        discard;
+    
+    vMtrlDiffuse *= g_vColor;
+    vMtrlDiffuse.a = g_fAlpha * g_vColor.a ;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    
+    return Out;
+}
+
+PS_OUT PS_CHECKPOINT_LINE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    //if (vMtrlDiffuse.a < 0.1f)
+    //    discard;
+    
+    Out.vDiffuse.rgb = g_vColor.rgb;
+    Out.vDiffuse.a = g_fAlpha;
+    
+    
+    return Out;
+}
+
 
 
 
@@ -628,6 +657,27 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_KURAMA_CRUSH();
     }
 
+    pass CheckPoint_Main //18
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_CHECKPOINT_MAIN();
+    }
+    
+    pass CheckPoint_Line //19
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_CHECKPOINT_LINE();
+    }
 }
 
 

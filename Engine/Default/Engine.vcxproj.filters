@@ -172,6 +172,9 @@
     <Filter Include="01. Utility\09. Sound_Manager">
       <UniqueIdentifier>{de3a2037-d378-465c-97c7-0196ef1ba40c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\04. Component\VIBuffer\Cube">
+      <UniqueIdentifier>{189f0df8-3943-4195-a505-74eb6c966264}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -342,6 +345,9 @@
     <ClInclude Include="..\Public\Sound_Manager.h">
       <Filter>01. Utility\09. Sound_Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Cube.h">
+      <Filter>01. Utility\04. Component\VIBuffer\Cube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -499,6 +505,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Sound_Manager.cpp">
       <Filter>01. Utility\09. Sound_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Cube.cpp">
+      <Filter>01. Utility\04. Component\VIBuffer\Cube</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

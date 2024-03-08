@@ -114,6 +114,8 @@ private:
 	// ¹«Àû
 	_bool						m_bInvincible = false;
 
+	_float						m_fStepCool = { 0.f };
+
 
 private:
 	map<const wstring, class CPartObject*>		m_PlayerParts;

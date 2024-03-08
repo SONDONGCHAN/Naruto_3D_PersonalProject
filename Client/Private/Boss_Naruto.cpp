@@ -822,6 +822,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iState = (PLAYER_THROW);
 				m_fDashSpeed = -15.f;
@@ -830,6 +831,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_STRONG)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)
@@ -841,6 +843,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iState = (PLAYER_BEATEN_START);
 				m_fDashSpeed = -15.f;
@@ -849,6 +852,7 @@ void CBoss_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CCol
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)

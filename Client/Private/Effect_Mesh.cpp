@@ -839,6 +839,82 @@ HRESULT CEffect_Mesh::Render()
 			}
 		}
 	}
+
+	else if (m_MyDesc.MyType == EFFECT_CHECKPOINT)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				m_vTextures[0]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+
+				_float4		vColor = { 80.f / 255.f, 180.f / 255.f, 1.f, 0.7f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(18)))
+					return E_FAIL;
+
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_LINE)
+	{
+		for (_uint i = 0; i < m_vModels.size(); i++)
+		{
+			_uint	iNumMeshes = m_vModels[i]->Get_NumMeshes();
+	
+			if (FAILED(Bind_ShaderResources()))
+				return E_FAIL;
+	
+			if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+				return E_FAIL;
+	
+			for (_uint j = 0; j < iNumMeshes; j++)
+			{
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
+					return E_FAIL;
+	
+				_float4		vColor = { 80.f / 255.f, 180.f / 255.f, 1.f, 0.7f };
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
+					return E_FAIL;
+	
+				m_fBrightness = 1.f;
+				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
+					return E_FAIL;
+	
+				if (FAILED(m_pShaderCom->Begin(19)))
+					return E_FAIL;
+	
+				if (FAILED(m_vModels[i]->Render(j)))
+					return E_FAIL;
+			}
+		}
+	}
 	
 	return S_OK;
 }
@@ -1241,6 +1317,52 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 		
 			else
 				m_fAlpha = 0.f;
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_CHECKPOINT)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+	
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+	
+
+			if (m_fAlpha > 0.f)
+				m_fAlpha -= m_AlphaSpeed * fTimeDelta;
+			else
+				m_fAlpha = 0.f;
+		}
+		else
+		{
+			vCurrentScale		*= 0.f;
+			m_MyDesc.vMyScale	*= 0.f;
+		}
+	}
+	else if (m_MyDesc.MyType == EFFECT_LINE)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+		
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		
+		
+			if (m_fAlpha > 0.f)
+				m_fAlpha -= m_AlphaSpeed * fTimeDelta;
+			else
+				m_fAlpha = 0.f;	
+		}
+		else
+		{
+			vCurrentScale		*= 0.f;
+			m_MyDesc.vMyScale	*= 0.f;
 		}
 	}
 }
@@ -1720,7 +1842,45 @@ HRESULT CEffect_Mesh::Add_Component()
 		vCurrentScale = m_MyDesc.vMyScale;
 		m_vUVSpeed = 1.f;
 		m_fSpinSpeed = 0.f;
-		}
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_CHECKPOINT)
+	{
+		CModel* m_pModel_CheckPoint;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_CheckPoint"),
+			TEXT("Com_Model_CheckPoint"), reinterpret_cast<CComponent**>(&m_pModel_CheckPoint))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_CheckPoint);
+	
+		CTexture* m_pTexture_CheckPoint;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Check_Point"),
+			TEXT("Com_Texture_CheckPoint"), reinterpret_cast<CComponent**>(&m_pTexture_CheckPoint))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_CheckPoint);
+	
+		m_ScalingSpeed = 1.f;
+		m_ScalingRatio = 0.5f;
+		m_AlphaSpeed = 2.f;
+		vCurrentScale = m_MyDesc.vMyScale * 0.5f;
+		m_vUVSpeed = 0.0f;
+		m_fSpinSpeed = 1.5f;
+	}
+
+	else if (m_MyDesc.MyType == EFFECT_LINE)
+	{
+		CModel* m_pModel_Line;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Line"),
+			TEXT("Com_Model_Line"), reinterpret_cast<CComponent**>(&m_pModel_Line))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Line);
+
+		m_ScalingSpeed = 1.f;
+		m_ScalingRatio = 0.5f;
+		m_AlphaSpeed = 2.f;
+		vCurrentScale = m_MyDesc.vMyScale * 0.5f;
+		m_vUVSpeed = 0.0f;
+		m_fSpinSpeed = 0.f;
+	}
 	
 	return S_OK;
 }

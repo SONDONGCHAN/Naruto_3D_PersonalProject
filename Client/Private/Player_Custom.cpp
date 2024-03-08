@@ -49,10 +49,10 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		
 		 if (m_Current_Level == LEVEL_GAMEPLAY)
 			 vStart_Pos = { 0.f, 0.f, -10.f, 1.f };
-		 else if (m_Current_Level == LEVEL_BOSS)
-			 vStart_Pos = { 91.f, 26.f, -8.f, 1.f };
 		 //else if (m_Current_Level == LEVEL_BOSS)
-			 //vStart_Pos = { -114.5f, 23.f, 82.5f, 1.f };
+			// vStart_Pos = { 91.f, 26.f, -8.f, 1.f };
+		 else if (m_Current_Level == LEVEL_BOSS)
+			 vStart_Pos = { -114.5f, 23.f, 82.5f, 1.f };
 		
 		
 		 // m_bOnAir = true;a
@@ -131,6 +131,8 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
 		return;
 	}
 
+	m_fStepCool -= fTimeDelta;
+	
 	for (_uint i = 0; i < SKILL_END; i++)
 	{
 		m_fSkillCurrentCoolTime[i] -= fTimeDelta;
@@ -173,6 +175,7 @@ void CPlayer_Custom::Priority_Tick(_float fTimeDelta)
  		m_bOnAir = false;
 		m_iState = 0x0000000000000000;
 		m_iState |= PLAYER_STATE_LAND;
+		m_pGameInstance->PlaySoundW("Land", SOUND_PLAYER_MOVE, 1.f, true);
 	}
 
 	TranslateRootAnimation();
@@ -346,6 +349,7 @@ void CPlayer_Custom::Model_Custom()
 			return;
 
 		m_iCustom_Curser++;
+		m_pGameInstance->PlaySoundW("Custom_Next_Type", SOUND_ETC_1, 0.5f, true);
 	}
 	if (m_pGameInstance->Key_Down(DIK_LEFT))
 	{
@@ -353,6 +357,7 @@ void CPlayer_Custom::Model_Custom()
 			return;
 
 		m_iCustom_Curser--;
+		m_pGameInstance->PlaySoundW("Custom_Next_Type", SOUND_ETC_1, 0.5f, true);
 	}
 
 	if (m_pGameInstance->Key_Down(DIK_UP))
@@ -375,6 +380,8 @@ void CPlayer_Custom::Model_Custom()
 
 		for (auto& Pair : m_PlayerParts)
 			Pair.second->Get_CurrentModel()->Reset_TrackPosition();
+
+		m_pGameInstance->PlaySoundW("Custom_Next_Index", SOUND_ETC_1, 0.8f, true);
 	}
 
 	if (m_pGameInstance->Key_Down(DIK_DOWN))
@@ -397,6 +404,8 @@ void CPlayer_Custom::Model_Custom()
 
 		for (auto& Pair : m_PlayerParts)
 			Pair.second->Get_CurrentModel()->Reset_TrackPosition();
+
+		m_pGameInstance->PlaySoundW("Custom_Next_Index", SOUND_ETC_1, 0.8f, true);
 	}
 	
 }
@@ -577,9 +586,10 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 
 	if ((m_pGameInstance->Mouse_Down(DIM_LB)))
 	{
+		m_pGameInstance->PlaySoundW("Attack_Basic", SOUND_PLAYER_ATTACK, 1.f, true);
+
 		if (!m_bOnAir)
 		{
-			m_pGameInstance->PlaySoundW("aaaa", SOUND_TEST, 0.8f, true);
 
 			if (m_fComboTime > 1.0f)
 			{
@@ -590,7 +600,6 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 				m_fDashSpeed = 15.f;
 				return;
 			}
-
 			if (m_iCombo & PLAYER_STATE_COMBO_3)
 			{
 				m_iCombo = 0x00000000;
@@ -620,6 +629,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 		}
 		else
 		{
+
 			if (m_fComboTime > 1.0f)
 			{
 				m_iCombo = 0x00000000;
@@ -652,6 +662,8 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 
 	else if (m_pGameInstance->Mouse_Down(DIM_RB))
 	{
+		m_pGameInstance->PlaySoundW("Attack_Sword", SOUND_PLAYER_ATTACK, 0.6f, true);
+
 		if (!m_bOnAir)
 		{
 			if (m_fComboTime > 1.0f)
@@ -719,6 +731,8 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 
 	if (m_pGameInstance->Key_Down(DIK_SPACE))
 	{
+		m_pGameInstance->PlaySoundW("Jump", SOUND_PLAYER_MOVE, 1.f, true);
+
 		if (!m_iJumpState)
 		{
 			m_iJumpState++;
@@ -727,6 +741,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 			m_fGravity = -0.35f;
 			m_vJumpDirection = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 			m_fJumpSpeed = 7.f;
+
 			return;
 		}
 		if (m_iJumpState == 1)
@@ -737,6 +752,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 			m_vJumpDirection = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 			m_fGravity = -0.35f;
 			m_fJumpSpeed = 7.f;
+
 			return;
 		}
 	}
@@ -780,18 +796,21 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 	{
 		m_iState |= PLAYER_STATE_DASH_LEFT;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return;
 	}
 	else if (m_pGameInstance->Key_Down(DIK_E))
 	{
 		m_iState |= PLAYER_STATE_DASH_RIGHT;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return;
 	}
 	else if (m_pGameInstance->Key_Down(DIK_X))
 	{
 		m_iState |= PLAYER_STATE_DASH_BACK;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return;
 	}
 	else if (m_pGameInstance->Key_Pressing(DIK_W, fTimeDelta) || m_pGameInstance->Key_Pressing(DIK_A, fTimeDelta) || m_pGameInstance->Key_Pressing(DIK_S, fTimeDelta) || m_pGameInstance->Key_Pressing(DIK_D, fTimeDelta))
@@ -848,6 +867,12 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 				Set_Direc_Lerf(DIR_RIGHT, 0.1f);
 			}
 
+			if (m_fStepCool <= 0.f)
+			{
+				m_pGameInstance->PlaySoundW("Step_1", SOUND_PLAYER_MOVE, 1.f, true);
+				m_fStepCool = 0.23f;
+			}
+
 			m_iState |= PLAYER_STATE_RUN;
 			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			return;
@@ -875,6 +900,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 					_float4 vDirec = Cal_Direc_To_CameraBase(DIR_FRONT);
 					m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					m_fDashSpeed = 18.f;
+					m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					return;
 				}
 				Set_Direc_Lerf(DIR_FRONT, 0.1f);
@@ -888,6 +914,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 					_float4 vDirec = Cal_Direc_To_CameraBase(DIR_BACK);
 					m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					m_fDashSpeed = 18.f;
+					m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					return;
 				}
 				Set_Direc_Lerf(DIR_BACK, 0.1f);
@@ -900,6 +927,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 					_float4 vDirec = Cal_Direc_To_CameraBase(DIR_LEFT);
 					m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					m_fDashSpeed = 18.f;
+					m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					return;
 				}
 				Set_Direc_Lerf(DIR_LEFT, 0.1f);
@@ -912,10 +940,12 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 					_float4 vDirec = Cal_Direc_To_CameraBase(DIR_RIGHT);
 					m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					m_fDashSpeed = 18.f;
+					m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					return;
 				}
 				Set_Direc_Lerf(DIR_RIGHT, 0.1f);
 			}
+			
 			m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		}
 	}
@@ -1065,6 +1095,7 @@ _bool CPlayer_Custom::Front_Dash()
 	{
 		m_iState |= PLAYER_STATE_DASH_FRONT;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return true;
 	}
 	return false;
@@ -1111,12 +1142,14 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_iState = PLAYER_THROW;
 				m_fDashSpeed = -15.f;
 				m_CurrentHp -= 20;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_iStruckState++;
 				if (m_iStruckState > 2)
 					m_iStruckState = 1;
@@ -1126,6 +1159,7 @@ void CPlayer_Custom::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_iState = (PLAYER_BEATEN_START);
 				m_fDashSpeed = -15.f;
 				m_CurrentHp -= 25;
@@ -1734,8 +1768,8 @@ HRESULT CPlayer_Custom::Add_Components()
 	}
 	else if (m_Current_Level == LEVEL_BOSS)
 	{
-		//NaviDesc.iStartCellIndex = 114;
-		NaviDesc.iStartCellIndex = 22;
+		NaviDesc.iStartCellIndex = 114;
+		//NaviDesc.iStartCellIndex = 22;
 
 		if (FAILED(__super::Add_Component(m_Current_Level, TEXT("Prototype_Component_Navi_Map_Konoha_Village"),
 			TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))

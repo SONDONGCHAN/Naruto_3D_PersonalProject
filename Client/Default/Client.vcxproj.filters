@@ -34,6 +34,9 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh_Effect.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -206,6 +209,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Mesh.cpp">
       <Filter>02.GameObjects\Effect\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sky.cpp">
+      <Filter>02.GameObjects\Sky</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -388,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Mesh.h">
       <Filter>02.GameObjects\Effect\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sky.h">
+      <Filter>02.GameObjects\Sky</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -605,6 +614,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Skill\Rasengun">
       <UniqueIdentifier>{89ed652d-c011-403c-89cd-367bed0c5ed5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Sky">
+      <UniqueIdentifier>{392093d2-1b0a-407e-9f86-907e04d3b2a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

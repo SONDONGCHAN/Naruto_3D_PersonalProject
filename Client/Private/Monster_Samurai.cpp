@@ -62,67 +62,75 @@ HRESULT CMonster_Samurai::Initialize(void* pArg)
 	m_pTransformCom->Set_Pos(vStart_Pos);
 	m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 
+	if (pGameObjectDesc->Current_Level == LEVEL_BOSS)
+		m_bVitalize = false;
 
-	
 	return S_OK;
 }
 
 void CMonster_Samurai::Priority_Tick(_float fTimeDelta)
 {
-	Set_Direction();
-	RootAnimation();
-	Set_Gravity(m_pTransformCom, fTimeDelta);
-	//Control_State(fTimeDelta);
-	State_Control(fTimeDelta);
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Priority_Tick(fTimeDelta);
+	if (m_bVitalize)
+	{
+		Set_Direction();
+		RootAnimation();
+		Set_Gravity(m_pTransformCom, fTimeDelta);
+		//Control_State(fTimeDelta);
+		State_Control(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Priority_Tick(fTimeDelta);
 
-	if (m_bSkillOn[SKILL_WOOD_DRAGON])
-		m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Priority_Tick(fTimeDelta);
+		if (m_bSkillOn[SKILL_WOOD_DRAGON])
+			m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Priority_Tick(fTimeDelta);
 
-	Particles_Priority_Tick(fTimeDelta);
+		Particles_Priority_Tick(fTimeDelta);
+	}
 
 }
 
 void CMonster_Samurai::Tick(_float fTimeDelta)
 {
-	Skill_Tick(fTimeDelta);
+	if (m_bVitalize)
+	{
+		Skill_Tick(fTimeDelta);
 
-	m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
-	m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
+		m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
+		m_pColliderAttack->Tick(m_pTransformCom->Get_WorldMatrix());
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Tick(fTimeDelta);
 
-	if (m_bSkillOn[SKILL_WOOD_DRAGON])
-		m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Tick(fTimeDelta);
+		if (m_bSkillOn[SKILL_WOOD_DRAGON])
+			m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Tick(fTimeDelta);
 
-	Particles_Tick(fTimeDelta);
-
+		Particles_Tick(fTimeDelta);
+	}
 }
 
 void CMonster_Samurai::Late_Tick(_float fTimeDelta)
 {
-	__super::Late_Tick(fTimeDelta);
+	if (m_bVitalize)
+	{
+		__super::Late_Tick(fTimeDelta);
 
-	//Collision_ToPlayer();
-	m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
-	m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
+		//Collision_ToPlayer();
+		m_pGameInstance->Check_Collision_For_MyEvent(m_Current_Level, m_pColliderMain, L"Player_Main_Collider");
+		m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderAttack, L"Player_Main_Collider", L"Monster_Attack_Collider");
 
 
-	for (auto& Pair : m_MonsterParts)
-		(Pair.second)->Late_Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterParts)
+			(Pair.second)->Late_Tick(fTimeDelta);
 
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
-		return;
+		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this)))
+			return;
 
-	if (m_bSkillOn[SKILL_WOOD_DRAGON])
-		m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Late_Tick(fTimeDelta);
+		if (m_bSkillOn[SKILL_WOOD_DRAGON])
+			m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Late_Tick(fTimeDelta);
 
-	for (auto& Pair : m_MonsterUIs)
-		Pair.second->Late_Tick(fTimeDelta);
+		for (auto& Pair : m_MonsterUIs)
+			Pair.second->Late_Tick(fTimeDelta);
 
-	Particles_Late_Tick(fTimeDelta);
+		Particles_Late_Tick(fTimeDelta);
 
 
 #ifdef _DEBUG
@@ -130,12 +138,16 @@ void CMonster_Samurai::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_DebugComponent(m_pColliderMain);
 		m_pGameInstance->Add_DebugComponent(m_pColliderAttack);
 #endif
+	}
 }
 
 HRESULT CMonster_Samurai::Render()
 {
-	if (m_bSkillOn[SKILL_WOOD_DRAGON])
-		m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Render();
+	if (m_bVitalize)
+	{
+		if (m_bSkillOn[SKILL_WOOD_DRAGON])
+			m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Render();
+	}
 
 	return S_OK;
 }
@@ -646,6 +658,7 @@ void CMonster_Samurai::Collider_Event_Enter(const wstring& strColliderLayerTag, 
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iState = (MONSTER_THROW);
 				m_fDashSpeed = -15.f;
@@ -654,6 +667,7 @@ void CMonster_Samurai::Collider_Event_Enter(const wstring& strColliderLayerTag, 
 			}
 			else if(pTargetCollider->Get_HitType() == HIT_STRONG)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)
@@ -665,6 +679,7 @@ void CMonster_Samurai::Collider_Event_Enter(const wstring& strColliderLayerTag, 
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iState = (MONSTER_BEATEN_START);
 				m_fDashSpeed = -15.f;
@@ -673,6 +688,7 @@ void CMonster_Samurai::Collider_Event_Enter(const wstring& strColliderLayerTag, 
 			}
 			else if(pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)
@@ -1218,6 +1234,29 @@ HRESULT CMonster_Samurai::Add_Particles()
 	if (nullptr == pParticle_Kamui_6)
 		return E_FAIL;
 	m_KamuiParticles.push_back(pParticle_Kamui_6);
+
+
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
+	InstanceDesc1.iNumInstance = 20;
+	InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.pCenter = &m_MyPos;
+	InstanceDesc1.vRange = _float3(3.f, 3.f, 3.f);
+	InstanceDesc1.vSize = _float2(2.f, 2.f);
+	InstanceDesc1.vSpeed = _float2(0.1f, 0.2f);
+	InstanceDesc1.vLifeTime = _float2(1.5f, 2.f);
+	InstanceDesc1.isLoop = false;
+	InstanceDesc1.vColor = _float4(1.f, 1.f, 1.f, 1.f);
+	InstanceDesc1.fDuration = 2.1f;
+	InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_SQUARE;
+	InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
+	InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Smoke_Sprite";
+	InstanceDesc1.vSpriteRatio = _float2(4.f, 4.f);
+	
+	//m_SmokeParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
+	//if (nullptr == m_SmokeParticles)
+	//	return E_FAIL;
 
 
 	return S_OK;

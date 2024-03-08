@@ -120,6 +120,10 @@ private:
 	_bool						m_bCustom_Mode = false;
 	_uint						m_iCustom_Curser = { 0 };
 
+	//
+	_float						m_fStepCool= { 0.f };
+
+
 private:
 	map<const wstring, class CPartObject*>		m_PlayerParts;
 	map<const wstring, class CPartObject*>		m_PlayerWeapon;

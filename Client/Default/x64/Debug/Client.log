@@ -1,2 +1,9 @@
-﻿  Player_Custom.cpp
+﻿  EventTrigger.cpp
+  Level_BossStage.cpp
+C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Client\Private\Level_BossStage.cpp(229,51): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+  Loader.cpp
+  Monster_LeafNinja.cpp
+  Monster_Samurai.cpp
+  Sky.cpp
+  코드를 생성하고 있습니다...
   Client.vcxproj -> C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Client\Bin\Client.exe

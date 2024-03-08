@@ -48,7 +48,6 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC		Elements[2];
 	};
 
-
 	struct ENGINE_DLL VTXPOSTEX
 	{
 		XMFLOAT3		vPosition;
@@ -57,6 +56,16 @@ namespace Engine
 		static const unsigned int	iNumElements = { 2 };
 		static const D3D11_INPUT_ELEMENT_DESC		Elements[2];
 	};
+
+	struct ENGINE_DLL VTXCUBE
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vTexcoord;
+	
+		static const unsigned int	iNumElements = { 2 };
+		static const D3D11_INPUT_ELEMENT_DESC		Elements[2];
+	};
+
 	struct ENGINE_DLL VTXNORTEX
 	{
 		XMFLOAT3		vPosition;

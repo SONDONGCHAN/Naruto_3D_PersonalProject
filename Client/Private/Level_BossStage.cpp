@@ -22,8 +22,8 @@ HRESULT CLevel_BossStage::Initialize()
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	//if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
-	//	return E_FAIL;
+	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
 		return E_FAIL;
@@ -40,6 +40,8 @@ HRESULT CLevel_BossStage::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_System_UI"))))
 		return E_FAIL;
 
+	m_pGameInstance->StopSound(SOUND_BGM);
+	m_pGameInstance->PlayBGM("BGM_STAGE_2", 0.3f);
 
 	return S_OK;
 }
@@ -110,6 +112,9 @@ HRESULT CLevel_BossStage::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_BossStage::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_Sky"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -191,14 +196,69 @@ HRESULT CLevel_BossStage::Ready_Layer_UI(const wstring& strLayerTag)
 
 HRESULT CLevel_BossStage::Ready_Layer_EventTrigger(const wstring& strLayerTag)
 {
-	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc{};
-
-	TriggerDesc.Current_Level = LEVEL_BOSS;
-	TriggerDesc.vPos = {89.f, 28.f, -17.7f , 1.f};
-
-	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc)))
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_1{};
+	TriggerDesc_1.Current_Level = LEVEL_BOSS;
+	TriggerDesc_1.vPos = { -63.4975128f, 24.5999794f, 79.9633102f , 1.f };
+	TriggerDesc_1.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_1;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_1)))
+		return E_FAIL;
+	
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_2{};
+	TriggerDesc_2.Current_Level = LEVEL_BOSS;
+	TriggerDesc_2.vPos = { -72.7875748f, 19.4805107f, 54.4979820f , 1.f };
+	TriggerDesc_2.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_2;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_2)))
+		return E_FAIL;
+	
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_3{};
+		TriggerDesc_3.Current_Level = LEVEL_BOSS;
+		TriggerDesc_3.vPos = { -91.7867889f, 6.95620728f, 64.2528763f , 1.f };
+		TriggerDesc_3.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_3;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_3)))
+		return E_FAIL;
+	
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_4{};
+	TriggerDesc_4.Current_Level = LEVEL_BOSS;
+	TriggerDesc_4.vPos = { -11.4271164f, 29.0357037f, 72.4113007f , 1.f };
+	TriggerDesc_4.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_4;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_4)))
+		return E_FAIL;
+	
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_5{};
+	TriggerDesc_5.Current_Level = LEVEL_BOSS;
+	TriggerDesc_5.vPos = { 27.1861095f, 28.8999901f, 72.3845139 , 1.f };
+	TriggerDesc_5.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_5;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_5)))
+		return E_FAIL;
+	
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_6{};
+	TriggerDesc_6.Current_Level = LEVEL_BOSS;
+	TriggerDesc_6.vPos = { 41.9866714f, 16.9669991f, 38.2162552f, 1.f };
+	TriggerDesc_6.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_6;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_6)))
+		return E_FAIL;
+	
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_7{};
+	TriggerDesc_7.Current_Level = LEVEL_BOSS;
+	TriggerDesc_7.vPos = { 46.5531578f, 17.0130043f, 6.36892986f , 1.f };
+	TriggerDesc_7.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_7;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_7)))
+		return E_FAIL;
+	
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc_8{};
+	TriggerDesc_8.Current_Level = LEVEL_BOSS;
+	TriggerDesc_8.vPos = { 90.1312561f, 23.9218426f, 2.37312698f , 1.f };
+	TriggerDesc_8.Trigger_Type = CEventTrigger::TRIGGER_CHECK_POINT_8;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc_8)))
 		return E_FAIL;
 
+	CEventTrigger::EVENTTRIGGER_DESC			TriggerDesc{};
+	TriggerDesc.Current_Level = LEVEL_BOSS;
+	TriggerDesc.vPos = { 88.f, 28.f, -30.f , 1.f };
+	TriggerDesc.Trigger_Type = CEventTrigger::TRIGGER_BOSS;
+	if (FAILED(m_pGameInstance->Add_CloneObject(LEVEL_BOSS, strLayerTag, TEXT("Prototype_GameObject_EventTrigger"), &TriggerDesc)))
+		return E_FAIL;
+	
 	return S_OK;
 }
 

@@ -97,6 +97,10 @@ private:
 	_bool				m_bSkillOn[SKILL_END] = { false, };
 	_float				m_fSkillDurTime = { 0.f };
 
+	_bool				m_bVitalize = true;
+
+public:
+	void	Set_Vitalize() { m_bVitalize = true; }
 
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;

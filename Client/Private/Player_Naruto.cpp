@@ -68,6 +68,8 @@ HRESULT CPlayer_Naruto::Initialize(void* pArg)
 
 void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 {
+	m_fStepCool -= fTimeDelta;
+
 	for (_uint i = 0; i < SKILL_END; i++)
 	{
 		m_fSkillCurrentCoolTime[i] -= fTimeDelta;
@@ -101,6 +103,7 @@ void CPlayer_Naruto::Priority_Tick(_float fTimeDelta)
 		m_bOnAir = false;
 		m_iState = 0x0000000000000000;
 		m_iState |= PLAYER_STATE_LAND;
+		m_pGameInstance->PlaySoundW("Land", SOUND_PLAYER_MOVE, 1.f, true);
 	}
 
 	TranslateRootAnimation();
@@ -407,6 +410,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 
 	if ((m_pGameInstance->Mouse_Down(DIM_LB)))
 	{
+		m_pGameInstance->PlaySoundW("Attack_Basic", SOUND_PLAYER_ATTACK, 1.f, true);
 		if (!m_bOnAir)
 		{
 			if (m_fComboTime > 1.0f)
@@ -480,6 +484,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 	
 	else if (m_pGameInstance->Mouse_Down(DIM_RB))
 	{
+		m_pGameInstance->PlaySoundW("Attack_Basic", SOUND_PLAYER_ATTACK, 1.f, true);
 		if (!m_bOnAir)
 		{
 			if (m_fComboTime > 1.0f)
@@ -546,6 +551,8 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 
 	if (m_pGameInstance->Key_Down(DIK_SPACE))
 	{
+		m_pGameInstance->PlaySoundW("Jump", SOUND_PLAYER_MOVE, 1.f, true);
+
 		if (!m_iJumpState)
 		{
 			m_iJumpState++;
@@ -600,18 +607,21 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 	{
 		m_iState |= PLAYER_STATE_DASH_LEFT;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return;
 	}
 	else if (m_pGameInstance->Key_Down(DIK_E))
 	{
 		m_iState |= PLAYER_STATE_DASH_RIGHT;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return;	
 	}
 	else if (m_pGameInstance->Key_Down(DIK_X))
 	{
 		m_iState |= PLAYER_STATE_DASH_BACK;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return;
 	}
 	else if (m_pGameInstance->Key_Pressing(DIK_W, fTimeDelta) || m_pGameInstance->Key_Pressing(DIK_A, fTimeDelta) || m_pGameInstance->Key_Pressing(DIK_S, fTimeDelta) || m_pGameInstance->Key_Pressing(DIK_D, fTimeDelta))
@@ -668,6 +678,12 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 				Set_Direc_Lerf(DIR_RIGHT, 0.1f);
 			}
 
+			if (m_fStepCool <= 0.f)
+			{
+				m_pGameInstance->PlaySoundW("Step_1", SOUND_PLAYER_MOVE, 1.f, true);
+				m_fStepCool = 0.23f;
+			}
+
 			m_iState |= PLAYER_STATE_RUN;
 			m_pTransformCom->Go_Straight(fTimeDelta,m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 			return;
@@ -695,6 +711,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 					_float4 vDirec = Cal_Direc_To_CameraBase(DIR_FRONT);
 					m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					m_fDashSpeed = 18.f;
+					m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					return;
 				}
 				Set_Direc_Lerf(DIR_FRONT, 0.1f);
@@ -708,6 +725,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 					_float4 vDirec = Cal_Direc_To_CameraBase(DIR_BACK);
 					m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					m_fDashSpeed = 18.f;
+					m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					return;
 				}
 				Set_Direc_Lerf(DIR_BACK, 0.1f);
@@ -720,6 +738,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 					_float4 vDirec = Cal_Direc_To_CameraBase(DIR_LEFT);
 					m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					m_fDashSpeed = 18.f;
+					m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					return;
 				}
 				Set_Direc_Lerf(DIR_LEFT, 0.1f);
@@ -732,6 +751,7 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 					 _float4 vDirec = Cal_Direc_To_CameraBase(DIR_RIGHT);
 					 m_pTransformCom->Set_Look(XMLoadFloat4(&vDirec));
 					 m_fDashSpeed = 18.f;
+					 m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 					 return;
 				 }
 				 Set_Direc_Lerf(DIR_RIGHT, 0.1f);
@@ -886,6 +906,7 @@ _bool CPlayer_Naruto::Front_Dash()
 	{
 		m_iState |= PLAYER_STATE_DASH_FRONT;
 		m_fDashSpeed = 20.f;
+		m_pGameInstance->PlaySoundW("Dash", SOUND_PLAYER_MOVE, 0.7f, true);
 		return true;
 	}
 	return false;
@@ -931,12 +952,14 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 
 			if (pTargetCollider->Get_HitType() == HIT_THROW)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_iState = PLAYER_THROW;
 				m_fDashSpeed = -15.f;
 				m_CurrentHp -= 20;
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_NORMAL)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Basic", SOUND_PLAYER_HIT, 0.7f, true);
 				m_iStruckState++;
 				if (m_iStruckState > 2)
 					m_iStruckState = 1;
@@ -946,6 +969,7 @@ void CPlayer_Naruto::Collider_Event_Enter(const wstring& strColliderLayerTag, CC
 			}
 			else if (pTargetCollider->Get_HitType() == HIT_BEATEN)
 			{
+				m_pGameInstance->PlaySoundW("Hit_Strong", SOUND_PLAYER_HIT, 0.7f, true);
 				m_iState = (PLAYER_BEATEN_START);
 				m_fDashSpeed = -15.f;
 				m_CurrentHp -= 25;

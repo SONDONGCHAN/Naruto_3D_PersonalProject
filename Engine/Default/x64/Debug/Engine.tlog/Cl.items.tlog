@@ -43,6 +43,7 @@ C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\Time
 C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\Transform.cpp;C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Default\x64\Debug\Transform.obj
 C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\VIBuffer.cpp;C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer.obj
 C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Cell.cpp;C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Cell.obj
+C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Cube.cpp;C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Cube.obj
 C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Instancing.cpp;C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Instancing.obj
 C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Particle_Point.cpp;C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Particle_Point.obj
 C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Private\VIBuffer_Particle_Rect.cpp;C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Default\x64\Debug\VIBuffer_Particle_Rect.obj
