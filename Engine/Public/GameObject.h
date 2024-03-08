@@ -36,13 +36,14 @@ public:
 	virtual void	Collider_Event_Stay(const wstring& strColliderLayerTag, _Out_ CCollider* pMyCollider, _Out_ CCollider* pTargetCollider) {};
 	virtual void	Collider_Event_Exit(const wstring& strColliderLayerTag, _Out_ CCollider* pMyCollider, _Out_ CCollider* pTargetCollider) {};
 
-	void			Compute_Z();
-
 	CTransform*		Get_TranformCom() { return m_pTransformCom; }
 	_bool			Get_isDead()	{ return m_bDead; }
 	_bool			Get_DeadCheck() { return m_bDeadCheck; }
 
+	_float Get_CamDistance();
 
+protected:
+	void Compute_CamDistance();
 
 protected:
 	ID3D11Device*			m_pDevice = { nullptr };
@@ -57,7 +58,8 @@ protected:
 
 protected:
 	map<const wstring, class CComponent*>		m_Components;
-	_float	m_fGameObjectScale = 1.f;
+	_float					m_fGameObjectScale = 1.f;
+	_float					m_fCameraDistance = 0.f;
 
 protected:
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComTag, CComponent** ppOut, void* pArg = nullptr);

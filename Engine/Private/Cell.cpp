@@ -48,11 +48,9 @@ HRESULT CCell::Initialize(const _float3* pPoints, _uint iCellIndex)
 	if (cos(XMConvertToRadians(70.f)) > vCellNormal.m128_f32[1])
 		m_isLand = false;
 
-#ifdef _DEBUG
 	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, m_vPoints);
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
-#endif
 
 	return S_OK;
 }

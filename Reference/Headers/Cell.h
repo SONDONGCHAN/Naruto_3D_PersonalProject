@@ -54,10 +54,8 @@ private:
 
 	_bool		m_isLand = { true };
 
-#ifdef _DEBUG
 private:
 	class CVIBuffer_Cell* m_pVIBuffer = { nullptr };
-#endif
 
 public:
 	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _uint iCellIndex);

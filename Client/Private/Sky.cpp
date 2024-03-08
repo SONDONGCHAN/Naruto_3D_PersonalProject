@@ -34,7 +34,7 @@ HRESULT CSky::Initialize(void* pArg)
 	if (FAILED(Add_Component()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scaling(1000.f, 1000.f, 1000.f);
+	m_pTransformCom->Set_Scaling(700.f, 700.f, 700.f);
 
 	return S_OK;
 }

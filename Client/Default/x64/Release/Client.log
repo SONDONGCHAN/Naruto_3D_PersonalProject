@@ -1,3 +1,7 @@
-﻿FXC : error X3501: 'main': entrypoint not found
-  
-  compilation failed; no code produced
+﻿  Body_Monster_LeafNinja.cpp
+  코드를 생성하고 있습니다.
+  0 of 2619 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  코드를 생성했습니다.
+  Client.vcxproj -> C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Client\Bin\Client.exe

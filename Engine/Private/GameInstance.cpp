@@ -208,12 +208,12 @@ HRESULT CGameInstance::Add_RenderGroup(CRenderer::RENDERGROUP eRenderGroup, CGam
 
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pGameObject);
 }
-
+#ifdef _DEBUG
 HRESULT CGameInstance::Add_DebugComponent(CComponent* pComponent)
 {
 	return m_pRenderer->Add_DebugComponent(pComponent);
 }
-
+#endif // _DEBUG
 /* For.Timer_Manager */
 
 _float CGameInstance::Compute_TimeDelta(const wstring& pTimerTag)

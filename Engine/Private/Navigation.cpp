@@ -13,18 +13,24 @@ CNavigation::CNavigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CNavigation::CNavigation(const CNavigation& rhs)
 	: CComponent(rhs)
+#ifdef _DEBUG
 	, m_pShader(rhs.m_pShader)
+#endif // _DEBUG
 	, m_vecCells(rhs.m_vecCells)
 {
 	for (auto& pCell : m_vecCells)
 		Safe_AddRef(pCell);
 
+#ifdef _DEBUG
 	Safe_AddRef(m_pShader);
+#endif // _DEBUG
+
 }
 
 HRESULT CNavigation::Initialize_Prototype(const wstring& strNavigationDataFilePath)
 { 
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+	
 
 	_ulong		dwByte = { 0 };
 	HANDLE		hFile = CreateFile(strNavigationDataFilePath.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);

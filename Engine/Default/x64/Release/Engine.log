@@ -1,0 +1,23 @@
+﻿  Navigation.cpp
+     ../Bin/Engine.lib 라이브러리 및 ../Bin/Engine.exp 개체를 생성하고 있습니다.
+  코드를 생성하고 있습니다.
+  Previous IPDB and IOBJ mismatch, fall back to full compilation.
+  All 3573 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+Effects11.lib(EffectAPI.obj) : warning LNK4099: '' PDB를 'Effects11.lib(EffectAPI.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11.lib(EffectNonRuntime.obj) : warning LNK4099: '' PDB를 'Effects11.lib(EffectNonRuntime.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11.lib(EffectLoad.obj) : warning LNK4099: '' PDB를 'Effects11.lib(EffectLoad.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11.lib(d3dxGlobal.obj) : warning LNK4099: '' PDB를 'Effects11.lib(d3dxGlobal.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11.lib(EffectReflection.obj) : warning LNK4099: '' PDB를 'Effects11.lib(EffectReflection.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+Effects11.lib(EffectRuntime.obj) : warning LNK4099: '' PDB를 'Effects11.lib(EffectRuntime.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(SpriteBatch.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(SpriteBatch.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(SpriteFont.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(SpriteFont.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(PrimitiveBatch.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(PrimitiveBatch.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(WICTextureLoader.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(WICTextureLoader.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(DDSTextureLoader.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(DDSTextureLoader.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(BufferHelpers.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(BufferHelpers.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(CommonStates.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(CommonStates.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(VertexTypes.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(VertexTypes.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(pch.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(pch.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+DirectXTK.lib(BinaryReader.obj) : warning LNK4099: '' PDB를 'DirectXTK.lib(BinaryReader.obj)' 또는 ''에서 찾을 수 없습니다. 디버그 정보가 없는 것처럼 개체를 링크합니다.
+  Engine.vcxproj -> C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Bin\Engine.dll

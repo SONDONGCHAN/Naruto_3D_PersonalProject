@@ -81,10 +81,19 @@ HRESULT CGameObject::Render()
     return S_OK;
 }
 
-void CGameObject::Compute_Z()
+_float CGameObject::Get_CamDistance()
 {
-
+    return m_fCameraDistance;
 }
+
+void CGameObject::Compute_CamDistance()
+{
+    _vector		vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+    _vector		vCamPosition = XMLoadFloat4(&m_pGameInstance->Get_CameraPos_Float());
+
+    m_fCameraDistance = XMVectorGetX(XMVector3Length(vPosition - vCamPosition));
+}
+
 
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring& strPrototypeTag, const wstring& strComTag, CComponent** ppOut, void* pArg)
 {
