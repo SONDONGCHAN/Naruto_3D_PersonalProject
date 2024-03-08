@@ -47,7 +47,6 @@ void CKamui::Tick(_float fTimeDelta)
 
 void CKamui::Late_Tick(_float fTimeDelta)
 {
-
     if (myState == STATE_HIT)
     {
         m_Effect_Kamui_Boom->Late_Tick(fTimeDelta);

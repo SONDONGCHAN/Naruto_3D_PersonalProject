@@ -59,6 +59,7 @@ void CWood_Swap::Tick(_float fTimeDelta)
 
 void CWood_Swap::Late_Tick(_float fTimeDelta)
 {
+
     if (myState == STATE_APPEAR || myState == STATE_RENDER)
     {
         m_Effect_WoodSwap_Main->Late_Tick(fTimeDelta);

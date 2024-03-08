@@ -106,7 +106,7 @@ void CBoss_Naruto::Late_Tick(_float fTimeDelta)
 		return;
 
 	for (auto& Pair : m_MonsterTrails)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+		Pair.second->Late_Tick(fTimeDelta);
 
 	for (auto& Pair : m_MonsterUIs)
 		Pair.second->Late_Tick(fTimeDelta);

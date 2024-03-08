@@ -50,6 +50,7 @@ private:
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
+	HRESULT Render_Bloom();
 
 #ifdef _DEBUG
 	HRESULT Render_Debug();

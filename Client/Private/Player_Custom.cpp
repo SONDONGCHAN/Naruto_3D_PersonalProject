@@ -246,7 +246,7 @@ void CPlayer_Custom::Late_Tick(_float fTimeDelta)
 #endif
 
 	for (auto& Pair : m_PlayerTrails)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+		Pair.second->Late_Tick(fTimeDelta);
 
 	for (auto& Pair : m_PlayerUIs)
 		Pair.second->Late_Tick(fTimeDelta);

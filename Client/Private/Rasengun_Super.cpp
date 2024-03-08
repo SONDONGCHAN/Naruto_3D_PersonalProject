@@ -119,7 +119,6 @@ void CRasengun_Super::Late_Tick(_float fTimeDelta)
 {
 	//Particles_Late_Tick(fTimeDelta);
 
-
 	if (myState == STATE_MAKING || myState == STATE_HIT || myState == STATE_DISSOLVE)
 	{
 		if (m_fMaking_Delay > 0.7f)

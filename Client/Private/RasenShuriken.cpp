@@ -95,6 +95,7 @@ void CRasenShuriken::Tick(_float fTimeDelta)
 
 void CRasenShuriken::Late_Tick(_float fTimeDelta)
 {
+
     if (myState == STATE_MAKING || myState == STATE_DETECTING)
     {
         m_Effect_RasenShuriken_Main->Late_Tick(fTimeDelta);

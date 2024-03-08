@@ -50,6 +50,7 @@ void CKurama_Scratch::Tick(_float fTimeDelta)
 
 void CKurama_Scratch::Late_Tick(_float fTimeDelta)
 {
+
 	if (myState == STATE_DETECTING || myState == STATE_HIT)
 	{
         if (STATE_DETECTING == myState)

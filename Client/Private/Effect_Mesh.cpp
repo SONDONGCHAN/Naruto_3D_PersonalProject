@@ -53,6 +53,8 @@ void CEffect_Mesh::Tick(_float fTimeDelta)
 
 void CEffect_Mesh::Late_Tick(_float fTimeDelta)
 {
+	__super::Late_Tick(fTimeDelta);
+
 	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this)))
 		return;
 }

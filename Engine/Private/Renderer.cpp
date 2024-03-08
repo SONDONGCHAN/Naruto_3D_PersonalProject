@@ -67,6 +67,10 @@ HRESULT CRenderer::Initialize()
 
 #pragma region MRT_Bloom
 
+    /* For.Target_Effect*/
+    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Effect"), (_uint)ViewPortDesc.Width, (_uint)ViewPortDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+
     /* For.Target_Blur_X*/
     if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Blur_X"), (_uint)ViewPortDesc.Width, (_uint)ViewPortDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
@@ -75,6 +79,8 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Blur_Y"), (_uint)ViewPortDesc.Width, (_uint)ViewPortDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
 
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Effect"), TEXT("Target_Effect"))))
+        return E_FAIL;
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_X"), TEXT("Target_Blur_X"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Blur_Y"), TEXT("Target_Blur_Y"))))
@@ -106,14 +112,18 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Depth"), 50.f, 250.f, 100.f, 100.f)))
         return E_FAIL;
 
+
     if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Shade"), 150.f, 50.f, 100.f, 100.f)))
         return E_FAIL;
     if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Specular"), 150.f, 150.f, 100.f, 100.f)))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Blur_X"), 250.f, 50.f, 100.f, 100.f)))
+
+    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Effect"), 250.f, 50.f, 100.f, 100.f)))
         return E_FAIL;
-    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Blur_Y"), 250.f, 150.f, 100.f, 100.f)))
+    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Blur_X"), 250.f, 150.f, 100.f, 100.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance->Ready_Debug(TEXT("Target_Blur_Y"), 250.f, 250.f, 100.f, 100.f)))
         return E_FAIL;
 
 #endif // _DEBUG
@@ -142,9 +152,11 @@ HRESULT CRenderer::Render()
         return E_FAIL;
     if (FAILED(Render_Lights()))
         return E_FAIL;
+    if (FAILED(Render_NonLight()))
+        return E_FAIL;
     if (FAILED(Render_Final()))
         return E_FAIL;
-    if (FAILED(Render_NonLight()))
+    if (FAILED(Render_Bloom()))
         return E_FAIL;
     if (FAILED(Render_Blend()))
         return E_FAIL;
@@ -257,6 +269,11 @@ HRESULT CRenderer::Render_Final()
         return E_FAIL;
     if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
         return E_FAIL;
+    if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Blur_Y"), m_pShader, "g_BlurTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Effect"), m_pShader, "g_EffectTexture")))
+        return E_FAIL;
+
 
     m_pShader->Begin(3);
 
@@ -268,6 +285,9 @@ HRESULT CRenderer::Render_Final()
 
 HRESULT CRenderer::Render_NonLight()
 {
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Effect"))))
+        return E_FAIL;
+
     for (auto& pGameObject : m_RenderObjects[RENDER_NONLIGHT])
     {
         if (nullptr != pGameObject)
@@ -278,6 +298,9 @@ HRESULT CRenderer::Render_NonLight()
     
     m_RenderObjects[RENDER_NONLIGHT].clear();
     
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -316,6 +339,49 @@ HRESULT CRenderer::Render_UI()
     return S_OK;
 }
 
+HRESULT CRenderer::Render_Bloom()
+{
+    if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Blur_X"))))
+        return E_FAIL;
+    
+    if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Effect"), m_pShader, "g_EffectTexture")))
+        return E_FAIL;
+    
+    m_pVIBuffer->Bind_Buffers();
+    
+    m_pShader->Begin(4);
+    
+    m_pVIBuffer->Render();
+    
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+    
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Blur_Y"))))
+        return E_FAIL;
+    
+    if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Blur_X"), m_pShader, "g_EffectTexture")))
+        return E_FAIL;
+    
+    m_pVIBuffer->Bind_Buffers();
+    
+    m_pShader->Begin(5);
+    
+    m_pVIBuffer->Render();
+    
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+
+
+    return S_OK;
+}
+
 #ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()
 {
@@ -324,10 +390,10 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
     
-    m_pGameInstance->Render_MRT(TEXT("MRT_GameObjects"), m_pShader, m_pVIBuffer);
-    
+    m_pGameInstance->Render_MRT(TEXT("MRT_GameObjects"), m_pShader, m_pVIBuffer);  
     m_pGameInstance->Render_MRT(TEXT("MRT_LightAcc"), m_pShader, m_pVIBuffer);
-    
+    m_pGameInstance->Render_MRT(TEXT("MRT_Effect"), m_pShader, m_pVIBuffer);
+
 
     for (auto& pComponent : m_DebugCom)
     {

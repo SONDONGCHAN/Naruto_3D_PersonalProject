@@ -47,7 +47,9 @@ void CParticle_Point::Tick(_float fTimeDelta)
 
 void CParticle_Point::Late_Tick(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this)))
+     __super::Late_Tick(fTimeDelta);
+
+	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
 		return;
 }
 
@@ -73,7 +75,7 @@ HRESULT CParticle_Point::Render()
     
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
         return E_FAIL;
-    
+
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &CameraPos, sizeof(_float4))))
         return E_FAIL;
     

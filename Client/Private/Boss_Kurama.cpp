@@ -139,7 +139,7 @@ void CBoss_Kurama::Late_Tick(_float fTimeDelta)
 			return;
 
 		for (auto& Pair : m_MonsterTrails)
-			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, Pair.second);
+			Pair.second->Late_Tick(fTimeDelta);
 
 		if (m_bAppear_End)
 		{

@@ -48,7 +48,7 @@ void CUI_Player_Skills::Tick(_float fTimeDelta)
 
 void CUI_Player_Skills::Late_Tick(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
+	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this)))
 		return;
 }
 

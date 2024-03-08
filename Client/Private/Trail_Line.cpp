@@ -68,6 +68,8 @@ void CTrail_Line::Tick(_float fTimeDelta)
 
 void CTrail_Line::Late_Tick(_float fTimeDelta)
 {
+	__super::Late_Tick(fTimeDelta);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
 HRESULT CTrail_Line::Render()

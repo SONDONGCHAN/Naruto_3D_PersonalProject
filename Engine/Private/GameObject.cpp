@@ -74,6 +74,7 @@ void CGameObject::Tick(_float fTimeDelta)
 
 void CGameObject::Late_Tick(_float fTimeDelta)
 {
+    Compute_CamDistance();
 }
 
 HRESULT CGameObject::Render()
