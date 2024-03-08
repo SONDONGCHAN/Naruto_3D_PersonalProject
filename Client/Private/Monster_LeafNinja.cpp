@@ -84,6 +84,7 @@ void CMonster_LeafNinja::Priority_Tick(_float fTimeDelta)
 			m_MonsterSkills.find(L"Skill_FlameBomb")->second->Priority_Tick(fTimeDelta);
 
 		Particles_Priority_Tick(fTimeDelta);
+		m_SmokeParticle->Priority_Tick(fTimeDelta);
 	}
 }
 
@@ -103,6 +104,8 @@ void CMonster_LeafNinja::Tick(_float fTimeDelta)
 			m_MonsterSkills.find(L"Skill_FlameBomb")->second->Tick(fTimeDelta);
 
 		Particles_Tick(fTimeDelta);
+		m_SmokeParticle->Tick(fTimeDelta);
+
 	}
 }
 
@@ -130,6 +133,8 @@ void CMonster_LeafNinja::Late_Tick(_float fTimeDelta)
 			Pair.second->Late_Tick(fTimeDelta);
 
 		Particles_Late_Tick(fTimeDelta);
+		m_SmokeParticle->Late_Tick(fTimeDelta);
+
 
 
 #ifdef _DEBUG
@@ -933,6 +938,12 @@ void CMonster_LeafNinja::Particles_Late_Tick(_float fTimeDelta)
 
 }
 
+void CMonster_LeafNinja::Set_Vitalize()
+{
+	m_bVitalize = true;
+	m_SmokeParticle->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+}
+
 HRESULT CMonster_LeafNinja::Add_Components()
 {
 	/* Com_Navigation */
@@ -1114,6 +1125,29 @@ HRESULT CMonster_LeafNinja::Add_Particles()
 		return E_FAIL;
 	m_KamuiParticles.push_back(pParticle_Kamui_6);
 
+
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
+	InstanceDesc1.iNumInstance = 20;
+	InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.pCenter = &m_MyPos;
+	InstanceDesc1.vRange = _float3(4.f, 4.f, 4.f);
+	InstanceDesc1.vSize = _float2(2.f, 2.f);
+	InstanceDesc1.vSpeed = _float2(0.1f, 0.2f);
+	InstanceDesc1.vLifeTime = _float2(1.5f, 2.f);
+	InstanceDesc1.isLoop = false;
+	InstanceDesc1.vColor = _float4(1.f, 1.f, 1.f, 1.f);
+	InstanceDesc1.fDuration = 2.1f;
+	InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_SQUARE;
+	InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_SPRITE;
+	InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Smoke_Sprite";
+	InstanceDesc1.vSpriteRatio = _float2(4.f, 4.f);
+
+	m_SmokeParticle = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
+	if (nullptr == m_SmokeParticle)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -1169,6 +1203,7 @@ void CMonster_LeafNinja::Free()
 	Safe_Release(m_pBodyModelCom);
 	Safe_Release(m_pColliderMain);
 	Safe_Release(m_pColliderAttack);
+	Safe_Release(m_SmokeParticle);
 
 	__super::Free();
 }

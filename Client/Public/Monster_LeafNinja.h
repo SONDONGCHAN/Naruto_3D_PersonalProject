@@ -100,7 +100,7 @@ private:
 	_bool				m_bVitalize = true;
 
 public:
-	void	Set_Vitalize() { m_bVitalize = true; }
+	void	Set_Vitalize();
 
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
@@ -109,6 +109,7 @@ private:
 	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
 	vector<class CParticle_Point*>	m_BasicParticles;
 	vector<class CParticle_Point*>	m_KamuiParticles;
+	CParticle_Point* m_SmokeParticle = { nullptr };
 
 private:
 	HRESULT Add_Components();

@@ -100,7 +100,7 @@ private:
 	_bool				m_bVitalize = true;
 
 public:
-	void	Set_Vitalize() { m_bVitalize = true; }
+	void	Set_Vitalize();
 
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;

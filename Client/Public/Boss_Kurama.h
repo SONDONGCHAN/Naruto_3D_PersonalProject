@@ -40,9 +40,9 @@ private:
 	_bool		InNormalAttackRange();
 
 	// 충돌 이벤트
-	void	Collider_Event_Enter(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider) override;
-	void	Collider_Event_Stay(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider) override;
-	void	Collider_Event_Exit(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider) override;
+	void		Collider_Event_Enter(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider) override;
+	void		Collider_Event_Stay(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider) override;
+	void		Collider_Event_Exit(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider) override;
 
 	// 공격
 	void		On_Attack_Collider(_float radius, _float distance, HIT_TYPE HitType = HIT_NORMAL);
@@ -82,10 +82,10 @@ public:
 	void		Set_Appear();
 
 private:
-	CModel* m_pBodyModelCom = { nullptr };
+	CModel*		m_pBodyModelCom = { nullptr };
 
-	CCollider* m_pColliderMain = { nullptr };
-	CCollider* m_pColliderAttack = { nullptr };
+	CCollider*	m_pColliderMain = { nullptr };
+	CCollider*	m_pColliderAttack = { nullptr };
 
 
 private:
@@ -97,7 +97,7 @@ private:
 
 
 	// 상태
-	_ulonglong				m_iState = { 0x00000010 };
+	_ulonglong			m_iState = { 0x00000010 };
 	BOSS_STATE			m_CurrentState = { BOSS_STATE_APPEAR };
 
 	// 움직임
@@ -149,6 +149,7 @@ private:
 	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
 	vector<class CParticle_Point*>	m_BasicParticles;
 	vector<class CParticle_Point*>	m_KamuiParticles;
+	CParticle_Point* m_SmokeParticle = { nullptr };
 
 private:
 	CEffect_Mesh*		m_Effect_Claw_Main = { nullptr };

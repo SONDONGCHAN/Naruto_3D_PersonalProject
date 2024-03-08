@@ -10,7 +10,6 @@
 #include "Level_BossStage.h"
 #include "BackGround.h"
 
-
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {

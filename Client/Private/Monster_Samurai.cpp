@@ -84,8 +84,8 @@ void CMonster_Samurai::Priority_Tick(_float fTimeDelta)
 			m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Priority_Tick(fTimeDelta);
 
 		Particles_Priority_Tick(fTimeDelta);
+		m_SmokeParticle->Priority_Tick(fTimeDelta);
 	}
-
 }
 
 void CMonster_Samurai::Tick(_float fTimeDelta)
@@ -104,6 +104,8 @@ void CMonster_Samurai::Tick(_float fTimeDelta)
 			m_MonsterSkills.find(L"Skill_Wood_Dragon")->second->Tick(fTimeDelta);
 
 		Particles_Tick(fTimeDelta);
+		m_SmokeParticle->Tick(fTimeDelta);
+
 	}
 }
 
@@ -131,6 +133,7 @@ void CMonster_Samurai::Late_Tick(_float fTimeDelta)
 			Pair.second->Late_Tick(fTimeDelta);
 
 		Particles_Late_Tick(fTimeDelta);
+		m_SmokeParticle->Late_Tick(fTimeDelta);
 
 
 #ifdef _DEBUG
@@ -1020,6 +1023,12 @@ void CMonster_Samurai::Particles_Late_Tick(_float fTimeDelta)
 		pParticle->Late_Tick(fTimeDelta);
 }
 
+void CMonster_Samurai::Set_Vitalize()
+{
+	m_bVitalize = true; 
+	m_SmokeParticle->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+}
+
 HRESULT CMonster_Samurai::Add_Components()
 {
 	/* Com_Navigation */
@@ -1241,7 +1250,7 @@ HRESULT CMonster_Samurai::Add_Particles()
 	InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
 	InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
 	InstanceDesc1.pCenter = &m_MyPos;
-	InstanceDesc1.vRange = _float3(3.f, 3.f, 3.f);
+	InstanceDesc1.vRange = _float3(4.f, 4.f, 4.f);
 	InstanceDesc1.vSize = _float2(2.f, 2.f);
 	InstanceDesc1.vSpeed = _float2(0.1f, 0.2f);
 	InstanceDesc1.vLifeTime = _float2(1.5f, 2.f);
@@ -1254,9 +1263,9 @@ HRESULT CMonster_Samurai::Add_Particles()
 	InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Smoke_Sprite";
 	InstanceDesc1.vSpriteRatio = _float2(4.f, 4.f);
 	
-	//m_SmokeParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
-	//if (nullptr == m_SmokeParticles)
-	//	return E_FAIL;
+	m_SmokeParticle = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
+	if (nullptr == m_SmokeParticle)
+		return E_FAIL;
 
 
 	return S_OK;
@@ -1314,6 +1323,7 @@ void CMonster_Samurai::Free()
 	Safe_Release(m_pBodyModelCom);
 	Safe_Release(m_pColliderMain);
 	Safe_Release(m_pColliderAttack);
+	Safe_Release(m_SmokeParticle);
 
 	__super::Free();
 }

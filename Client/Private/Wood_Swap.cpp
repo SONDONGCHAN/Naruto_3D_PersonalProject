@@ -134,7 +134,7 @@ void CWood_Swap::Set_User_Pos()
 
     vTargetDir = XMVector3Normalize(vTargetDir);
 
-    uniform_real_distribution<float>	LengthRange(5.f, 10.f);
+    uniform_real_distribution<float>	LengthRange(3.f, 5.f);
 
     _float fDistance = LengthRange(m_RandomNumber);
 
