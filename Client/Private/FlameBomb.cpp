@@ -187,6 +187,7 @@ void CFlameBomb::Set_Next_State()
     if (myState == STATE_DETECTING)
     {
         m_TraceParticles->Set_Loop_ON(true);
+        m_TraceParticles2->Set_Loop_ON(true);
         m_Effect_Fireball_Main->Start_Trigger();
         m_pColliderMain->Set_Radius(1.f);
     }
@@ -194,6 +195,7 @@ void CFlameBomb::Set_Next_State()
     else if (myState == STATE_HIT)
     {
         m_TraceParticles->Set_Loop_ON(false);
+        m_TraceParticles2->Set_Loop_ON(false);
         m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
         m_pColliderMain->Set_Radius(3.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -234,6 +236,7 @@ void CFlameBomb::Particles_Priority_Tick(_float fTimeDelta)
     m_BasicParticles->Priority_Tick(fTimeDelta);
     m_ExplosionParticles->Priority_Tick(fTimeDelta);
     m_TraceParticles->Priority_Tick(fTimeDelta);
+    m_TraceParticles2->Priority_Tick(fTimeDelta);
 }
 
 void CFlameBomb::Particles_Tick(_float fTimeDelta)
@@ -241,6 +244,7 @@ void CFlameBomb::Particles_Tick(_float fTimeDelta)
     m_BasicParticles->Tick(fTimeDelta);
     m_ExplosionParticles->Tick(fTimeDelta);
     m_TraceParticles->Tick(fTimeDelta);
+    m_TraceParticles2->Tick(fTimeDelta);
 }
 
 void CFlameBomb::Particles_Late_Tick(_float fTimeDelta)
@@ -248,6 +252,7 @@ void CFlameBomb::Particles_Late_Tick(_float fTimeDelta)
     m_BasicParticles->Late_Tick(fTimeDelta);
     m_ExplosionParticles->Late_Tick(fTimeDelta);
     m_TraceParticles->Late_Tick(fTimeDelta);
+    m_TraceParticles2->Late_Tick(fTimeDelta);
 }
 
 HRESULT CFlameBomb::Add_Components()
@@ -344,7 +349,7 @@ HRESULT CFlameBomb::Add_Particles()
     InstanceDesc3.vSpeed = _float2(0.3f, 0.5f);
     InstanceDesc3.vLifeTime = _float2(0.1f, 2.f);
     InstanceDesc3.isLoop = true;
-    InstanceDesc3.vColor = _float4(1.f, 110.f / 255.f, 0.f, 0.7f);
+    InstanceDesc3.vColor = _float4(1.f, 110.f / 255.f, 0.f, 1.f);
     InstanceDesc3.fDuration = 2.1f;
     InstanceDesc3.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
     InstanceDesc3.MyOption_Shape = CVIBuffer_Instancing::SHAPE_SQUARE;
@@ -356,6 +361,28 @@ HRESULT CFlameBomb::Add_Particles()
     if (nullptr == m_TraceParticles)
         return E_FAIL;
 
+    CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc4{};
+    InstanceDesc4.iNumInstance = 1000;
+    InstanceDesc4.vPivot = _float3(0.f, 0.f, 0.f);
+    InstanceDesc4.vCenter = _float3(0.f, 0.f, 0.f);
+    InstanceDesc4.pCenter = &m_MyPos;
+    InstanceDesc4.vRange = _float3(3.f, 3.f, 3.f);
+    InstanceDesc4.vSize = _float2(0.04f, 0.1f);
+    InstanceDesc4.vSpeed = _float2(1.f, 1.5f);
+    InstanceDesc4.vLifeTime = _float2(0.1f, 4.f);
+    InstanceDesc4.isLoop = true;
+    InstanceDesc4.vColor = _float4(1.f, 110.f / 255.f, 0.f, 1.f);
+    InstanceDesc4.fDuration = 4.1f;
+    InstanceDesc4.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+    InstanceDesc4.MyOption_Shape = CVIBuffer_Instancing::SHAPE_RECTANGLE;
+    InstanceDesc4.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
+    InstanceDesc4.MyOption_Size = CVIBuffer_Instancing::SIZE_DIMINISH;
+    InstanceDesc4.strTextureTag = L"Prototype_Component_Texture_Circle_Noise";
+    InstanceDesc4.vSpriteRatio = _float2(1.f, 1.f);
+    
+    m_TraceParticles2 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc4));
+    if (nullptr == m_TraceParticles2)
+        return E_FAIL;
 
     return S_OK;
 }
@@ -394,6 +421,7 @@ void CFlameBomb::Free()
     Safe_Release(m_BasicParticles);
     Safe_Release(m_ExplosionParticles);
     Safe_Release(m_TraceParticles);
+    Safe_Release(m_TraceParticles2);
 
     __super::Free();
 }

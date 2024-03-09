@@ -272,7 +272,7 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 			Use_Skill(L"Skill_Wood_Dragon");
 			m_CurrentState = MONSTER_STATE_NINJUTSU;
 			//m_iState |= MONSTER_HANDSEAL;
-			m_fNinjutsu = 15.f;
+			m_fNinjutsu = 20.f;
 			m_iNinjutsuCount = 0;
 			return;
 		}

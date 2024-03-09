@@ -49,8 +49,16 @@ void CParticle_Point::Late_Tick(_float fTimeDelta)
 {
      __super::Late_Tick(fTimeDelta);
 
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
-		return;
+     if (m_Instance_Desc.MyOption_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
+     {
+         if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this)))
+             return;
+     }
+     else
+     {
+         if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
+             return;
+     }
 }
 
 HRESULT CParticle_Point::Render()

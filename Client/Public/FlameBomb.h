@@ -51,6 +51,8 @@ private:
 	CParticle_Point*	m_BasicParticles		= { nullptr };
 	CParticle_Point*	m_ExplosionParticles	= { nullptr };
 	CParticle_Point*	m_TraceParticles		= { nullptr };
+	CParticle_Point*	m_TraceParticles2		= { nullptr };
+
 
 
 

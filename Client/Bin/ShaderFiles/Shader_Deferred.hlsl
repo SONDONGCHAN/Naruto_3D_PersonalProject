@@ -15,7 +15,7 @@ static const float fWeight[13] =
 };
 
 static const float fTotal = 6.2108;
-// static const float fTotal = 2.6054;
+//static const float fTotal = 2.6054;
 
 vector		g_vLightDir;
 vector      g_vLightDiffuse;
@@ -163,7 +163,10 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     else
         vShade.xyz = float3(1.f, 1.f, 1.f);
     
-    Out.vColor = vDiffuse * vShade + vSpecular + vEffect + vBlur;
+    //Out.vColor = vDiffuse * vShade + vSpecular + (vEffect*0.3f) + vBlur;
+    
+    Out.vColor = vDiffuse * vShade + vSpecular ;
+    
 
     return Out;
 }

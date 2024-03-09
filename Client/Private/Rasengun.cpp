@@ -243,6 +243,7 @@ void CRasengun::Set_Next_State()
     {
         m_Effect_Rasengun_Boom->Start_Trigger();
         m_BoomParticles->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+        m_BoomParticles2->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
         m_pColliderMain->Set_Radius(2.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
@@ -274,16 +275,22 @@ void CRasengun::Set_State()
 void CRasengun::Particles_Priority_Tick(_float fTimeDelta)
 {
     m_BoomParticles->Priority_Tick(fTimeDelta);
+    m_BoomParticles2->Priority_Tick(fTimeDelta);
+
 }
 
 void CRasengun::Particles_Tick(_float fTimeDelta)
 {
     m_BoomParticles->Tick(fTimeDelta);
+    m_BoomParticles2->Tick(fTimeDelta);
+
 }
 
 void CRasengun::Particles_Late_Tick(_float fTimeDelta)
 {
     m_BoomParticles->Late_Tick(fTimeDelta);
+    m_BoomParticles2->Late_Tick(fTimeDelta);
+
 }
 
 HRESULT CRasengun::Add_Components()
@@ -360,8 +367,8 @@ HRESULT CRasengun::Add_Particles()
     InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vRange = _float3(3.f, 3.f, 3.f);
-    InstanceDesc1.vSize = _float2(0.03f, 0.04f);
-    InstanceDesc1.vSpeed = _float2(0.6f, 1.f);
+    InstanceDesc1.vSize = _float2(0.05f, 0.07f);
+    InstanceDesc1.vSpeed = _float2(1.f, 1.5f);
     InstanceDesc1.vLifeTime = _float2(2.5f, 3.f);
     InstanceDesc1.isLoop = false;
     InstanceDesc1.vColor = _float4(121.f / 255.f, 237.f / 255.f, 1.f, 0.7f);
@@ -375,6 +382,26 @@ HRESULT CRasengun::Add_Particles()
 
     m_BoomParticles = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
     if (nullptr == m_BoomParticles)
+        return E_FAIL;
+
+    CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc{};
+    InstanceDesc.iNumInstance = 150;
+    InstanceDesc.vPivot = _float3(0.f, 0.f, 0.f);
+    InstanceDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    InstanceDesc.vRange = _float3(0.1f, 0.1f, 0.1f);
+    InstanceDesc.vSize = _float2(0.05f, 0.06f);
+    InstanceDesc.vSpeed = _float2(1.5f, 2.f);
+    InstanceDesc.vLifeTime = _float2(1.f, 1.3f);
+    InstanceDesc.isLoop = false;
+    InstanceDesc.vColor = _float4(121.f / 255.f, 237.f / 255.f, 1.f, 0.7f);
+    InstanceDesc.fDuration = 1.4f;
+    InstanceDesc.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+    InstanceDesc.MyOption_Shape = CVIBuffer_Instancing::SHAPE_NIDDLE;
+    InstanceDesc.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
+    InstanceDesc.strTextureTag = L"Prototype_Component_Texture_Circle";
+
+    m_BoomParticles2 = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc));
+    if (nullptr == m_BoomParticles2)
         return E_FAIL;
 
     return S_OK;
@@ -414,6 +441,7 @@ void CRasengun::Free()
     Safe_Release(m_Effect_Rasengun_Rush);
     Safe_Release(m_Effect_Rasengun_Boom);
     Safe_Release(m_BoomParticles);
+    Safe_Release(m_BoomParticles2);
 
     __super::Free();
 }

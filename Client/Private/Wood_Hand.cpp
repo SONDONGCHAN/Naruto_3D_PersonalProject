@@ -311,7 +311,7 @@ HRESULT CWood_Hand::Add_Particles()
 	InstanceDesc1.vSpeed = _float2(0.1f, 0.2f);
 	InstanceDesc1.vLifeTime = _float2(2.f, 2.5f);
 	InstanceDesc1.isLoop = false;
-	InstanceDesc1.vColor = _float4(0.7f, 0.7f, 0.7f, 0.7f);
+	InstanceDesc1.vColor = _float4(0.7f, 0.7f, 0.7f, 1.f);
 	InstanceDesc1.fDuration = 3.f;
 	InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
 	InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_SQUARE;

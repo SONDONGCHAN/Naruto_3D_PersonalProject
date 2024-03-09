@@ -9,7 +9,35 @@ CTarget_Manager::CTarget_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 }
 
 HRESULT CTarget_Manager::Initialize()
-{
+{   
+    ID3D11RenderTargetView* pBackBufferRTV = nullptr;
+    m_pContext->OMGetRenderTargets(1, &pBackBufferRTV, nullptr);
+
+    D3D11_RENDER_TARGET_VIEW_DESC pBackBufferDesc;
+    pBackBufferRTV->GetDesc(&pBackBufferDesc);
+
+    D3D11_TEXTURE2D_DESC	TextureDesc;
+    ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+    
+    TextureDesc.Width = 1280;
+    TextureDesc.Height = 720;
+    TextureDesc.MipLevels = 1;
+    TextureDesc.ArraySize = 1;
+    TextureDesc.Format = pBackBufferDesc.Format;
+    
+    TextureDesc.SampleDesc.Quality = 0;
+    TextureDesc.SampleDesc.Count = 1;
+    
+    TextureDesc.Usage = D3D11_USAGE_DEFAULT;
+    TextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    TextureDesc.CPUAccessFlags = 0;
+    TextureDesc.MiscFlags = 0;
+    
+    if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &m_pBackBufferTextureCopy)))
+        return E_FAIL;
+
+    Safe_Release(pBackBufferRTV);
+
     return S_OK;
 }
 
@@ -87,6 +115,30 @@ HRESULT CTarget_Manager::Bind_SRV(const wstring& strTargetTag, CShader* pShader,
 
     return pRenderTarget->Bind_SRV(pShader, pConstantName);
 }
+HRESULT CTarget_Manager::Copy_BackBufferTexture()
+{
+    /* 현재 랜더 타겟을 가져온다(백 버퍼) */
+    ID3D11RenderTargetView* pBackBufferRTV = nullptr;
+    m_pContext->OMGetRenderTargets(1, &pBackBufferRTV, nullptr);
+
+    /* 백버퍼를 텍스쳐로 저장한다 */
+    ID3D11Resource* pBackBufferResource = nullptr;
+    pBackBufferRTV->GetResource(&pBackBufferResource);
+
+    /* 백버퍼 텍스쳐를 멤버로써 저장한다 */
+    m_pContext->CopyResource(m_pBackBufferTextureCopy, pBackBufferResource);
+
+    Safe_Release(m_pBackBufferSRV);
+
+    /* 백버퍼 텍스쳐를 이용해서 백버퍼 쉐이더 SRV를 만들어준다. */
+    if (FAILED(m_pDevice->CreateShaderResourceView(m_pBackBufferTextureCopy, nullptr, &m_pBackBufferSRV)))
+        return E_FAIL;
+
+    Safe_Release(pBackBufferResource);
+    Safe_Release(pBackBufferRTV);
+
+    return S_OK;
+}
 #ifdef _DEBUG
 HRESULT CTarget_Manager::Ready_Debug(const wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
@@ -157,7 +209,8 @@ void CTarget_Manager::Free()
 
     m_RenderTargets.clear();
 
-
     Safe_Release(m_pContext);
     Safe_Release(m_pDevice);
+    Safe_Release(m_pBackBufferTextureCopy);
+    Safe_Release(m_pBackBufferSRV);
 }

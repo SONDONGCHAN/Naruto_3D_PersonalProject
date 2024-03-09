@@ -56,7 +56,7 @@ void CLevel_GamePlay::Tick(_float fTimeDelta)
 	{
 		m_fEnd_Time += fTimeDelta;
 
-		if (m_fEnd_Time > 10.f)
+		if (m_fEnd_Time > 12.f)
 		{
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_BOSS))))
 				return;
@@ -223,7 +223,7 @@ void CLevel_GamePlay::Add_Run_Time_Object()
 		m_pGameInstance->Add_CloneObject(LEVEL_GAMEPLAY, TEXT("Layer_System_UI"), TEXT("Prototype_GameObject_UI_System"), &desc);
 	}
 
-	if (m_fEnd_Time > 2.f && !m_bCreated[1])
+	if (m_fEnd_Time > 4.f && !m_bCreated[1])
 	{
 		m_bCreated[1] = true;
 		

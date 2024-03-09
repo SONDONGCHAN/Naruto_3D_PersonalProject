@@ -165,28 +165,13 @@ PS_OUT PS_MAIN(PS_IN In)
     
     vector vMtrlDiffuse = g_Texture.Sample(g_LinearSampler, In.vTexcoord);
     
-        if (vMtrlDiffuse.a < 0.01f)
+    if (vMtrlDiffuse.a < 0.01f)
         discard;
-        
-    float4 vColor;
+            
+    Out.vColor = vMtrlDiffuse * In.vColor;
     
-    if (vMtrlDiffuse.a < 0.8f)
-        vColor.rgb = In.vColor.rgb * (1.f - vMtrlDiffuse.a);
-    else
-        vColor.rgb = vMtrlDiffuse.rgb;
+    Out.vColor.a = 1.f;
     
-    vColor.a = In.vColor.a;
- 
-    Out.vColor = vColor;
-    //float4 vColor = g_Texture.Sample(g_LinearSampler, In.vTexcoord) * In.vColor;
-    
-    //if (vColor.a < 0.3f)
-    //    discard;
-        
-    //vColor = In.vColor;
-    
-    //Out.vColor = vColor;
-  
     return Out;
 }
 
@@ -217,11 +202,6 @@ PS_OUT PS_NONE_DIRECTION(PS_IN In)
  
     Out.vColor = vColor;
     
-        
-    //vColor.rgb = vColor.rgb * In.vColor.r;
-    
-    //Out.vColor = vColor;
-  
     return Out;
 }
 
@@ -239,10 +219,10 @@ PS_OUT PS_NONE_SPRITE(PS_IN In)
     
     vColor = vMtrlDiffuse * In.vColor;
     
-    if (vColor.r < 0.3f)
-        vColor.rgb = In.vColor * 2.f;
-    
     Out.vColor = vColor;
+    
+    Out.vColor.a = 1.f;
+    
           
     return Out;
     

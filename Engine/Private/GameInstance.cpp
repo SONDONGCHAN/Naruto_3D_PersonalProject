@@ -400,6 +400,16 @@ HRESULT CGameInstance::Bind_SRV(const wstring& strTargetTag, CShader* pShader, c
 	return m_pTarget_Manager->Bind_SRV(strTargetTag, pShader, pConstantName);
 }
 
+HRESULT CGameInstance::Copy_BackBufferTexture()
+{
+	return m_pTarget_Manager->Copy_BackBufferTexture();
+}
+
+ID3D11ShaderResourceView* CGameInstance::Get_BackBufferCopySRV()
+{
+	return m_pTarget_Manager ->Get_BackBufferCopySRV(); 
+}
+
 /* For.Sound_Manager */
 void CGameInstance::PlaySoundW(const string pSoundKey, CHANNELID eID, float fVolume, _bool _overlap)
 {

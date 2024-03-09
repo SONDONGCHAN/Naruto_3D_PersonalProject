@@ -109,11 +109,9 @@ HRESULT CVIBuffer_Particle_Point::Initialize(void* pArg)
 
 	for (_uint i = 0; i < m_iNumInstance; ++i)
 	{
-		_float		fSize = SizeRange(m_RandomNumber);
-
-		pInsVertices[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
-		pInsVertices[i].vUp = _float4(0.f, fSize, 0.f, 0.f);
-		pInsVertices[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
+		pInsVertices[i].vRight = _float4(0.f, 0.f, 0.f, 0.f);
+		pInsVertices[i].vUp = _float4(0.f, 0.f, 0.f, 0.f);
+		pInsVertices[i].vLook = _float4(0.f, 0.f, 0.f, 0.f);
 		pInsVertices[i].vTranslation = _float4(
 			m_InstanceData.vCenter.x + WidthRange(m_RandomNumber),
 			m_InstanceData.vCenter.y + HeightRange(m_RandomNumber),

@@ -7,7 +7,7 @@ CVIBuffer_Instancing::CVIBuffer_Instancing(ID3D11Device* pDevice, ID3D11DeviceCo
 
 CVIBuffer_Instancing::CVIBuffer_Instancing(const CVIBuffer_Instancing& rhs)
 	: CVIBuffer(rhs)
-	//, m_pVBInstance(rhs.m_pVBInstance)
+	, m_pVBInstance(rhs.m_pVBInstance)
 	//, m_iInstanceStride(rhs.m_iInstanceStride)
 	//, m_iNumInstance(rhs.m_iNumInstance)
 	//, m_iIndexCountPerInstance(rhs.m_iIndexCountPerInstance)
@@ -52,7 +52,6 @@ HRESULT CVIBuffer_Instancing::Initialize(void* pArg)
 		m_pLifeTime[i]	= 0.f;
 		m_pMaxLifeTime[i] = TimeRange(m_RandomNumber);
 	}
-
 	m_isFinished = { true };
 	return S_OK;
 }
@@ -149,6 +148,7 @@ _bool CVIBuffer_Instancing::Trigger(_vector vCenterPos)
 				XMStoreFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation, XMLoadFloat4(&((VTXINSTANCE*)m_SubResource.pData)[i].vTranslation) + XMVector3Normalize(vDir) * fSize * yScale);
 			}
 		}
+		m_pContext->Unmap(m_pVBInstance, 0);
 
 		return true;
 	}
@@ -253,6 +253,7 @@ void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 				m_InstanceData.vPivot = m_InstanceData.vCenter;
 
 				m_pLifeTime[i] = TimeRange(m_RandomNumber);
+				m_pMaxLifeTime[i] = m_pLifeTime[i];
 				((VTXINSTANCE*)SubResource.pData)[i].vTranslation = _float4(
 					m_InstanceData.vCenter.x + WidthRange(m_RandomNumber),
 					m_InstanceData.vCenter.y + HeightRange(m_RandomNumber),
@@ -263,7 +264,8 @@ void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 				_float		yScale = { 1.f };
 				
 				((VTXINSTANCE*)SubResource.pData)[i].vRight = _float4(fSize, 0.f, 0.f, 0.f);
-				
+				m_pMaxSizeX[i] = fSize;
+
 				if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 					yScale = 60.f;
 				else if (m_InstanceData.MyOption_Shape == SHAPE_RECTANGLE)
@@ -272,9 +274,8 @@ void CVIBuffer_Instancing::Tick_Spread_Loop(_float fTimeDelta)
 				((VTXINSTANCE*)SubResource.pData)[i].vUp = _float4(0.f, fSize * yScale, 0.f, 0.f);
 				m_pMaxSizeY[i] = fSize * yScale;
 				((VTXINSTANCE*)SubResource.pData)[i].vLook = _float4(0.f, 0.f, fSize, 0.f);
+				m_pMaxSizeZ[i] = fSize;
 				
-
-
 				if (m_InstanceData.MyOption_Shape == SHAPE_NIDDLE)
 				{
 					_vector		vDir = XMLoadFloat4(&((VTXINSTANCE*)SubResource.pData)[i].vTranslation) - XMLoadFloat3(&m_InstanceData.vPivot);
@@ -338,6 +339,11 @@ void CVIBuffer_Instancing::Tick_Spread(_float fTimeDelta)
 			if (0.0f >= m_pLifeTime[i])
 			{
 				((VTXINSTANCE*)m_SubResource.pData)[i].vColor.w = 0.f;
+
+				((VTXINSTANCE*)m_SubResource.pData)[i].vRight = _float4(0.f, 0.f, 0.f, 0.f);
+				((VTXINSTANCE*)m_SubResource.pData)[i].vUp = _float4(0.f, 0.f, 0.f, 0.f);
+				((VTXINSTANCE*)m_SubResource.pData)[i].vLook = _float4(0.f, 0.f, 0.f, 0.f);
+
 			}
 			else
 			{

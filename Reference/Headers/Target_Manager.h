@@ -9,6 +9,8 @@ private:
 	CTarget_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CTarget_Manager() = default;
 
+public : 
+	ID3D11ShaderResourceView* Get_BackBufferCopySRV() { return m_pBackBufferSRV; }
 public:
 	HRESULT Initialize();
 	HRESULT Add_RenderTarget(const wstring& strTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
@@ -16,6 +18,7 @@ public:
 	HRESULT Begin_MRT(const wstring& strMRTTag);
 	HRESULT End_MRT();
 	HRESULT Bind_SRV(const wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
+	HRESULT Copy_BackBufferTexture();
 
 #ifdef _DEBUG
 
@@ -30,6 +33,9 @@ private:
 
 	ID3D11RenderTargetView* m_pBackBufferView = { nullptr };
 	ID3D11DepthStencilView* m_pDepthStencilView = { nullptr };
+
+	ID3D11Texture2D*			m_pBackBufferTextureCopy	= { nullptr }; // 백버퍼 텍스쳐
+	ID3D11ShaderResourceView*	m_pBackBufferSRV			= { nullptr };
 
 private:
 	map<const wstring, class CRenderTarget*>			m_RenderTargets;

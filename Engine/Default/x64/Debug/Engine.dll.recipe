@@ -12,6 +12,9 @@
     <ContentFile>
       <FullPath>C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Bin\Shader_Deferred.cso</FullPath>
     </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\dhqks\Desktop\3D_Personal_Client\3D_Personal_Client\Engine\Bin\Shader_PostProcessing.cso</FullPath>
+    </ContentFile>
   </ContentFiles>
   <SatelliteDlls />
   <NonRecipeFileRefs />

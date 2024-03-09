@@ -141,7 +141,7 @@ HRESULT CEventTrigger::Add_Effects()
     Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_LINE;
     Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_END;
     Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
-    Effect_Desc_2.vMyScale = _vector{ 20.f, 1000.f, 20.f, 1.f };
+    Effect_Desc_2.vMyScale = _vector{ 30.f, 1000.f, 30.f, 1.f };
     m_Effect_Line = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
     if (nullptr == m_Effect_Line)
         return E_FAIL;

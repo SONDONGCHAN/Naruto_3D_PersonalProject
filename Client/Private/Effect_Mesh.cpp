@@ -55,7 +55,7 @@ void CEffect_Mesh::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this)))
+	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
 		return;
 }
 
@@ -80,6 +80,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_UVMovement", &m_vUVMovement, sizeof(_float2))))
 					return E_FAIL;
 
+				m_fAlpha = 0.8f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 
@@ -210,7 +211,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 
-				_float4		vColor = { 0.f, 0.f, 0.f, 0.5f };
+				_float4		vColor = { 50.f, 50.f, 50.f, 0.5f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 

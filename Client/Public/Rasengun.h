@@ -56,6 +56,8 @@ private:
 	CEffect_Mesh*		m_Effect_Rasengun_Rush		= { nullptr };
 	CEffect_Mesh*		m_Effect_Rasengun_Boom		= { nullptr };
 	CParticle_Point*	m_BoomParticles				= { nullptr };
+	CParticle_Point*	m_BoomParticles2			= { nullptr };
+
 
 private:
 	RASENGUN_STATE myState = { STATE_MAKING };

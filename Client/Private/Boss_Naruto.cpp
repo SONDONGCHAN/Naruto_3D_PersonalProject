@@ -273,7 +273,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			if ((!InComboAttackRange()) && CheckPlayer()) {
 				Use_Skill(L"Skill_RasenShuriken");
 				m_CurrentState = MONSTER_STATE_NINJUTSU_2;
-				m_fCoolRasenshuriken = 15.f;
+				m_fCoolRasenshuriken = 25.f;
 				m_iCountRasenshuriken = 0;
 				return;
 			}
@@ -283,7 +283,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			if ((!InComboAttackRange()) && CheckPlayer()) {
 				Use_Skill(L"Skill_Rasengun");
 				m_CurrentState = MONSTER_STATE_NINJUTSU;
-				m_fCoolRasengun = 20.f;
+				m_fCoolRasengun = 30.f;
 				m_iCountRasengun = 0;
 				return;
 			}
@@ -293,7 +293,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 			if ((InComboAttackRange()) && CheckPlayer()) {
 				Use_Skill(L"Skill_Rasengun_Super");
 				m_CurrentState = MONSTER_STATE_NINJUTSU_3;
-				m_fCoolRasengun_Super = 30.f;
+				m_fCoolRasengun_Super = 40.f;
 				m_iCountRasengun_Super = 0;
 				return;
 			}

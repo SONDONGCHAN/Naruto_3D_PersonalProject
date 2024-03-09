@@ -94,6 +94,8 @@ public: /* For.Target_Manager */
 	HRESULT Begin_MRT(const wstring& strMRTTag);
 	HRESULT End_MRT();
 	HRESULT Bind_SRV(const wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
+	HRESULT Copy_BackBufferTexture();
+	ID3D11ShaderResourceView* Get_BackBufferCopySRV();
 
 public: /* For.Sound_Manager */
 	void PlaySoundW(const string pSoundKey, CHANNELID eID, float fVolume, _bool _overlap = false);

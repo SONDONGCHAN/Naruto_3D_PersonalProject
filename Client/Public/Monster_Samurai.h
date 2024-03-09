@@ -81,7 +81,7 @@ private:
 
 	// 인술
 	_uint				m_iNinjutsuCount = { 0 };
-	_float				m_fNinjutsu = 10.f;
+	_float				m_fNinjutsu = 15.f;
 
 	// 피격
 	_uint				m_iStruckState = 0;

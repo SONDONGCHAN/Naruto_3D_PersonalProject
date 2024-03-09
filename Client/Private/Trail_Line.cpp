@@ -39,15 +39,15 @@ HRESULT CTrail_Line::Initialize(void* pArg)
 	if (m_eMyCharacter == PLAYER_CUSTOM) {
 		//m_vColor = { 113.f / 255.f, 199.f / 255.f, 236.f / 255.f , 1.f };
 		m_vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 1.f };
-		m_vThickness = 0.025f;
+		m_vThickness = 0.015f;
 	}
 	else if (m_eMyCharacter == PLAYER_NARUTO) {
 		m_vColor = { 252.f / 255.f, 220.f / 255.f, 100.f / 255.f , 1.f };
-		m_vThickness = 0.025f;
+		m_vThickness = 0.015f;
 	}
 	else if (m_eMyCharacter == MONSTER_NARUTO) {
 		m_vColor = { 255.f / 255.f, 100.f / 255.f, 100.f / 255.f , 1.f };
-		m_vThickness = 0.025f;
+		m_vThickness = 0.015f;
 	}
 	else if (m_eMyCharacter == BOSS_KURAMA) {
 		m_vColor = { 0.f, 0.f, 0.f , 1.f };
@@ -69,7 +69,14 @@ void CTrail_Line::Tick(_float fTimeDelta)
 void CTrail_Line::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
+
+	if (m_eMyCharacter == BOSS_KURAMA)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
+
+	else
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+
+
 }
 
 HRESULT CTrail_Line::Render()

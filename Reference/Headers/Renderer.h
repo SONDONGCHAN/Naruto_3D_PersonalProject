@@ -31,7 +31,9 @@ private:
 	class CGameInstance*				m_pGameInstance = { nullptr };
 
 private:
-	class CShader*						m_pShader = { nullptr };
+	class CShader*						m_pShader_Deferred			= { nullptr };
+	class CShader*						m_pShader_PostProcessing	= { nullptr };
+
 	class CVIBuffer_Rect*				m_pVIBuffer = { nullptr };
 
 	_float4x4							m_WorldMatrix, m_ViewMatrix, m_ProjMatrix;
@@ -51,6 +53,8 @@ private:
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
 	HRESULT Render_Bloom();
+	HRESULT Render_PostProcessing();
+
 
 #ifdef _DEBUG
 	HRESULT Render_Debug();

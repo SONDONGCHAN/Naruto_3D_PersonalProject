@@ -269,7 +269,7 @@ void CMonster_LeafNinja::State_Control(_float fTimeDelta)
 			Use_Skill(L"Skill_FlameBomb");
 			m_CurrentState = MONSTER_STATE_NINJUTSU;
 			//m_iState |= MONSTER_HANDSEAL;
-			m_fNinjutsu = 12.f;
+			m_fNinjutsu = 15.f;
 			m_iNinjutsuCount = 0;
 			return;
 		}
