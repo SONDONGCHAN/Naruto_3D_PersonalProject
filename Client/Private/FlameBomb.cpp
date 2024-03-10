@@ -186,6 +186,7 @@ void CFlameBomb::Set_Next_State()
 
     if (myState == STATE_DETECTING)
     {
+        m_pGameInstance->PlaySoundW("FireBall_Detect", SOUND_SKILL, 1.f, true);
         m_TraceParticles->Set_Loop_ON(true);
         m_TraceParticles2->Set_Loop_ON(true);
         m_Effect_Fireball_Main->Start_Trigger();
@@ -194,6 +195,7 @@ void CFlameBomb::Set_Next_State()
 
     else if (myState == STATE_HIT)
     {
+        m_pGameInstance->PlaySoundW("FireBall_Explosion", SOUND_SKILL, 1.f, true);
         m_TraceParticles->Set_Loop_ON(false);
         m_TraceParticles2->Set_Loop_ON(false);
         m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
@@ -223,6 +225,7 @@ void CFlameBomb::Set_State()
 {
     myState = STATE_MAKING;
     m_Effect_Fireball_Ring->Start_Trigger();
+    m_pGameInstance->PlaySoundW("FireBall_Pre", SOUND_SKILL, 1.f, true);
 }
 
 void CFlameBomb::Set_Targeting(_vector Target_Pos)

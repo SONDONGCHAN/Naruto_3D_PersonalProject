@@ -74,7 +74,7 @@ void CTrail_Line::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 
 	else
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_GLOW, this);
 
 
 }

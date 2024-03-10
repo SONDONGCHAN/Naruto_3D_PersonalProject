@@ -64,6 +64,7 @@ void CPlayer::Key_Input(_float fTimeDelta)
 	if (m_pGameInstance->Key_Down(DIK_T) && m_fTagCool> 1.f)
 	{
 		m_fTagCool = 0.f;
+		m_pGameInstance->PlaySoundW("Skill_Pre", SOUND_SKILL, 1.f, true);
 
 		m_iCurrent_Character_Index++;
 
@@ -118,7 +119,6 @@ void CPlayer::Check_Tag()
 		dynamic_cast<CPlayer_Custom*>(m_pCurrentCharacter)->Add_MainCollider();
 
 		m_pGameInstance->PlaySoundW("Player_Tag", SOUND_ETC_1, 1.f, true);
-
 	}
 
 	m_pCurrentCharacter->Get_TranformCom()->Set_World(OldCharacterWorldMat);

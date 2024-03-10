@@ -93,6 +93,7 @@ void CChidori::Collider_Event_Enter(const wstring& strColliderLayerTag, CCollide
         if (myState == STATE_DETECTING)
         {
             m_bIsHit = true;
+            m_pGameInstance->PlaySoundW("Chidori_Hit", SOUND_SKILL, 1.f, true);
         }
     }
 }
@@ -155,6 +156,7 @@ void CChidori::Set_Next_State()
 void CChidori::Set_State()
 {
     myState = STATE_MAKING;
+    m_pGameInstance->PlaySoundW("Chidori_Pre", SOUND_SKILL, 0.7f, true);
 }
 
 void CChidori::Particles_Priority_Tick(_float fTimeDelta)

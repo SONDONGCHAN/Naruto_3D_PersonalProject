@@ -202,6 +202,7 @@ void CRasengun_Super::Set_Next_State()
 
 	if (myState == STATE_HIT)
 	{
+		m_pGameInstance->PlaySoundW("Rasengun_Super_Hit", SOUND_SKILL, 1.f, true);
 		m_pColliderMain->Set_Radius(2.5f);
 		m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
 		m_fDurTime = 0;
@@ -238,6 +239,8 @@ void CRasengun_Super::Set_State()
 	myState = STATE_MAKING;
 	m_Effect_Rasengun_Super_Main ->Start_Trigger();
 	m_Effect_Rasengun_Super_Noise->Start_Trigger();
+	m_pGameInstance->PlaySoundW("Rasengun_Super_Human", SOUND_SKILL, 1.f, true);
+	m_pGameInstance->PlaySoundW("Rasengun_Super_Pre", SOUND_SKILL, 1.f, true);
 }
 
 void CRasengun_Super::Particles_Priority_Tick(_float fTimeDelta)

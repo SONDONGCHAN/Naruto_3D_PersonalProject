@@ -194,6 +194,7 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 
 		if (m_fAppearDurTime > 0.4f && m_fAppearDurTime < 0.5f)
 		{
+			m_pGameInstance->PlaySoundW("Boss_Appear_1", SOUND_ETC_2, 1.f, true);
 			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.2f);
 			m_SmokeParticle->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			m_fAppearDurTime += 0.1f;
@@ -205,11 +206,13 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 
 		if (m_fAppearDurTime2 > 0.7f && m_fAppearDurTime2 < 0.8f)
 		{
+			m_pGameInstance->PlaySoundW("Boss_Appear_2", SOUND_ETC_3, 1.f, true);
 			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
 			m_fAppearDurTime2 += 0.1f;
 		}	
 		else if (m_fAppearDurTime2 > 1.4f && m_fAppearDurTime2 < 1.5f)
 		{
+			m_pGameInstance->PlaySoundW("Boss_Appear_2", SOUND_ETC_3, 1.f, true);
 			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
 			m_fAppearDurTime2 += 0.1f;
 		}
@@ -222,11 +225,18 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 		{
 			m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 4.f, 2.3f);
 			m_fAppearDurTime2 += 0.1f;
+			m_pGameInstance->PlaySoundW("Boss_Appear", SOUND_ETC_1, 1.f, true);
 		}
 	}
-	else 
+	else
+	{
+		if (!m_bBGM_ON)
+		{
+			m_bBGM_ON = true;
+			m_pGameInstance->PlayBGM("BGM_STAGE_Boss", 0.3f);
+		}
 		CoolTimeTick(fTimeDelta);
-
+	}
 
 	if (m_CurrentHp <= 0)
 	{
@@ -259,6 +269,7 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 				m_CrashMat.r[3] += XMVector3Normalize(Dir) * 5;
 				m_CrashMat.r[3] += _vector{ 0.f, 0.1f ,0.f };
 				m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.2f);
+				m_pGameInstance->PlaySoundW("Boss_Crash", SOUND_SKILL, 1.f, true);
 			}
 			On_Attack_Collider(4.f, 5.f, HIT_BEATEN);
 		}
@@ -285,6 +296,7 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 		{
 			if (!m_bKick_2_Start) {
 				m_Effect_Kick_2->Start_Trigger();
+				m_pGameInstance->PlaySoundW("Boss_Kick", SOUND_SKILL, 1.f, true);
 				m_bKick_2_Start = true;
 				m_bKick_1_Start = false;
 			}
@@ -299,6 +311,7 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 		{
 			if (!m_bKick_1_Start) {
 				m_Effect_Kick_1->Start_Trigger();
+				m_pGameInstance->PlaySoundW("Boss_Kick", SOUND_SKILL, 1.f, true);
 				m_bKick_1_Start = true;
 			}
 			On_Attack_Collider(2.5f, 2.5f);
@@ -382,9 +395,10 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
-			if(m_iState == BOSS_ATTACK_SCRATCH)
+			if (m_iState == BOSS_ATTACK_SCRATCH) {
 				m_Effect_Claw_Main->Start_Trigger();
-
+				m_pGameInstance->PlaySoundW("Boss_Claw", SOUND_SKILL, 1.f, true);
+			}
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
@@ -437,8 +451,10 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
-			if (m_iState == BOSS_ATTACK_SCRATCH)
+			if (m_iState == BOSS_ATTACK_SCRATCH) {
 				m_Effect_Claw_Main->Start_Trigger();
+				m_pGameInstance->PlaySoundW("Boss_Claw", SOUND_SKILL, 1.f, true);
+			}
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <=0.f)) {
@@ -491,8 +507,10 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
-			if (m_iState == BOSS_ATTACK_SCRATCH)
+			if (m_iState == BOSS_ATTACK_SCRATCH) {
 				m_Effect_Claw_Main->Start_Trigger();
+				m_pGameInstance->PlaySoundW("Boss_Claw", SOUND_SKILL, 1.f, true);
+			}
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
@@ -545,8 +563,10 @@ void CBoss_Kurama::State_Control(_float fTimeDelta)
 			m_iState |= (BOSS_ATTACK_SCRATCH * iRandom);
 			m_fWaitingTime = 0.f;
 			m_ColliderDelay = 0.f;
-			if (m_iState == BOSS_ATTACK_SCRATCH)
+			if (m_iState == BOSS_ATTACK_SCRATCH) {
 				m_Effect_Claw_Main->Start_Trigger();
+				m_pGameInstance->PlaySoundW("Boss_Claw", SOUND_SKILL, 1.f, true);
+			}
 			break;
 		}
 		else if (InRushAttackRange() && (m_fCoolTime_Rush_Current <= 0.f)) {
@@ -763,8 +783,9 @@ void CBoss_Kurama::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 		{
 			if (m_fGetAttack_FrameCount == 0)
 			{
-				m_fGetAttack_FrameCount = 7;
+				m_fGetAttack_FrameCount = 8;
 				m_CurrentHp -= 10;
+				m_pGameInstance->PlaySoundW("Kamui_Hit", SOUND_SKILL, 0.7f, true);
 
 				_vector vParPos = m_MyPos;
 				vParPos.m128_f32[1] += 0.7f;
@@ -786,6 +807,9 @@ void CBoss_Kurama::Collider_Event_Exit(const wstring& strColliderLayerTag, CColl
 
 	 if (strColliderLayerTag == L"Kamui_Collider" || strColliderLayerTag == L"RasenShuriken_Collider" || strColliderLayerTag == L"Rasengun_Super_Collider")
 	 {
+		 if(strColliderLayerTag == L"Kamui_Collider")
+			m_pGameInstance->PlaySoundW("Kamui_Final", SOUND_SKILL, 1.f, true);
+
 	 	if (pMyCollider == m_pColliderMain)
 	 	{
 	 		m_fGetAttack_FrameCount = 0;
@@ -1184,7 +1208,6 @@ void CBoss_Kurama::Set_Appear()
 {
 	Set_Appear_Camera();
 	m_bAppear = true;
-
 }
 
 HRESULT CBoss_Kurama::Add_Components()

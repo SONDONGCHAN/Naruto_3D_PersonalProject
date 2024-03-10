@@ -44,7 +44,7 @@ void CParticle_Rect::Tick(_float fTimeDelta)
 
 void CParticle_Rect::Late_Tick(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_GLOW, this)))
         return;
 }
 

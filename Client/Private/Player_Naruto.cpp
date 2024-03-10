@@ -533,17 +533,28 @@ void CPlayer_Naruto::Key_Input(_float fTimeDelta)
 			
 			m_vJumpDirection = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 			m_fChargingtime = 0.f;
+			m_pGameInstance->PlaySoundW("Jump_Charge_Jump", SOUND_PLAYER_MOVE, 1.f, true);
+			m_pGameInstance->StopSound(SOUND_SKILL_LOOP_3);
+			m_bCharge_Complete = false;
 			return;
 		}
 	}
 	if (m_pGameInstance->Key_Down(DIK_LCONTROL))
-	{ }
+	{
+		m_pGameInstance->PlaySoundW("Jump_Charging", SOUND_SKILL_LOOP_3, 1.f, true);
+	}
 	
 	if (m_pGameInstance->Key_Pressing(DIK_LCONTROL, fTimeDelta, &m_fChargingtime))
 	{
 		if (!m_iJumpState)
 		{
 			m_iState |= PLAYER_STATE_CHAKRAJUMP_LOOP;
+
+			if (m_fChargingtime >= 3.f && !m_bCharge_Complete)
+			{
+				m_bCharge_Complete = true;
+				m_pGameInstance->PlaySoundW("Jump_Charge_Finish", SOUND_PLAYER_MOVE, 1.f, true);
+			}
 		}
 		return;
 	}
@@ -1119,6 +1130,8 @@ void CPlayer_Naruto::Off_Attack_Collider()
 
 void CPlayer_Naruto::Use_Skill(const wstring& strSkillName)
 {
+	m_pGameInstance->PlaySoundW("Skill_Pre", SOUND_SKILL, 1.f, true);
+
 	if (strSkillName == L"Skill_Rasengun")
 	{
 		m_pCamera->Set_Camera_radius(2.f, 0.02f);

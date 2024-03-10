@@ -56,7 +56,7 @@ void CParticle_Point::Late_Tick(_float fTimeDelta)
      }
      else
      {
-         if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
+         if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_GLOW, this)))
              return;
      }
 }

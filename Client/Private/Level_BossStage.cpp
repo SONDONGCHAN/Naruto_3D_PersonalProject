@@ -277,6 +277,7 @@ void CLevel_BossStage::Add_Run_Time_Object()
 		desc.fAppearTime = 0.7f;
 	
 		m_pGameInstance->Add_CloneObject(LEVEL_BOSS, TEXT("Layer_System_UI"), TEXT("Prototype_GameObject_UI_System"), &desc);
+		m_pGameInstance->PlaySoundW("Stage_Start", SOUND_ETC_1, 1.f, true);
 	}
 
 	if (m_fEnd_Time > 7.f && !m_bCreated[1])
@@ -292,6 +293,9 @@ void CLevel_BossStage::Add_Run_Time_Object()
 		desc.fAppearTime = 0.7f;
 
 		m_pGameInstance->Add_CloneObject(LEVEL_BOSS, TEXT("Layer_System_UI"), TEXT("Prototype_GameObject_UI_System"), &desc);
+		
+		m_pGameInstance->StopSound(SOUND_BGM);
+		m_pGameInstance->PlaySoundW("Stage_Win", SOUND_ETC_1, 1.f, true);
 	}
 }
 

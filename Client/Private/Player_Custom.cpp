@@ -712,11 +712,15 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 
 			m_vJumpDirection = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 			m_fChargingtime = 0.f;
+			m_pGameInstance->PlaySoundW("Jump_Charge_Jump", SOUND_PLAYER_MOVE, 1.f, true);
+			m_pGameInstance->StopSound(SOUND_SKILL_LOOP_3);
+			m_bCharge_Complete = false;
 			return;
 		}
 	}
 	if (m_pGameInstance->Key_Down(DIK_LCONTROL))
 	{
+		m_pGameInstance->PlaySoundW("Jump_Charging", SOUND_SKILL_LOOP_3, 1.f, true);
 	}
 
 	if (m_pGameInstance->Key_Pressing(DIK_LCONTROL, fTimeDelta, &m_fChargingtime))
@@ -724,6 +728,13 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 		if (!m_iJumpState)
 		{
 			m_iState |= PLAYER_STATE_CHAKRAJUMP_LOOP;
+
+			if (m_fChargingtime >= 3.f && !m_bCharge_Complete)
+			{
+				m_bCharge_Complete = true;
+				m_pGameInstance->PlaySoundW("Jump_Charge_Finish", SOUND_PLAYER_MOVE, 1.f, true);
+			}
+
 		}
 		return;
 	}
@@ -1310,6 +1321,8 @@ void CPlayer_Custom::Off_Attack_Collider()
 
 void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 {
+	m_pGameInstance->PlaySoundW("Skill_Pre", SOUND_SKILL, 1.f, true);
+
 	if (strSkillName == L"Skill_Wood_Swap")
 	{
 		m_Skill_Animation_State = SKILL_WOOD_SWAP;
@@ -1326,6 +1339,8 @@ void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 	}
 	else if (strSkillName == L"Skill_FlameBomb")
 	{
+		m_pGameInstance->PlaySoundW("FireBall_Human", SOUND_PLAYER_SKILL, 1.f, true);
+
 		m_pCamera->Set_Camera_radius(2.f);
 
 		m_Skill_Animation_State = SKILL_FLAMEBOMB;
@@ -1362,6 +1377,8 @@ void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 	{
 		if (!m_bOnAir)
 		{
+			m_pGameInstance->PlaySoundW("Wood_Hand_Human", SOUND_PLAYER_SKILL, 1.f, true);
+
 			m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
 			m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
 			m_pCamera->Set_Camera_radius(2.f, 0.07f);
@@ -1381,6 +1398,8 @@ void CPlayer_Custom::Use_Skill(const wstring& strSkillName)
 	{
 		if (!m_bOnAir)
 		{
+			m_pGameInstance->PlaySoundW("Kamui_Human", SOUND_PLAYER_SKILL, 1.f, true);
+
 			m_pCamera->Set_Camera_State(CCamera_Free::CAMERA_FREE);
 			m_pCamera->Set_Camera_Point(&m_MyWorldMat, CCamera_Free::PLAYER_FRONT);
 			m_pCamera->Set_Camera_radius(1.3f, 0.15f);

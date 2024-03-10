@@ -15,7 +15,8 @@ HRESULT CLevel_Logo::Initialize()
 {
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
-
+	m_pGameInstance->StopSound(SOUND_BGM);
+	m_pGameInstance->PlayBGM("BGM_STAGE_Logo", 0.3f);
 	return S_OK;
 }
 
@@ -23,6 +24,8 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 {
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
+		m_pGameInstance->PlaySoundW("Custom_Complete", SOUND_ETC_1, 0.5f, true);
+
 		if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_CUSTOMROOM))))
 			return;
 

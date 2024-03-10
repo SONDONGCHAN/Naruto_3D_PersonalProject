@@ -272,7 +272,7 @@ void CMonster_Samurai::State_Control(_float fTimeDelta)
 			Use_Skill(L"Skill_Wood_Dragon");
 			m_CurrentState = MONSTER_STATE_NINJUTSU;
 			//m_iState |= MONSTER_HANDSEAL;
-			m_fNinjutsu = 20.f;
+			m_fNinjutsu = 25.f;
 			m_iNinjutsuCount = 0;
 			return;
 		}
@@ -816,7 +816,7 @@ void CMonster_Samurai::Collider_Event_Stay(const wstring& strColliderLayerTag, C
 		{
 			if (m_fGetAttack_FrameCount == 0)
 			{
-				m_fGetAttack_FrameCount = 7;
+				m_fGetAttack_FrameCount = 8;
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)
@@ -825,6 +825,7 @@ void CMonster_Samurai::Collider_Event_Stay(const wstring& strColliderLayerTag, C
 				m_fDashSpeed = -3.f;
 				m_fWaitingTime = 0.f;
 				m_CurrentHp -= 10;
+				m_pGameInstance->PlaySoundW("Kamui_Hit", SOUND_SKILL, 0.7f, true);
 
 				_vector vParPos = m_MyPos;
 				vParPos.m128_f32[1] += 0.7f;
@@ -888,6 +889,9 @@ void CMonster_Samurai::Collider_Event_Exit(const wstring& strColliderLayerTag, C
 			m_fDashSpeed = -15.f;
 			m_fWaitingTime = 0.f;
 			m_CurrentHp -= 20;
+
+			m_pGameInstance->PlaySoundW("Kamui_Final", SOUND_SKILL, 1.f, true);
+
 		}
 	}
 }
@@ -1027,6 +1031,7 @@ void CMonster_Samurai::Set_Vitalize()
 {
 	m_bVitalize = true; 
 	m_SmokeParticle->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_pGameInstance->PlaySoundW("Monster_Appear", SOUND_ETC_1, 1.f, true);
 }
 
 HRESULT CMonster_Samurai::Add_Components()

@@ -160,6 +160,7 @@ void CWood_Hand::State_Control(_float fTimeDelta)
 		{
 			if (m_fDurTime < 0.52f)
 			{
+				m_pGameInstance->PlaySoundW("Wood_Hand_Hit", SOUND_SKILL, 1.f, true);
 				m_bHitting = true;
 				m_Effect_ShockWave_Main->Start_Trigger();
 				m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
@@ -177,6 +178,7 @@ void CWood_Hand::Set_Next_State()
 
 	if (myState == STATE_DETECTING)
 	{
+		m_pGameInstance->PlaySoundW("Wood_Hand_Pre", SOUND_SKILL, 1.f, true);
 		m_pTransformCom->Set_Pos(m_vTarget_Pos);	
 		_vector vDir = m_pParentTransform->Get_State(CTransform::STATE_LOOK);
 		m_pTransformCom->Set_Look(vDir);

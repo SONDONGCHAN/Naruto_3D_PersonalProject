@@ -29,7 +29,7 @@ HRESULT CLevel_CustomRoom::Initialize()
         return E_FAIL;
 
     m_pGameInstance->StopSound(SOUND_BGM);
-    m_pGameInstance->PlayBGM("BGM_CustomRoom", 0.3f);
+    m_pGameInstance->PlayBGM("BGM_STAGE_Custom", 0.3f);
 
 
     return S_OK;

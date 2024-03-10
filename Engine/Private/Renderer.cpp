@@ -303,12 +303,12 @@ HRESULT CRenderer::Render_NonLight()
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Effect"))))
         return E_FAIL;
 
-    m_RenderObjects[RENDER_NONLIGHT].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+    m_RenderObjects[RENDER_GLOW].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
         {
             return (pSour)->Get_CamDistance() > (pDest)->Get_CamDistance();
         });
 
-    for (auto& pGameObject : m_RenderObjects[RENDER_NONLIGHT])
+    for (auto& pGameObject : m_RenderObjects[RENDER_GLOW])
     {
         if (nullptr != pGameObject)
             pGameObject->Render();
@@ -404,10 +404,10 @@ HRESULT CRenderer::Render_Bloom()
 
 HRESULT CRenderer::Render_PostProcessing()
 {
-    if (m_RenderObjects[RENDER_NONLIGHT].empty())
+    if (m_RenderObjects[RENDER_GLOW].empty())
         return S_OK;
 
-    m_RenderObjects[RENDER_NONLIGHT].clear();
+    m_RenderObjects[RENDER_GLOW].clear();
 
     /* 사각형을 직교투영으로 화면에 꽉 채워서 그린다. */
     if (FAILED(m_pShader_PostProcessing->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))

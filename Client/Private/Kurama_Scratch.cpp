@@ -167,6 +167,8 @@ void CKurama_Scratch::Set_Next_State()
 
     if (myState == STATE_DETECTING)
     {
+        m_pGameInstance->PlaySoundW("Boss_Scratch", SOUND_SKILL, 1.f, true);
+
         m_Effect_Scratch_Main->Start_Trigger();
 
         m_pColliderMain->Set_Radius(1.f);
@@ -174,7 +176,7 @@ void CKurama_Scratch::Set_Next_State()
 
     else if (myState == STATE_HIT)
     {
-       // m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
+        m_pGameInstance->PlaySoundW("Boss_Scratch_Hit", SOUND_SKILL_2, 1.f, true);
         m_BoomParticles->Trigger(m_pTransformCom->Get_WorldMatrix().r[3]);
         m_pColliderMain->Set_Radius(3.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());

@@ -151,6 +151,7 @@ void CBoss_Naruto::State_Control(_float fTimeDelta)
 	{
 		if (!m_bDeadCheck)
 		{
+			m_pGameInstance->PlaySoundW("Monster_Dead", SOUND_ETC_3, 1.f, true);
 			m_bDeadCheck = true;
 			m_pGameInstance->Kill_Dead_Collider(m_Current_Level,m_pColliderMain);
 			m_pGameInstance->Kill_Dead_Collider(m_Current_Level, m_pColliderAttack);
@@ -971,7 +972,7 @@ void CBoss_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 		{
 			if (m_fGetAttack_FrameCount == 0)
 			{
-				m_fGetAttack_FrameCount = 7;
+				m_fGetAttack_FrameCount = 8;
 				m_CurrentState = MONSTER_STATE_STRUCK;
 				m_iStruckState++;
 				if (m_iStruckState > 2)
@@ -980,6 +981,8 @@ void CBoss_Naruto::Collider_Event_Stay(const wstring& strColliderLayerTag, CColl
 				m_fDashSpeed = -3.f;
 				m_fWaitingTime = 0.f;
 				m_CurrentHp -= 10;
+
+				m_pGameInstance->PlaySoundW("Kamui_Hit", SOUND_SKILL_2, 0.7f, true);
 
 				_vector vParPos = m_MyPos;
 				vParPos.m128_f32[1] += 0.7f;
@@ -1034,6 +1037,8 @@ void CBoss_Naruto::Collider_Event_Exit(const wstring& strColliderLayerTag, CColl
 			vDir.m128_f32[1] = 0.f;
 			m_pTransformCom->Set_Look(vDir);
 
+			m_pGameInstance->PlaySoundW("Kamui_Final", SOUND_SKILL, 1.f, true);
+			
 			m_CurrentState = MONSTER_STATE_STRUCK;
 			m_iState = PLAYER_BEATEN_START;
 			m_fDashSpeed = -15.f;

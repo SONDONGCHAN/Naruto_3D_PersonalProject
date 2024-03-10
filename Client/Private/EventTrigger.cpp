@@ -179,6 +179,7 @@ HRESULT CEventTrigger::Add_Particles()
 void CEventTrigger::Collider_Event_Enter(const wstring& strColliderLayerTag, CCollider* pMyCollider, CCollider* pTargetCollider)
 {
     m_CheckPoint_Particles->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+    m_pGameInstance->PlaySoundW("Check_Point", SOUND_ETC_2, 1.f, true);
 
     if (m_MyDesc.Trigger_Type == TRIGGER_CHECK_POINT_1)
     {
@@ -226,6 +227,7 @@ void CEventTrigger::Collider_Event_Enter(const wstring& strColliderLayerTag, CCo
     else if (m_MyDesc.Trigger_Type == TRIGGER_BOSS)
     {
         m_bUsed = true;
+        m_pGameInstance->StopSound(SOUND_BGM);
         dynamic_cast<CBoss_Kurama*>(m_pGameInstance->Get_GameObject(m_MyDesc.Current_Level, TEXT("Layer_Monster"), 2))->Set_Appear();
     }
 

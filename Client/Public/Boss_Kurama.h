@@ -140,7 +140,7 @@ private:
 
 	_bool				m_bKick_1_Start = false;
 	_bool				m_bKick_2_Start = false;
-
+	_bool				m_bBGM_ON = false;
 private:
 	map<const wstring, class CPartObject*>		m_MonsterParts;
 	map<const wstring, class CSkill*>			m_MonsterSkills;

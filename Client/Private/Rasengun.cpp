@@ -236,11 +236,15 @@ void CRasengun::Set_Next_State()
 
     if (myState == STATE_DETECTING)
     {
+        m_pGameInstance->PlaySoundW("Rasengun_Detect", SOUND_SKILL_LOOP_1, 1.f, true);
         m_pColliderMain->Set_Radius(1.0f);
     }
 
     else if (myState == STATE_HIT)
     {
+        m_pGameInstance->StopSound(SOUND_SKILL_LOOP_1);
+        m_pGameInstance->PlaySoundW("Rasengun_Human", SOUND_SKILL, 1.f, true);
+        m_pGameInstance->PlaySoundW("Rasengun_Hit", SOUND_SKILL, 1.f, true);
         m_Effect_Rasengun_Boom->Start_Trigger();
         m_BoomParticles->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
         m_BoomParticles2->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
@@ -269,7 +273,7 @@ void CRasengun::Set_State()
     myState = STATE_MAKING; 
     m_Effect_Rasengun_Main->Start_Trigger();
     m_Effect_Rasengun_Charge->Start_Trigger();
-
+    m_pGameInstance->PlaySoundW("Rasengun_Pre", SOUND_SKILL_2, 1.f, true);
 }
 
 void CRasengun::Particles_Priority_Tick(_float fTimeDelta)

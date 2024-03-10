@@ -128,6 +128,7 @@ void CWood_Dragon::Set_Next_State()
 
     if (myState == STATE_HIT)
     {
+        m_pGameInstance->PlaySoundW("Wood_Dragon_Fear", SOUND_SKILL, 1.f, true);
         m_pColliderMain->Set_Extents_OBB({1.5f, 1.5f, 8.f});
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_fDurTime = 0;
@@ -148,6 +149,8 @@ void CWood_Dragon::Set_Next_State()
 void CWood_Dragon::Set_State()
 {
     myState = STATE_MAKING;
+    m_pGameInstance->PlaySoundW("Wood_Dragon_Human", SOUND_SKILL, 1.f, true);
+
 }
 
 void CWood_Dragon::RootAnimation()

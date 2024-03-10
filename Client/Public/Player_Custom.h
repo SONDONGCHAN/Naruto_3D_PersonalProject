@@ -92,6 +92,8 @@ private:
 	_vector						m_vJumpDirection = {};
 	_float						m_fJumpSpeed = { 0.f };
 	_float						m_fChargingtime = { 0.f };
+	_bool						m_bCharge_Complete = false;
+
 
 	// ·Ï¿Â
 	CGameObject*				m_pLockOnTarget = { nullptr };

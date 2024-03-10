@@ -232,10 +232,14 @@ void CRasenShuriken::Set_Next_State()
 
     if (myState == STATE_DETECTING)
     {
+        m_pGameInstance->PlaySoundW("Rasengun_Detect", SOUND_SKILL_LOOP_2, 1.f, true);
         m_pColliderMain->Set_Radius(1.f);
     }
     else if (myState == STATE_HIT)
     {
+        m_pGameInstance->StopSound(SOUND_SKILL_LOOP_2);
+        m_pGameInstance->PlaySoundW("RasenShuriken_Loop", SOUND_SKILL_LOOP_2, 1.f, true);
+
         m_pColliderMain->Set_Radius(4.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_fDurTime = 0;
@@ -262,6 +266,7 @@ void CRasenShuriken::Set_Next_State()
     }
     else if (myState == STATE_DISSOLVE)
     {
+        m_pGameInstance->StopSound(SOUND_SKILL_LOOP_2);
         m_DissolveParticles->Trigger(m_pTransformCom->Get_WorldMatrix().r[3]);
 
         m_pColliderMain->Set_Radius(0.f);
@@ -297,6 +302,9 @@ void CRasenShuriken::Set_State()
     m_Effect_RasenShuriken_Main->Start_Trigger();
     m_Effect_RasenShuriken_Wing->Start_Trigger();
     m_Effect_RasenShuriken_Ring->Start_Trigger();
+    m_pGameInstance->PlaySoundW("RasenShuriken_Human", SOUND_SKILL, 1.f, true);
+    m_pGameInstance->PlaySoundW("RasenShuriken_Pre", SOUND_SKILL, 1.f, true);
+
 }
 
 void CRasenShuriken::Set_Targeting(_vector Target_Pos)
