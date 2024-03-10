@@ -31,8 +31,6 @@ struct VS_OUT
 	float2 vTexcoord : TEXCOORD0;
 };
 
-
-
 VS_OUT VS_MAIN(VS_IN In)
 {
 	VS_OUT		Out = (VS_OUT)0;
@@ -68,6 +66,8 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
     vector      vEffect     = g_EffectTexture.Sample(g_LinearSampler, In.vTexcoord);
 	vector		vBlur       = g_BlurTexture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    vEffect.rgb *= 0.7f;
     
     Out.vColor = vBackBuffer + vBlur + vEffect;
   

@@ -51,7 +51,7 @@ void CParticle_Point::Late_Tick(_float fTimeDelta)
 
      if (m_Instance_Desc.MyOption_Texture == CVIBuffer_Instancing::TEXTURE_SPRITE)
      {
-         if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this)))
+         if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
              return;
      }
      else

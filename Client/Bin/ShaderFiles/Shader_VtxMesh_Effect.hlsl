@@ -173,7 +173,7 @@ PS_OUT PS_RASENGUN_MAIN(PS_IN In)
     if (vMtrlDiffuse.r < 0.5)
     {
         vColor.rgb = vRGB - vMtrlDiffuse.rgb;
-        vColor.rgb = vColor.rgb * g_vColor.rgb;
+        vColor.rgb = vColor.rgb * g_vColor.rgb * g_fBrightness;
     }
     else
         vColor.rgb = float3(1.f, 1.f, 1.f);
@@ -227,7 +227,7 @@ PS_OUT PS_RASENGUN_BOOM(PS_IN In)
         discard;
     
 
-    vMtrlDiffuse.rgb = vMtrlDiffuse.rgb * g_vColor.rgb;
+    vMtrlDiffuse.rgb = vMtrlDiffuse.rgb * g_vColor.rgb * g_fBrightness;
     vMtrlDiffuse.a = vMtrlDiffuse.a * g_vColor.a;
     
     Out.vDiffuse = vMtrlDiffuse;
@@ -246,7 +246,7 @@ PS_OUT PS_RASENSHURIKEN_WING(PS_IN In)
 
     float4 vColor;
     
-    vColor= vMtrlDiffuse * g_vColor;   
+    vColor = vMtrlDiffuse * g_vColor * g_fBrightness;
     
     Out.vDiffuse = vColor;
     
@@ -270,7 +270,7 @@ PS_OUT PS_RASENSHURIKEN_END(PS_IN In)
     if (vMtrlDiffuse.r < 0.5)
     {
         vColor.rgb = vRGB - vMtrlDiffuse.rgb;
-        vColor.rgb = vColor.rgb * g_vColor.rgb;
+        vColor.rgb = vColor.rgb * g_vColor.rgb * g_fBrightness;
     }
     else
         vColor.rgb = float3(1.f, 1.f, 1.f);
@@ -333,7 +333,7 @@ PS_OUT PS_RASENGUN_SUPER_MAIN(PS_IN In)
 
     vector vMtrlDiffuse = g_vColor;
     
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse * g_fBrightness;
     
     //Out.vDiffuse = g_vColor;
     return Out;
@@ -349,7 +349,7 @@ PS_OUT PS_RASENGUN_SUPER_MAIN_END(PS_IN In)
     if (vDissolve.r < g_fDiscardColor)
         discard;
     
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse * g_fBrightness;
     
     
     //Out.vDiffuse = g_vColor;
@@ -380,9 +380,9 @@ PS_OUT PS_KURAMA_SCRATCH(PS_IN In)
     if (vMtrlDiffuse.a < 0.3f || vMtrlDiffuse.r < 0.3f )
         discard;
     
-    vMtrlDiffuse *= g_vColor;
+    vMtrlDiffuse *= (g_vColor * g_fBrightness);
     
-    Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vMtrlDiffuse ;
     
 
     return Out;
@@ -430,7 +430,7 @@ PS_OUT PS_CHECKPOINT_MAIN(PS_IN In)
     if (vMtrlDiffuse.a < 0.01)
         discard;
     
-    vMtrlDiffuse *= g_vColor;
+    vMtrlDiffuse *= (g_vColor * g_fBrightness);
     vMtrlDiffuse.a = g_fAlpha * g_vColor.a ;
     
     Out.vDiffuse = vMtrlDiffuse;
@@ -447,9 +447,27 @@ PS_OUT PS_CHECKPOINT_LINE(PS_IN In)
     //if (vMtrlDiffuse.a < 0.1f)
     //    discard;
     
-    Out.vDiffuse.rgb = g_vColor.rgb;
+    Out.vDiffuse.rgb = g_vColor.rgb * g_fBrightness;
     Out.vDiffuse.a = g_fAlpha;
     
+    
+    return Out;
+}
+
+PS_OUT PS_CHIDORI(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(g_LinearSampler, In.vTexcoord);
+
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    float4 vColor;
+    
+    vColor = vMtrlDiffuse * g_vColor * g_fBrightness;
+    
+    Out.vDiffuse = vColor;
     
     return Out;
 }
@@ -678,6 +696,18 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_CHECKPOINT_LINE();
     }
+
+    pass Chidori_Main //20
+    {
+        SetRasterizerState(RS_None_Cull);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlending, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_CHIDORI();
+    }
+
 }
 
 

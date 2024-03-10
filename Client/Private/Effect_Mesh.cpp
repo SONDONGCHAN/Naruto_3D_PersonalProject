@@ -55,8 +55,26 @@ void CEffect_Mesh::Late_Tick(_float fTimeDelta)
 {
 	__super::Late_Tick(fTimeDelta);
 
-	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_GLOW, this)))
-		return;
+	if (m_MyDesc.MyType == EFFECT_SHOCKWAVE ||
+		m_MyDesc.MyType == EFFECT_RASENGUN_CHARGE ||
+		m_MyDesc.MyType == EFFECT_RASENGUN_RUSH ||
+		//m_MyDesc.MyType == EFFECT_RASENSHURIKEN_DECO ||
+		m_MyDesc.MyType == EFFECT_RASENGUNSUPER_NOISE || 
+		//m_MyDesc.MyType == EFFECT_RASENGUNSUPER_DECO ||
+		m_MyDesc.MyType == EFFECT_WOOD_SWAP ||
+		m_MyDesc.MyType == EFFECT_KURAMA_CLAW ||
+		m_MyDesc.MyType == EFFECT_KURAMA_RUSH ||
+		m_MyDesc.MyType == EFFECT_KURAMA_KICK )
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
+			return;
+	}
+
+	else
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_GLOW, this)))
+			return;
+	}
 }
 
 HRESULT CEffect_Mesh::Render()
@@ -84,7 +102,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 
@@ -119,11 +137,11 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 			
-				_float4		vColor = { 1.f, 110.f / 255.f, 0.f, 0.5f };
+				_float4		vColor = { 1.f, 110.f / 255.f, 0.f, 0.7f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 			
@@ -173,7 +191,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 	
-				_float4		vColor = { 13.f/255.f, 154.f/255.f, 1.f, 0.9f };
+				_float4		vColor = { 55.f/255.f, 154.f/255.f, 1.f, 1.f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 	
@@ -181,7 +199,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 	
-				if (FAILED(m_pShaderCom->Begin(1)))
+				if (FAILED(m_pShaderCom->Begin(20)))
 					return E_FAIL;
 	
 				if (FAILED(m_vModels[ModelIndex]->Render(j)))
@@ -253,7 +271,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 		
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.7f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 		
@@ -287,11 +305,11 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 		
-				_float4		vColor = { 121.f/255.f, 237.f/255.f, 1.f, 0.9f };
+				_float4		vColor = { 121.f/255.f, 237.f/255.f, 1.f, 1.f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 		
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 		
@@ -407,7 +425,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.7f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 
@@ -441,11 +459,11 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 	
-				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.9f };
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 1.f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 	
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 	
@@ -479,11 +497,11 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 		
-				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.6f };
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.8f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 		
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 		
@@ -517,11 +535,11 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 
-				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.3f };
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.6f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 
@@ -555,11 +573,11 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 	
-				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.7f };
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 1.f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 	
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 	
@@ -610,8 +628,12 @@ HRESULT CEffect_Mesh::Render()
 				_float4		vColor = { 1.f, 1.f, 1.f, 1.f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
-	
-				m_fBrightness = 1.f;
+				
+				if (m_MyDesc.MyType == EFFECT_RASENSHURIKEN_DECO)
+					m_fBrightness = 0.6f;
+				else
+					m_fBrightness = 1.f;
+
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 	
@@ -659,11 +681,11 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float))))
 					return E_FAIL;
 			
-				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 0.7f };
+				_float4		vColor = { 121.f / 255.f, 237.f / 255.f, 1.f, 1.f };
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 			
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 			
@@ -750,7 +772,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.6f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 
@@ -869,7 +891,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.7f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 
@@ -906,7 +928,7 @@ HRESULT CEffect_Mesh::Render()
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &vColor, sizeof(_float4))))
 					return E_FAIL;
 	
-				m_fBrightness = 1.f;
+				m_fBrightness = 0.7f;
 				if (FAILED(m_pShaderCom->Bind_RawValue("g_fBrightness", &m_fBrightness, sizeof(_float))))
 					return E_FAIL;
 	
@@ -1484,7 +1506,7 @@ HRESULT CEffect_Mesh::Add_Component()
 		m_vTextures.push_back(m_pTexture_Chidori_Mask);
 
 		vCurrentScale = m_MyDesc.vMyScale;
-		m_vUVSpeed = 1.f;
+		m_vUVSpeed = 3.f;
 	}
 
 	else if (m_MyDesc.MyType == EFFECT_SHOCKWAVE)

@@ -532,7 +532,7 @@ HRESULT CRasenShuriken::Add_Particles()
     InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
     InstanceDesc1.vRange = _float3(3.f, 3.f, 3.f);
-    InstanceDesc1.vSize = _float2(0.04f, 0.05f);
+    InstanceDesc1.vSize = _float2(0.06f, 0.08f);
     InstanceDesc1.vSpeed = _float2(1.5f, 2.f);
     InstanceDesc1.vLifeTime = _float2(2.5f, 3.f);
     InstanceDesc1.isLoop = false;

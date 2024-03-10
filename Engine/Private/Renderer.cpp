@@ -165,11 +165,13 @@ HRESULT CRenderer::Render()
         return E_FAIL;
     if (FAILED(Render_Lights()))
         return E_FAIL;
-    if (FAILED(Render_NonLight()))
-         return E_FAIL;
-    if (FAILED(Render_Bloom()))
-        return E_FAIL;
     if (FAILED(Render_Final()))
+        return E_FAIL;
+    if (FAILED(Render_NonLights()))
+        return E_FAIL;
+    if (FAILED(Render_Glow()))
+        return E_FAIL;
+    if (FAILED(Render_Bloom()))
         return E_FAIL;
     if (FAILED(Render_PostProcessing()))
         return E_FAIL;
@@ -266,6 +268,26 @@ HRESULT CRenderer::Render_Lights()
     return S_OK;
 }
 
+HRESULT CRenderer::Render_NonLights()
+{
+    m_RenderObjects[RENDER_NONLIGHT].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+        {
+            return (pSour)->Get_CamDistance() > (pDest)->Get_CamDistance();
+        });
+
+    for (auto& pGameObject : m_RenderObjects[RENDER_NONLIGHT])
+    {
+        if (nullptr != pGameObject)
+            pGameObject->Render();
+
+        Safe_Release(pGameObject);
+    }
+
+    m_RenderObjects[RENDER_NONLIGHT].clear();
+
+    return S_OK;
+}
+
 HRESULT CRenderer::Render_Final()
 {
     /* 사각형을 직교투영으로 화면에 꽉 채워서 그린다. */
@@ -298,7 +320,7 @@ HRESULT CRenderer::Render_Final()
     return S_OK;
 }
 
-HRESULT CRenderer::Render_NonLight()
+HRESULT CRenderer::Render_Glow()
 {
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Effect"))))
         return E_FAIL;
