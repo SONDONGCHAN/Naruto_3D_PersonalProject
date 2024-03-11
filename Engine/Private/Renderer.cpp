@@ -173,6 +173,8 @@ HRESULT CRenderer::Render()
         return E_FAIL;
     if (FAILED(Render_Bloom()))
         return E_FAIL;
+    if (FAILED(Render_Distortion()))
+        return E_FAIL;
     if (FAILED(Render_PostProcessing()))
         return E_FAIL;
     if (FAILED(Render_Blend()))
@@ -181,8 +183,8 @@ HRESULT CRenderer::Render()
         return E_FAIL;
     
 #ifdef _DEBUG
-    if (FAILED(Render_Debug()))
-        return E_FAIL;
+    //if (FAILED(Render_Debug()))
+    //    return E_FAIL;
 #endif // _DEBUG
 
     return S_OK;
@@ -306,11 +308,6 @@ HRESULT CRenderer::Render_Final()
         return E_FAIL;
     if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Specular"), m_pShader_Deferred, "g_SpecularTexture")))
         return E_FAIL;
-    //if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Blur_Y"), m_pShader_Deferred, "g_BlurTexture")))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Effect"), m_pShader_Deferred, "g_EffectTexture")))
-    //    return E_FAIL;
-
 
     m_pShader_Deferred->Begin(3);
 
@@ -424,6 +421,33 @@ HRESULT CRenderer::Render_Bloom()
     return S_OK;
 }
 
+HRESULT CRenderer::Render_Distortion()
+{
+    if (m_RenderObjects[RENDER_DISTORTION].empty())
+        return S_OK;
+
+    else
+    {
+        if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Distortion"))))
+            return E_FAIL;
+
+        for (auto& pGameObject : m_RenderObjects[RENDER_DISTORTION])
+        {
+            if (nullptr != pGameObject)
+                pGameObject->Render();
+
+            Safe_Release(pGameObject);
+        }
+
+        if (FAILED(m_pGameInstance->End_MRT()))
+            return E_FAIL;
+    }
+
+    m_RenderObjects[RENDER_DISTORTION].clear();
+
+    return S_OK;
+}
+
 HRESULT CRenderer::Render_PostProcessing()
 {
     if (m_RenderObjects[RENDER_GLOW].empty())
@@ -444,6 +468,7 @@ HRESULT CRenderer::Render_PostProcessing()
     if (FAILED(m_pShader_PostProcessing->Bind_SRV("g_BackBufferTexture", m_pGameInstance->Get_BackBufferCopySRV())))
         return E_FAIL;
 
+    /* Glow */
     if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Blur_Y"), m_pShader_PostProcessing, "g_BlurTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Effect"), m_pShader_PostProcessing, "g_EffectTexture")))
@@ -454,7 +479,21 @@ HRESULT CRenderer::Render_PostProcessing()
     m_pVIBuffer->Bind_Buffers();
     m_pVIBuffer->Render();
 
+    // =====================================================================================
 
+    m_pGameInstance->Copy_BackBufferTexture();
+    
+    if (FAILED(m_pShader_PostProcessing->Bind_SRV("g_BackBufferTexture", m_pGameInstance->Get_BackBufferCopySRV())))
+        return E_FAIL;
+    
+    /* Distortion */
+    if (FAILED(m_pGameInstance->Bind_SRV(TEXT("Target_Distortion"), m_pShader_PostProcessing, "g_DistortionTexture")))
+        return E_FAIL;
+    
+    m_pShader_PostProcessing->Begin(1);
+    
+    m_pVIBuffer->Bind_Buffers();
+    m_pVIBuffer->Render();
 
     return S_OK;
 }
@@ -471,6 +510,7 @@ HRESULT CRenderer::Render_Debug()
     m_pGameInstance->Render_MRT(TEXT("MRT_LightAcc"), m_pShader_Deferred, m_pVIBuffer);
     m_pGameInstance->Render_MRT(TEXT("MRT_Effect"), m_pShader_Deferred, m_pVIBuffer);
     m_pGameInstance->Render_MRT(TEXT("MRT_Blur_Y"), m_pShader_Deferred, m_pVIBuffer);
+    m_pGameInstance->Render_MRT(TEXT("MRT_Distortion"), m_pShader_Deferred, m_pVIBuffer);
 
     for (auto& pComponent : m_DebugCom)
     {

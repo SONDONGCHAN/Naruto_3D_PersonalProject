@@ -17,6 +17,7 @@ texture2D   g_SpecularTexture;
 
 texture2D   g_EffectTexture;
 texture2D   g_BlurTexture;
+texture2D   g_DistortionTexture;
 texture2D   g_BackBufferTexture;
 
 struct VS_IN
@@ -69,7 +70,32 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     
     vEffect.rgb *= 0.7f;
     
-    Out.vColor = vBackBuffer + vBlur + vEffect;
+    float4 vColor = vBackBuffer + vBlur + vEffect;
+
+    Out.vColor = vColor;
+  
+    return Out;
+}
+
+PS_OUT PS_DISTORTION(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vBackBuffer = g_BackBufferTexture.Sample(g_LinearSampler, In.vTexcoord);
+   
+    vector vDistortion = g_DistortionTexture.Sample(g_LinearSampler, In.vTexcoord);
+    
+    if (vDistortion.r > 0)
+    {
+        float2 vNoisedUVs;
+        vNoisedUVs = In.vTexcoord + vDistortion.r;
+        
+        In.vTexcoord = lerp(In.vTexcoord, vNoisedUVs, 10.f / 100.f);
+
+        vBackBuffer = g_BackBufferTexture.Sample(g_LinearSampler, In.vTexcoord);
+    }
+    
+    Out.vColor = vBackBuffer;
   
     return Out;
 }
@@ -86,5 +112,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_FINAL();
+    }
+
+    pass Distortion
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None_ZTestAndWrite, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DISTORTION();
     }
 }

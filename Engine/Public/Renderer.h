@@ -6,7 +6,7 @@ BEGIN(Engine)
 class CRenderer final : public CBase
 {
 public: 
-	enum RENDERGROUP{ RENDER_PRIORITY, RENDER_NONBLEND, RENDER_NONLIGHT, RENDER_GLOW, RENDER_BLEND, RENDER_UI, RENDER_END };
+	enum RENDERGROUP{ RENDER_PRIORITY, RENDER_NONBLEND, RENDER_NONLIGHT, RENDER_GLOW, RENDER_DISTORTION, RENDER_BLEND, RENDER_UI, RENDER_END };
 
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -51,9 +51,10 @@ private:
 	HRESULT Render_NonLights();
 	HRESULT Render_Final();
 	HRESULT Render_Glow();
+	HRESULT Render_Bloom();
+	HRESULT Render_Distortion();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
-	HRESULT Render_Bloom();
 	HRESULT Render_PostProcessing();
 
 

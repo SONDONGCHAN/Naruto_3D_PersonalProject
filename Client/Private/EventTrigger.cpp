@@ -161,7 +161,7 @@ HRESULT CEventTrigger::Add_Particles()
     InstanceDesc1.vLifeTime = _float2(2.f, 2.5f);
     InstanceDesc1.isLoop = false;
     InstanceDesc1.vColor = _float4(80.f/255.f, 180.f/255.f, 1.f, 0.7f);
-    InstanceDesc1.fDuration = 3.1f;
+    InstanceDesc1.fDuration = 2.6f;
     InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
     InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_RECTANGLE;
     InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;

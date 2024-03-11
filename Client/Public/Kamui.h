@@ -44,7 +44,7 @@ public:
 
 private:
 	CCollider*		m_pColliderMain = { nullptr };
-	CEffect_Mesh*	m_Effect_Kamui_Boom= { nullptr };
+	CEffect_Mesh*	m_Effect_Kamui_Boom = { nullptr };
 	CEffect_Mesh*	m_Effect_Kamui_ShockWave = { nullptr };
 
 private:

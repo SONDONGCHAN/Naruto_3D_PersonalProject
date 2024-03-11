@@ -79,6 +79,8 @@ HRESULT CPlayer_Custom::Initialize_Prototype()
 		 if (FAILED(Add_Particles()))
 			 return E_FAIL;
 
+		 if (FAILED(Add_Effects()))
+			 return E_FAIL;
 
 		 m_pTransformCom->Go_Straight(0.01f, m_pNavigationCom, m_bOnAir, &m_bCellisLand);
 		 m_bCustom_Mode = false;
@@ -721,6 +723,7 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 	if (m_pGameInstance->Key_Down(DIK_LCONTROL))
 	{
 		m_pGameInstance->PlaySoundW("Jump_Charging", SOUND_SKILL_LOOP_3, 1.f, true);
+		m_Effect_ChargingLine->Start_Trigger();
 	}
 
 	if (m_pGameInstance->Key_Pressing(DIK_LCONTROL, fTimeDelta, &m_fChargingtime))
@@ -729,8 +732,19 @@ void CPlayer_Custom::Key_Input(_float fTimeDelta)
 		{
 			m_iState |= PLAYER_STATE_CHAKRAJUMP_LOOP;
 
+			_matrix cMat = m_pTransformCom->Get_WorldMatrix();
+			_vector cLook = cMat.r[2];
+			cMat.r[3] += cLook*0.5f;
+			_matrix SpinMatrix = XMMatrixRotationX(XMConvertToRadians(45.f));
+			cMat = SpinMatrix* cMat;
+			m_Effect_ChargingLine->State_Tick(cMat);
+			m_Effect_ChargingLine->Tick(fTimeDelta);
+			m_Effect_ChargingLine->Scale_Change(fTimeDelta);
+			m_Effect_ChargingLine->Late_Tick(fTimeDelta);
+
 			if (m_fChargingtime >= 3.f && !m_bCharge_Complete)
 			{
+				m_Particle_Charged->Trigger(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				m_bCharge_Complete = true;
 				m_pGameInstance->PlaySoundW("Jump_Charge_Finish", SOUND_PLAYER_MOVE, 1.f, true);
 			}
@@ -1435,6 +1449,7 @@ _bool CPlayer_Custom::Skill_State(_float fTimeDelta)
 			m_pCamera->Set_Camera_radius();
 			m_Skill_Animation_State = SKILL_END;
 			m_bInvincible = false;
+			dynamic_cast<CKamui*>(m_PlayerSkills.find(L"Skill_Kamui")->second)->Set_Next_State();
 			m_bSkillOn[SKILL_KAMUI] = false;
 
 			return false;
@@ -1598,7 +1613,7 @@ void CPlayer_Custom::Skill_Tick(_float fTimeDelta)
 
 				
 				_vector KamuiDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-				_vector vKamuiPos = m_MyPos + (XMVector3Normalize(KamuiDir) * 7.f);
+				_vector vKamuiPos = m_MyPos + (XMVector3Normalize(KamuiDir) * 1.f);
 				vKamuiPos.m128_f32[1] += 0.7f;
 				pKamui->Set_Targeting(vKamuiPos);
 				//if (m_LockOnTargetLength < 99999.f)
@@ -1740,6 +1755,8 @@ void CPlayer_Custom::Particles_Priority_Tick(_float fTimeDelta)
 	for (auto pParticle : m_BasicParticles)
 		pParticle->Priority_Tick(fTimeDelta);	
 
+	m_Particle_Charged->Priority_Tick(fTimeDelta);
+
 	m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Priority_Tick(fTimeDelta);
 	m_PlayerSkills.find(L"Skill_FlameBomb")->second->Particles_Priority_Tick(fTimeDelta);
 	m_PlayerSkills.find(L"Skill_Kamui")->second->Particles_Priority_Tick(fTimeDelta);
@@ -1752,6 +1769,8 @@ void CPlayer_Custom::Particles_Tick(_float fTimeDelta)
 	for (auto pParticle : m_BasicParticles)
 		pParticle->Tick(fTimeDelta);
 
+	m_Particle_Charged->Tick(fTimeDelta);
+
 	m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Tick(fTimeDelta);
 	m_PlayerSkills.find(L"Skill_FlameBomb")->second->Particles_Tick(fTimeDelta);
 	m_PlayerSkills.find(L"Skill_Kamui")->second->Particles_Tick(fTimeDelta);
@@ -1763,6 +1782,8 @@ void CPlayer_Custom::Particles_Late_Tick(_float fTimeDelta)
 {
 	for (auto pParticle : m_BasicParticles)
 		pParticle->Late_Tick(fTimeDelta);
+
+	m_Particle_Charged->Late_Tick(fTimeDelta);
 
 	m_PlayerSkills.find(L"Skill_Wood_Swap")->second->Particles_Late_Tick(fTimeDelta);
 	m_PlayerSkills.find(L"Skill_FlameBomb")->second->Particles_Late_Tick(fTimeDelta);
@@ -2118,6 +2139,44 @@ HRESULT CPlayer_Custom::Add_Particles()
 	return S_OK;
 }
 
+HRESULT CPlayer_Custom::Add_Effects()
+{
+	CEffect_Mesh::EFFECT_DESC Effect_Desc_1{};
+	Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_CHARGING_LINE;
+	Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_Y;
+	Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
+	Effect_Desc_1.vMyScale = _vector{ 6.f, 200.f, 6.f, 1.f };
+	m_Effect_ChargingLine = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
+	if (nullptr == m_Effect_ChargingLine)
+		return E_FAIL;
+
+	CVIBuffer_Instancing::INSTANCE_DESC  InstanceDesc1{};
+	InstanceDesc1.iNumInstance = 200;
+	InstanceDesc1.vPivot = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.vCenter = _float3(0.f, 0.f, 0.f);
+	InstanceDesc1.vRange = _float3(0.2, 0.2f, 0.2f);
+	InstanceDesc1.vSize = _float2(0.04f, 0.05f);
+	InstanceDesc1.vSpeed = _float2(2.f, 2.5f);
+	InstanceDesc1.vLifeTime = _float2(2.f, 2.5f);
+	InstanceDesc1.isLoop = false;
+	InstanceDesc1.vColor = _float4(80.f / 255.f, 180.f / 255.f, 1.f, 0.7f);
+	InstanceDesc1.fDuration = 2.6f;
+	InstanceDesc1.MyOption_Moving = CVIBuffer_Instancing::OPTION_SPREAD;
+	InstanceDesc1.MyOption_Shape = CVIBuffer_Instancing::SHAPE_RECTANGLE;
+	InstanceDesc1.MyOption_Texture = CVIBuffer_Instancing::TEXTURE_NONE_SPRITE;
+	InstanceDesc1.MyOption_Size = CVIBuffer_Instancing::SIZE_DIMINISH;
+	InstanceDesc1.strTextureTag = L"Prototype_Component_Texture_Circle_Noise";
+	InstanceDesc1.vSpriteRatio = _float2(1.f, 1.f);
+
+	m_Particle_Charged = dynamic_cast<CParticle_Point*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle_Point"), &InstanceDesc1));
+	if (nullptr == m_Particle_Charged)
+		return E_FAIL;
+
+
+
+	return S_OK;
+}
+
 HRESULT CPlayer_Custom::Add_CustomUI()
 {
 	CUI_Player_Custom::UI_Player_Custom_DESC UI_Custom_Desc{};
@@ -2201,7 +2260,9 @@ void CPlayer_Custom::Free()
 	Safe_Release(m_pColliderMain);
 	Safe_Release(m_pColliderDetecting);
 	Safe_Release(m_pColliderAttack);
-	
+	Safe_Release(m_Effect_ChargingLine);
+	Safe_Release(m_Particle_Charged);
+
 	//if(m_pLockOnTarget != nullptr)
 		//Safe_Release(m_pLockOnTarget);
 

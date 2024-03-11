@@ -69,12 +69,30 @@ void CEffect_Mesh::Late_Tick(_float fTimeDelta)
 		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this)))
 			return;
 	}
-
+	else if (m_MyDesc.MyType == EFFECT_KAMUI ||
+		m_MyDesc.MyType == EFFECT_KAMUI_SHOCK)
+	{
+		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DISTORTION, this)))
+			return;
+	}
 	else
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_GLOW, this)))
 			return;
 	}
+
+
+	//if 	(m_MyDesc.MyType == EFFECT_RASENGUNSUPER_MAIN)
+	//{
+	//	if (FAILED(m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DISTORTION, this)))
+	//		return;
+	//}
+
+
+
+
+
+
 }
 
 HRESULT CEffect_Mesh::Render()
@@ -245,7 +263,7 @@ HRESULT CEffect_Mesh::Render()
 			}
 		}
 	}
-	else if (m_MyDesc.MyType == EFFECT_KAMUI)
+	else if (m_MyDesc.MyType == EFFECT_KAMUI || m_MyDesc.MyType == EFFECT_KAMUI_SHOCK)
 	{
 		for (_uint i = 0; i < m_vModels.size(); i++)
 		{
@@ -904,7 +922,7 @@ HRESULT CEffect_Mesh::Render()
 		}
 	}
 
-	else if (m_MyDesc.MyType == EFFECT_LINE)
+	else if (m_MyDesc.MyType == EFFECT_LINE || m_MyDesc.MyType == EFFECT_CHARGING_LINE)
 	{
 		for (_uint i = 0; i < m_vModels.size(); i++)
 		{
@@ -1075,6 +1093,11 @@ void CEffect_Mesh::Start_Trigger()
 		m_ScalingRatio = 1.f;
 		vCurrentScale = m_MyDesc.vMyScale;
 	}
+	else if (EFFECT_KAMUI_SHOCK == m_MyDesc.MyType)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
+	}
 	else if (EFFECT_RASENGUN_MAIN == m_MyDesc.MyType)
 	{
 		m_ScalingRatio = 0.f;
@@ -1131,6 +1154,11 @@ void CEffect_Mesh::Start_Trigger()
 		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
 		m_fAlpha = 1.f;
 		m_vUVMovement.x = -0.4f;
+	}
+	else if (m_MyDesc.MyType == EFFECT_CHARGING_LINE)
+	{
+		m_ScalingRatio = 0.f;
+		vCurrentScale = _vector{ 0.f, 0.f, 0.f, 1.f };
 	}
 }
 
@@ -1191,9 +1219,28 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 			else
 				m_ScalingRatio = 0.f;
 
+			_float fScalingRatio = m_ScalingRatio * 2.f;
+
+			if (fScalingRatio > 1.f)
+				fScalingRatio = 1.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, fScalingRatio);
+		}
+	}
+	else if (EFFECT_KAMUI_SHOCK == m_MyDesc.MyType)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+
 			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
 		}
 	}
+
+	
 	else if (EFFECT_RASENGUN_MAIN == m_MyDesc.MyType)
 	{
 		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
@@ -1390,6 +1437,20 @@ void CEffect_Mesh::Scale_Change(_float fTimeDelta)
 			m_MyDesc.vMyScale	*= 0.f;
 		}
 	}
+	else if (m_MyDesc.MyType == EFFECT_CHARGING_LINE)
+	{
+		if (vCurrentScale.m128_f32[0] < m_MyDesc.vMyScale.m128_f32[0])
+		{
+			if (m_ScalingRatio <= 1.f)
+				m_ScalingRatio += m_ScalingSpeed * fTimeDelta;
+			else
+				m_ScalingRatio = 1.f;
+
+			vCurrentScale = m_MyDesc.vMyScale * Lerp(0.f, 1.f, m_ScalingRatio);
+		}
+	}
+
+	
 }
 
 _float CEffect_Mesh::Lerp(_float start, _float end, _float ratio)
@@ -1540,8 +1601,29 @@ HRESULT CEffect_Mesh::Add_Component()
 
 		m_ScalingSpeed = 2.f;
 		vCurrentScale = m_MyDesc.vMyScale;
-		m_vUVSpeed = 2.f;
+		m_vUVSpeed = 5.f;
 	}
+
+	else if (m_MyDesc.MyType == EFFECT_KAMUI_SHOCK)
+	{
+		CModel* m_pModel_Kamui_Shock;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Rasengun_Boom"),
+			TEXT("Com_Model_Kamui_Shock"), reinterpret_cast<CComponent**>(&m_pModel_Kamui_Shock))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_Kamui_Shock);
+	
+		CTexture* m_pTexture_Kamui_Shock;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Rasengun_Boom"),
+			TEXT("Com_Texture_Kamui_Shock"), reinterpret_cast<CComponent**>(&m_pTexture_Kamui_Shock))))
+			return E_FAIL;
+		m_vTextures.push_back(m_pTexture_Kamui_Shock);
+	
+		m_ScalingSpeed = 3.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 0.f;
+	}
+
+	
 
 	else if (m_MyDesc.MyType == EFFECT_RASENGUN_MAIN)
 	{
@@ -1906,6 +1988,21 @@ HRESULT CEffect_Mesh::Add_Component()
 		m_vUVSpeed = 0.0f;
 		m_fSpinSpeed = 0.f;
 	}
+	else if (m_MyDesc.MyType == EFFECT_CHARGING_LINE)
+	{
+		CModel* m_pModel_ChargingLine;
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Line"),
+			TEXT("Com_Model_ChargingLine"), reinterpret_cast<CComponent**>(&m_pModel_ChargingLine))))
+			return E_FAIL;
+		m_vModels.push_back(m_pModel_ChargingLine);
+	
+		m_ScalingSpeed = 1.f;
+		vCurrentScale = m_MyDesc.vMyScale;
+		m_vUVSpeed = 1.f;
+		m_fSpinSpeed = 0.f;
+	}
+
+	
 	
 	return S_OK;
 }

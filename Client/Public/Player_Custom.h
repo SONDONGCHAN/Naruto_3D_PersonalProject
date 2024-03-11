@@ -2,6 +2,8 @@
 
 #include "Client_Defines.h"
 #include "LandObject.h"
+#include "Effect_Mesh.h"
+#include "Particle_Point.h"
 
 BEGIN(Client)
 
@@ -136,6 +138,8 @@ private:
 	//map<const wstring, vector<class CParticle_Point*> >	m_ParticleClip;
 	vector<class CParticle_Point*>	m_BasicParticles;
 
+	CEffect_Mesh* m_Effect_ChargingLine	= { nullptr };
+	CParticle_Point* m_Particle_Charged = { nullptr };
 
 	CUI* m_Player_Custom_UI = {nullptr};
 
@@ -147,7 +151,7 @@ private:
 	HRESULT Add_Trails();
 	HRESULT Add_UIs();
 	HRESULT Add_Particles();
-
+	HRESULT Add_Effects();
 
 	HRESULT Add_CustomUI();
 

@@ -38,10 +38,15 @@ void CKamui::Tick(_float fTimeDelta)
     State_Control(fTimeDelta);
     m_Effect_Kamui_Boom->State_Tick(m_pTransformCom->Get_WorldMatrix());
     m_Effect_Kamui_Boom->Tick(fTimeDelta);
-
+    m_Effect_Kamui_ShockWave->State_Tick(m_pTransformCom->Get_WorldMatrix());
+    m_Effect_Kamui_ShockWave->Tick(fTimeDelta);
     if (myState == STATE_HIT)
     {
         m_Effect_Kamui_Boom->Scale_Change(fTimeDelta);
+    }
+    else if (myState == STATE_FINISH)
+    {
+        m_Effect_Kamui_ShockWave->Scale_Change(fTimeDelta);
     }
 }
 
@@ -54,6 +59,10 @@ void CKamui::Late_Tick(_float fTimeDelta)
         m_pGameInstance->Add_DebugComponent(m_pColliderMain);
 #endif  
 
+    }
+    else if (myState == STATE_FINISH)
+    {
+        m_Effect_Kamui_ShockWave->Late_Tick(fTimeDelta);
     }
 }
 
@@ -84,7 +93,7 @@ void CKamui::State_Control(_float fTimeDelta)
     {
         m_fDurTime += fTimeDelta;
     
-        if (m_bTargeting)
+        if (m_bTargeting && m_fDurTime < 0.8f)
         {
             m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
             m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Kamui_Collider");
@@ -114,12 +123,19 @@ void CKamui::Set_Next_State()
     }
     else if (myState == STATE_FINISH)
     {
+        m_Effect_Kamui_ShockWave->Start_Trigger();
         m_pCamera->ShakeCamera(CCamera_Free::SHAKE_ALL, 3.f, 0.1f);
         m_pColliderMain->Set_Radius(0.f);
         m_pColliderMain->Tick(m_pTransformCom->Get_WorldMatrix());
         m_pGameInstance->Check_Collision_For_TargetEvent(m_Current_Level, m_pColliderMain, L"Monster_Main_Collider", L"Kamui_Collider");
         m_fDurTime = 0;
         m_bTargeting = false;
+    }
+    else if (myState == STATE_END)
+    {
+        m_Effect_Kamui_ShockWave->Start_Trigger();
+        m_Effect_Kamui_ShockWave->State_Tick(m_pTransformCom->Get_WorldMatrix());
+        m_Effect_Kamui_ShockWave->Late_Tick(1.f / 60.f);
     }
 }
 
@@ -154,7 +170,7 @@ HRESULT CKamui::Add_Components()
 
     CBounding_Sphere::SPHERE_DESC		BoundingDesc{};
     BoundingDesc.fRadius = 0.f;
-    BoundingDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    BoundingDesc.vCenter = _float3(0.f, 0.f, 6.5f);
     if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
         TEXT("Com_Collider_Main"), reinterpret_cast<CComponent**>(&m_pColliderMain), &BoundingDesc)))
         return E_FAIL;
@@ -170,7 +186,7 @@ HRESULT CKamui::Add_Effects()
     Effect_Desc_1.MyType = CEffect_Mesh::EFFECT_KAMUI;
     Effect_Desc_1.MyUVOption = CEffect_Mesh::MOVE_X;
     Effect_Desc_1.MySpinOption = CEffect_Mesh::SPIN_NONE;
-    Effect_Desc_1.vMyScale = _vector{ 30.f, 30.f, 30.f, 1.f };
+    Effect_Desc_1.vMyScale = _vector{ 25.f, 25.f, 5.f, 1.f };
     m_Effect_Kamui_Boom = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_1));
     if (nullptr == m_Effect_Kamui_Boom)
         return E_FAIL;
@@ -179,7 +195,7 @@ HRESULT CKamui::Add_Effects()
     Effect_Desc_2.MyType = CEffect_Mesh::EFFECT_KAMUI_SHOCK;
     Effect_Desc_2.MyUVOption = CEffect_Mesh::MOVE_END;
     Effect_Desc_2.MySpinOption = CEffect_Mesh::SPIN_NONE;
-    Effect_Desc_2.vMyScale = _vector{ 1.f, 1.f, 1.f, 1.f };
+    Effect_Desc_2.vMyScale = _vector{ 20.f, 20.f, 3.f, 1.f };
     m_Effect_Kamui_ShockWave = dynamic_cast<CEffect_Mesh*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Effect_Mesh"), &Effect_Desc_2));
     if (nullptr == m_Effect_Kamui_ShockWave)
         return E_FAIL;

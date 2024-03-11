@@ -71,12 +71,12 @@ HRESULT CMainApp::Render()
 
 	if (m_fTimeAcc >= 1.f)
 	{
-		wsprintf(m_szFPS, TEXT("FPS:%d"), m_iNumRender);
+		//wsprintf(m_szFPS, TEXT("FPS:%d"), m_iNumRender);
+		wsprintf(m_szFPS, TEXT(""));
 
 		m_iNumRender = 0;
 		m_fTimeAcc = 0.f;
 	}
-
 
 	if (FAILED(m_pGameInstance->Render_Font(TEXT("Font_Maple"), m_szFPS, _float2(0.f, 0.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), ORIGIN_LEFT_TOP, 0.f, 0.5f)))
 		return E_FAIL;

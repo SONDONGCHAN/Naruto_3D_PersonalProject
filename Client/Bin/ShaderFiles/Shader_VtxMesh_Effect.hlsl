@@ -146,14 +146,8 @@ PS_OUT PS_KAMUI(PS_IN In)
 
     if (vMtrlDiffuse.a < 0.2f)
         discard;
-
-    float4 vColor;
-    float3 vRGB = float3(1.f, 1.f, 1.f);
     
-    vColor.rgb = vRGB - vMtrlDiffuse.rgb;
-    vColor.a = vMtrlDiffuse.a * g_fAlpha ;
-    
-    Out.vDiffuse = vColor;
+    Out.vDiffuse = vMtrlDiffuse;
     
     return Out;
 }
